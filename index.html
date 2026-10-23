@@ -1,0 +1,1108 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="robots" content="noindex,nofollow"><meta name="apple-mobile-web-app-title" content="VHF"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#0e2233"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"></head><body><title>VHF Pocket Handbook</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: phone-first reference app — sticky header with search, four tabs in a bottom bar,
+   emergency scripts open as full-screen sheets with large type. Night mode = red-on-black for the helm. */
+:root{
+  --bg:#f3f6f8; --surface:#ffffff; --ink:#0e2233; --muted:#55687a; --line:#d5dee6; --soft:#e8eef3;
+  --accent:#1b5b8c; --accent-ink:#ffffff;
+  --mayday:#c3102b; --mayday-soft:#fbe7ea; --pan:#b86a00; --pan-soft:#fbf0de; --sec:#17765a; --sec-soft:#e1f2eb;
+  --hl:#fff3b0; --hl-ink:#3a2c00;
+  --f-body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0a131b; --surface:#112131; --ink:#e4edf4; --muted:#93a6b7; --line:#21374b; --soft:#18293a;
+  --accent:#73b4ea; --accent-ink:#06121d;
+  --mayday:#ff5d66; --mayday-soft:#3a1419; --pan:#f3aa3d; --pan-soft:#35260d; --sec:#4fc79d; --sec-soft:#0f3026;
+  --hl:#4a3f0c; --hl-ink:#fff1b3; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0a131b; --surface:#112131; --ink:#e4edf4; --muted:#93a6b7; --line:#21374b; --soft:#18293a;
+  --accent:#73b4ea; --accent-ink:#06121d;
+  --mayday:#ff5d66; --mayday-soft:#3a1419; --pan:#f3aa3d; --pan-soft:#35260d; --sec:#4fc79d; --sec-soft:#0f3026;
+  --hl:#4a3f0c; --hl-ink:#fff1b3; color-scheme:dark}
+:root.night{
+  --bg:#000000; --surface:#0c0202; --ink:#e04444; --muted:#a02c2c; --line:#3a0c0c; --soft:#1a0505;
+  --accent:#e04444; --accent-ink:#000000;
+  --mayday:#ff3b3b; --mayday-soft:#2a0606; --pan:#d84a2a; --pan-soft:#220804; --sec:#c24040; --sec-soft:#1d0606;
+  --hl:#3d0a0a; --hl-ink:#ff6a6a; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+:root:not(.js) .js-only{display:none!important}
+:root.js .nojs-only{display:none!important}
+a.card,a.bigbtn{text-decoration:none}
+a.card{color:var(--ink)}
+nav.tabs a{text-decoration:none;padding:10px 4px 12px;display:grid;justify-items:center;gap:2px;color:var(--muted);font-size:13px;font-weight:700}
+nav.tabs a svg{width:22px;height:22px}
+nav.tabs a[aria-current="page"]{color:var(--accent)}
+nav.tabs a.t-em[aria-current="page"]{color:var(--mayday)}
+.static-sheet{border-top:6px solid var(--k);padding-top:12px;display:grid;gap:12px}
+.view,.sec,.static-sheet{scroll-margin-top:76px}
+.static-sheet>h2{color:var(--k);font-size:24px;letter-spacing:.04em}
+:root{padding-top:env(safe-area-inset-top,0px)}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.55;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+a{color:var(--accent)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+h1,h2,h3,h4{text-wrap:balance;line-height:1.2;margin:0}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
+.top-row{display:flex;align-items:center;gap:10px;max-width:760px;margin:0 auto}
+.brand{display:flex;align-items:baseline;gap:8px;flex:0 0 auto}
+.brand b{font-size:17px;letter-spacing:.01em}
+.brand span{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.search{flex:1;min-width:0;position:relative}
+.search input{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:8px 14px;font-size:16px}
+.iconbtn{flex:0 0 auto;border:1px solid var(--line);background:var(--bg);border-radius:999px;height:40px;min-width:40px;padding:0 12px;cursor:pointer;font-size:13px;font-weight:700;letter-spacing:.04em}
+.iconbtn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+#results{max-width:760px;margin:8px auto 0;display:grid;grid-template-columns:minmax(0,1fr);gap:6px;max-height:60vh;overflow-y:auto}
+#results button{min-width:0}
+#results button{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:8px 12px;cursor:pointer}
+#results small{display:block;color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* main */
+main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px calc(96px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:760px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.view{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.panel,.view>*{min-width:0}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.lead{color:var(--muted);margin:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.panel>h2{font-size:20px;margin-bottom:8px}
+.panel p{margin:.4em 0}
+ul,ol{padding-left:1.25em;margin:.4em 0}
+li{margin:.2em 0}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.08em;border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:0 5px;vertical-align:2px;margin-left:4px}
+.note{border-left:4px solid var(--accent);background:var(--soft);padding:10px 12px;border-radius:0 8px 8px 0;margin:.6em 0}
+.warn{border-left-color:var(--mayday);background:var(--mayday-soft)}
+
+/* emergency */
+.sos{display:grid;gap:12px}
+.bigbtn{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 12px;width:100%;text-align:left;border:0;border-radius:var(--r);padding:16px 18px;cursor:pointer;color:#fff}
+.bigbtn b{font-size:28px;letter-spacing:.06em;line-height:1.1}
+.bigbtn span{grid-column:1;font-size:15px;opacity:.95}
+.bigbtn i{grid-row:1/span 2;grid-column:2;font-style:normal;font-size:28px}
+.b-mayday{background:var(--mayday)}
+:root.night .bigbtn{color:#000}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]):not(.night) .bigbtn{color:#14070a}}
+:root[data-theme="dark"]:not(.night) .bigbtn{color:#14070a}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:420px){.grid2{grid-template-columns:1fr}}
+.card{display:flex;flex-direction:column;gap:2px;text-align:left;border:1px solid var(--line);border-left:6px solid var(--k,var(--accent));background:var(--surface);border-radius:var(--r);padding:12px 14px;cursor:pointer;min-width:0}
+.card b{font-size:18px}
+.card span{font-size:14px;color:var(--muted)}
+.k-mayday{--k:var(--mayday)} .k-pan{--k:var(--pan)} .k-sec{--k:var(--sec)}
+.ch-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ch{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center}
+.ch b{display:block;font-family:var(--f-mono);font-size:24px}
+.ch span{font-size:12px;color:var(--muted);line-height:1.2;display:block}
+
+/* boat form */
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.form label{display:grid;gap:4px;font-size:13px;font-weight:700;color:var(--muted);min-width:0}
+.form .full{grid-column:1/-1}
+.form input,.form select,.form textarea{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:9px 10px;font-size:16px;font-weight:400;color:var(--ink)}
+@media (max-width:420px){.form{grid-template-columns:1fr}}
+.saved{font-size:13px;color:var(--sec);min-height:1.2em}
+
+/* sheet */
+.sheet{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.sheet-head{position:sticky;top:0;z-index:2;background:var(--k,var(--accent));color:#fff;
+  padding-top:calc(10px + env(safe-area-inset-top,0px));padding-bottom:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+:root.night .sheet-head{color:#000}
+.sheet-head .row{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.sheet-head h2{font-size:22px;letter-spacing:.04em;flex:1}
+.sheet-head button{border:2px solid currentColor;background:transparent;color:inherit;border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer}
+.sheet-body{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px calc(40px + env(safe-area-inset-bottom,0px))}
+.sheet-body .wrap{gap:14px}
+.steps{list-style:none;padding:0;margin:0;display:grid;gap:8px;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:0}
+.steps li::before{content:counter(s);font-family:var(--f-mono);font-weight:600;background:var(--k,var(--accent));color:var(--bg);border-radius:50%;width:28px;height:28px;display:grid;place-items:center;font-size:14px}
+.script{background:var(--surface);border:2px solid var(--k,var(--accent));border-radius:var(--r);padding:16px 18px;font-size:21px;line-height:1.45}
+.script p{margin:0 0 .55em}
+.script p:last-child{margin:0}
+.script .pw{font-weight:700;letter-spacing:.03em}
+.script .lbl{display:inline-block;font-family:var(--f-mono);font-size:13px;font-weight:600;color:var(--k,var(--accent));width:1.6em}
+.fill{background:var(--hl);color:var(--hl-ink);border-radius:4px;padding:0 4px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.empty{font-style:italic}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:15px}
+.chips button[aria-pressed="true"]{background:var(--k,var(--accent));border-color:var(--k,var(--accent));color:var(--bg);font-weight:700}
+.quick{display:grid;gap:10px}
+.quick label{display:grid;gap:4px;font-size:13px;font-weight:700;color:var(--muted)}
+.quick input{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px;font-size:17px;width:100%}
+
+/* reference tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--soft);position:sticky;top:0}
+tr:last-child td{border-bottom:0}
+td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.hot td{background:var(--mayday-soft)}
+.phon{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
+.phon div{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;display:flex;gap:10px;align-items:baseline}
+.phon b{font-family:var(--f-mono);font-size:20px;width:1.1em}
+.dl{display:grid;grid-template-columns:minmax(110px,32%) 1fr;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.dl dt,.dl dd{margin:0;padding:8px 10px;border-bottom:1px solid var(--line)}
+.dl dt{font-weight:700;background:var(--soft)}
+.dl dt:nth-last-of-type(1),.dl dd:last-child{border-bottom:0}
+.filter{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.filter button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:14px}
+.filter button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+/* study */
+details.ch-d{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+details.ch-d>summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;gap:12px;align-items:baseline}
+details.ch-d>summary::-webkit-details-marker{display:none}
+details.ch-d>summary .no{font-family:var(--f-mono);font-weight:600;color:var(--accent);min-width:1.6em}
+details.ch-d>summary h3{font-size:18px;flex:1}
+details.ch-d>summary::after{content:"+";font-family:var(--f-mono);font-size:20px;color:var(--muted)}
+details.ch-d[open]>summary::after{content:"−"}
+details.ch-d>.body{padding:0 16px 16px;border-top:1px solid var(--line)}
+details.ch-d h4{font-size:16px;margin:16px 0 4px;color:var(--accent)}
+.facts{counter-reset:f;list-style:none;padding:0;display:grid;gap:6px}
+.facts li{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:0}
+.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 4px var(--accent)}100%{box-shadow:0 0 0 0 transparent}}
+@media (prefers-reduced-motion:reduce){.flash{animation:none}}
+
+/* bottom nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}
+nav.tabs .row{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav.tabs button{border:0;background:transparent;padding:10px 4px 12px;cursor:pointer;display:grid;justify-items:center;gap:2px;color:var(--muted);font-size:13px;font-weight:700}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button[aria-current="page"]{color:var(--accent)}
+nav.tabs button.t-em[aria-current="page"]{color:var(--mayday)}
+footer.src{font-size:13px;color:var(--muted);text-align:center}
+</style>
+
+<header class="top">
+  <div class="top-row">
+    <div class="brand"><b>VHF</b><span>SRC</span></div>
+    <div class="search js-only"><input id="q" type="search" placeholder="Search: squelch, ch 70, Seelonce…" autocomplete="off" aria-label="Search the handbook"></div>
+    <button class="iconbtn js-only" id="night" aria-pressed="false" title="Night mode: red on black, keeps your night vision">NIGHT</button>
+  </div>
+  <div id="results" hidden></div>
+</header>
+
+<main><div class="wrap">
+
+<!-- ============ EMERGENCY ============ -->
+<section class="view" id="v-emergency" data-tab="emergency">
+  <div>
+    <div class="eyebrow">Emergency</div>
+    <h1 style="font-size:26px">Channel 16 · High power · Speak slowly</h1>
+  </div>
+  <div class="sos">
+    <a class="bigbtn b-mayday" href="#s-mayday" data-open="mayday"><b>MAYDAY</b><span>Grave and imminent danger to my vessel or a person on board</span><i aria-hidden="true">›</i></a>
+    <div class="grid2">
+      <a class="card k-mayday" href="#s-dsc" data-open="dsc"><b>DSC distress alert</b><span>Red button, hold ~5 s, then voice Mayday</span></a>
+      <a class="card k-mayday" href="#s-relay" data-open="relay"><b>Mayday Relay</b><span>Another vessel is in distress</span></a>
+      <a class="card k-pan" href="#s-pan" data-open="pan"><b>Pan-pan</b><span>Urgent, not grave and imminent</span></a>
+      <a class="card k-pan" href="#s-medico" data-open="medico"><b>Medical advice</b><span>Pan-pan to the Coastguard</span></a>
+      <a class="card k-mayday" href="#s-heard" data-open="heard"><b>I hear a Mayday</b><span>Wait, write down, acknowledge if you can help</span></a>
+      <a class="card k-mayday" href="#s-false" data-open="false"><b>False alert sent</b><span>Cancel an accidental DSC alert</span></a>
+      <a class="card k-sec" href="#s-securite" data-open="securite"><b>Sécurité</b><span>Navigational or weather warning</span></a>
+      <a class="card k-sec" href="#s-seelonce" data-open="seelonce"><b>Seelonce</b><span>Radio silence during distress traffic</span></a>
+    </div>
+  </div>
+  <div class="ch-strip" aria-label="Key channels">
+    <div class="ch"><b>16</b><span>Distress, safety, calling</span></div>
+    <div class="ch"><b>70</b><span>DSC only, never voice</span></div>
+    <div class="ch"><b>67</b><span>UK small craft safety</span></div>
+    <div class="ch"><b>13</b><span>Bridge-to-bridge</span></div>
+  </div>
+
+  <div class="panel js-only" id="boat">
+    <h2>My boat</h2>
+    <p class="lead" style="font-size:15px">Fill this in once. Every script uses it, and the callsign is spelled out phonetically for you. Stored only in this browser.</p>
+    <form class="form" id="boatform" autocomplete="off" onsubmit="return false">
+      <label>Boat name<input id="b-name" placeholder="e.g. Hydro Ace"></label>
+      <label>Callsign<input id="b-call" placeholder="e.g. MVYQ7" autocapitalize="characters"></label>
+      <label>MMSI (9 digits)<input id="b-mmsi" inputmode="numeric" maxlength="9" placeholder="e.g. 232089001"></label>
+      <label>Persons on board<input id="b-pob" inputmode="numeric" placeholder="e.g. 3"></label>
+      <label class="full">Description<input id="b-desc" placeholder="e.g. Twelve metre motor cruiser, white deck and hull"></label>
+    </form>
+    <div class="saved" id="b-saved"></div>
+  </div>
+</section>
+
+<section class="view nojs-only" id="v-scripts" data-tab="scripts">
+  <div><div class="eyebrow">Emergency scripts</div><h1 style="font-size:26px">Read out loud. Fill in the [brackets].</h1></div>
+  <div class="static-sheet" id="s-mayday" style="--k:var(--mayday)"><h2>MAYDAY</h2>
+  <div class="note warn"><b>Grave and imminent danger</b> to a vessel or person. Authorised by the person in charge. If you have DSC: press the red Distress button first (see DSC distress alert), then give this voice call.</div>
+  <ol class="steps"><li><span>Channel <b>16</b></span></li><li><span><b>High power</b></span></li><li><span>Press PTT, speak <b>slowly and clearly</b></span></li></ol>
+  
+  <div class="eyebrow">Distress call</div>
+  <div class="script">
+   <p><span class="pw">MAYDAY, MAYDAY, MAYDAY</span></p>
+   <p><span class="pw">this is</span></p>
+   <p><span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span></p>
+   <p><span class="fill empty">[callsign, spelled phonetically]</span></p>
+   <p>MMSI <span class="fill empty">[MMSI]</span></p>
+  </div>
+  <div class="eyebrow">Distress message, straight after (MIPDANIO)</div>
+  <div class="script">
+   <p><span class="lbl">M</span><span class="pw">MAYDAY</span></p>
+   <p><span class="lbl">I</span><span class="fill empty">[boat name]</span>, <span class="fill empty">[callsign, spelled phonetically]</span>, MMSI <span class="fill empty">[MMSI]</span></p>
+   <p><span class="lbl">P</span>My position is <span class="fill empty">[position]</span></p>
+   <p><span class="lbl">D</span><span class="fill">Sinking</span></p>
+   <p><span class="lbl">A</span>Require immediate assistance</p>
+   <p><span class="lbl">N</span><span class="fill empty">[number]</span> people on board</p>
+   <p><span class="lbl">I</span><span class="fill empty">[short description of boat]</span></p>
+   <p><span class="lbl">O</span><span class="pw">OVER</span></p>
+  </div>
+  <div class="panel"><h2 style="font-size:17px">Then</h2><ul>
+   <li>Listen. Reply will be like: "<i>Mayday …, this is … Coastguard, Received Mayday, Stand by.</i>"</li>
+   <li>No answer? Repeat the call and message.</li>
+   <li>Every following message about this incident starts with <b>Mayday</b>.</li>
+   <li>Don't switch off until all distress traffic is finished.</li></ul></div><p><a href="#v-emergency">↑ Back to Emergency</a></p></div>
+  <div class="static-sheet" id="s-dsc" style="--k:var(--mayday)"><h2>DSC DISTRESS ALERT</h2>
+  <ol class="steps">
+   <li><span>Lift the cover of the red <b>Distress</b> button.</span></li>
+   <li><span>If there's time: press and release it (or use the Call menu) and pick the <b>nature of distress</b>: Fire/explosion, Flooding, Collision, Grounding, Listing, Sinking, Disabled and adrift, Abandoning ship, Piracy, Man overboard. Otherwise it sends "Undesignated".</span></li>
+   <li><span><b>Press and hold</b> Distress for about <b>5 seconds</b> until it transmits. Your MMSI and GPS position are included.</span></li>
+   <li><span>The alert repeats automatically about every 4 minutes until acknowledged or cancelled.</span></li>
+   <li><span>Radio switches to ch 16. Immediately give the <b>voice Mayday</b> with your MMSI.</span></li>
+  </ol>
+  
+  <div class="note">Sent it by accident? Use <a href="#s-false">False alert sent</a>.</div><p><a href="#v-emergency">↑ Back to Emergency</a></p></div>
+  <div class="static-sheet" id="s-relay" style="--k:var(--mayday)"><h2>MAYDAY RELAY</h2>
+  <div class="note warn">Use when another vessel is in distress and its Mayday has not been acknowledged (about a minute with no traffic suggesting contact), or you see a vessel in distress that can't call for itself. <b>Not</b> by DSC on a Class D set: by voice.</div>
+  <ol class="steps"><li><span>Channel <b>16</b>, high power</span></li><li><span>Address the Coastguard. No reply? Repeat with "All stations".</span></li></ol>
+  
+  <div class="script">
+   <p><span class="pw">MAYDAY RELAY, MAYDAY RELAY, MAYDAY RELAY</span></p>
+   <p><span class="pw">All stations, All stations, All stations</span></p>
+   <p><span class="pw">this is</span> <span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span></p>
+   <p><span class="fill empty">[callsign, spelled phonetically]</span>, MMSI <span class="fill empty">[MMSI]</span></p>
+   <p><span class="lbl">M</span><span class="pw">MAYDAY</span></p>
+   <p><span class="lbl">I</span><span class="fill empty">[vessel in distress]</span></p>
+   <p><span class="lbl">P</span>Position <span class="fill empty">[its position]</span></p>
+   <p><span class="lbl">D</span><span class="fill empty">[nature of distress]</span></p>
+   <p><span class="lbl">A</span>Require immediate assistance</p>
+   <p><span class="lbl">N</span><span class="fill empty">[number]</span> people on board</p>
+   <p><span class="lbl">I</span><span class="fill empty">[description]</span></p>
+   <p><span class="lbl">O</span><span class="pw">OVER</span></p>
+  </div>
+  <p class="lead">Your own name goes after "this is", not the casualty's. If you saw a signal rather than heard a message, give equivalent information: "red flare seen approximately one two zero degrees from Blunt Point, five miles".</p><p><a href="#v-emergency">↑ Back to Emergency</a></p></div>
+  <div class="static-sheet" id="s-pan" style="--k:var(--pan)"><h2>PAN-PAN</h2>
+  <div class="note">Very urgent message about the safety of a vessel or person, but not grave and imminent. Example: disabled and drifting, far from danger. Priority over everything except distress.</div>
+  <ol class="steps"><li><span>DSC (optional): Call → All ships → Urgency → ch 16 → send</span></li><li><span>Channel <b>16</b>, <b>high power</b></span></li><li><span>Address it (usually All stations); message follows straight away</span></li></ol>
+  
+  <div class="script" style="--k:var(--pan)">
+   <p><span class="pw">PAN-PAN, PAN-PAN, PAN-PAN</span></p>
+   <p><span class="pw">All stations, All stations, All stations</span></p>
+   <p><span class="pw">this is</span> <span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span></p>
+   <p><span class="fill empty">[callsign, spelled phonetically]</span>, MMSI <span class="fill empty">[MMSI]</span></p>
+   <p><span class="lbl">P</span>My position <span class="fill empty">[position]</span></p>
+   <p><span class="lbl">D</span><span class="fill empty">[what's wrong]</span></p>
+   <p><span class="lbl">A</span><span class="fill empty">[help needed]</span></p>
+   <p><span class="lbl">N</span><span class="fill empty">[number]</span> persons on board</p>
+   <p><span class="lbl">I</span><span class="fill empty">[description]</span></p>
+   <p><span class="lbl">O</span><span class="pw">OVER</span></p>
+  </div><p><a href="#v-emergency">↑ Back to Emergency</a></p></div>
+  <div class="static-sheet" id="s-medico" style="--k:var(--pan)"><h2>MEDICAL ADVICE</h2>
+  <div class="note">A Pan-pan addressed to the <b>Coastguard</b>, not All stations. ("Panpan Medico" is no longer used.)</div>
+  <ol class="steps"><li><span>Channel <b>16</b>, high power</span></li></ol>
+  
+  <div class="script" style="--k:var(--pan)">
+   <p><span class="pw">PAN-PAN, PAN-PAN, PAN-PAN</span></p>
+   <p><span class="fill empty">[Coastguard]</span>, <span class="fill empty">[Coastguard]</span>, <span class="fill empty">[Coastguard]</span></p>
+   <p><span class="pw">this is</span> <span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span></p>
+   <p><span class="fill empty">[callsign, spelled phonetically]</span>, MMSI <span class="fill empty">[MMSI]</span></p>
+   <p>Request urgent medical advice</p>
+   <p><span class="pw">OVER</span></p>
+  </div>
+  <p class="lead">Expect to be moved to a duplex channel (UK: 62, 63 or 64) and linked to a doctor. Have your position and vessel details ready in case it escalates to a lifeboat or helicopter.</p><p><a href="#v-emergency">↑ Back to Emergency</a></p></div>
+  <div class="static-sheet" id="s-heard" style="--k:var(--mayday)"><h2>I HEAR A MAYDAY</h2>
+  <ol class="steps">
+   <li><span><b>Write it down</b>: name, callsign/MMSI, position, problem, people on board.</span></li>
+   <li><span>Keep <b>radio silence</b> on that channel unless you are acknowledging and helping.</span></li>
+   <li><span>A coast station has probably heard it: give them <b>5 minutes</b> to respond.</span></li>
+   <li><span>Can't help effectively? <b>Don't acknowledge.</b></span></li>
+   <li><span>No response and you can help: acknowledge by voice, then report your position, speed and ETA.</span></li>
+   <li><span>No acknowledgement at all and no sign of contact with rescuers: send a <a href="#s-relay">Mayday Relay</a>.</span></li>
+   <li><span>DSC alert received: same rules. Class D can't acknowledge or relay by DSC; if not acknowledged within 5 min, call the casualty and the Coastguard <b>by voice on 16</b>.</span></li>
+  </ol>
+  <div class="eyebrow">Acknowledge</div>
+  <div class="script">
+   <p><span class="pw">MAYDAY</span> <span class="fill empty">[casualty name]</span></p>
+   <p><span class="pw">this is</span> <span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span></p>
+   <p><span class="pw">RECEIVED MAYDAY</span></p>
+   <p><span class="pw">OUT</span></p>
+  </div>
+  <div class="eyebrow">Follow up</div>
+  
+  <div class="script">
+   <p><span class="pw">MAYDAY</span> <span class="fill empty">[casualty name]</span></p>
+   <p><span class="pw">this is</span> <span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span></p>
+   <p>My position <span class="fill empty">[your position]</span></p>
+   <p><span class="fill empty">[speed and ETA]</span></p>
+   <p><span class="pw">OUT</span></p>
+  </div><p><a href="#v-emergency">↑ Back to Emergency</a></p></div>
+  <div class="static-sheet" id="s-false" style="--k:var(--mayday)"><h2>FALSE ALERT</h2>
+  <div class="note warn">First rule: <b>don't repeat it.</b></div>
+  <ol class="steps">
+   <li><span><b>Switch the DSC controller off</b> (usually the radio off) to stop automatic repeats. If your set has a dedicated <b>cancel distress</b> function, use that instead.</span></li>
+   <li><span>Switch back on, select <b>ch 16</b> and <b>high power</b>.</span></li>
+   <li><span>Send this cancel message:</span></li>
+  </ol>
+  <div class="script">
+   <p><span class="pw">All stations, All stations, All stations</span></p>
+   <p><span class="pw">this is</span> <span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span></p>
+   <p><span class="fill empty">[callsign, spelled phonetically]</span></p>
+   <p>MMSI <span class="fill empty">[MMSI]</span>, <span class="pw">I say again</span>, MMSI <span class="fill empty">[MMSI]</span></p>
+   <p>Cancel my distress alert, <span class="pw">I say again</span>, cancel my distress alert</p>
+   <p><span class="pw">OUT</span></p>
+  </div>
+  <div class="panel"><h2 style="font-size:17px">EPIRB set off by accident?</h2><p>Switch it off immediately and tell the nearest Search and Rescue authority (the Coastguard) by any means available that a false alert has been made.</p></div><p><a href="#v-emergency">↑ Back to Emergency</a></p></div>
+  <div class="static-sheet" id="s-securite" style="--k:var(--sec)"><h2>SÉCURITÉ</h2>
+  <div class="note">Important navigational or meteorological warning. Pronounced "Securitay". Announce on ch 16, give the message on a working channel. Spotted a hazard yourself (e.g. a floating container)? Usually better to tell the Coastguard.</div>
+  <ol class="steps"><li><span>DSC (optional): Call → All ships → Safety → working channel → send</span></li><li><span>Announce on <b>16</b></span></li><li><span>Switch to the working channel and repeat the call with the message</span></li></ol>
+  <div class="script" style="--k:var(--sec)">
+   <p><span class="pw">SÉCURITÉ, SÉCURITÉ, SÉCURITÉ</span></p>
+   <p><span class="pw">All ships, All ships, All ships</span></p>
+   <p><span class="pw">this is</span> <span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span>, <span class="fill empty">[boat name]</span></p>
+   <p>For navigational warning listen channel <span class="fill">[working ch]</span></p>
+   <p><span class="pw">OUT</span></p>
+  </div>
+  <p class="lead">Book example: "Securitay ×3, All ships ×3, this is Yarmouth Coastguard ×3, for new gale warning for sea areas Humber, Thames, listen Channel eight four. Out."</p><p><a href="#v-emergency">↑ Back to Emergency</a></p></div>
+  <div class="static-sheet" id="s-seelonce" style="--k:var(--sec)"><h2>SEELONCE</h2>
+  <p>Distress traffic automatically means radio silence on that channel for everyone not involved. The casualty or the station controlling the distress traffic (e.g. the Coastguard) can impose it:</p>
+  <div class="script" style="--k:var(--mayday)">
+   <p><span class="pw">All ships, All ships, All ships</span></p>
+   <p><span class="pw">this is</span> Brixham Coastguard, Brixham Coastguard, Brixham Coastguard</p>
+   <p><span class="pw">SEELONCE MAYDAY</span>, <span class="pw">I say again</span>, <span class="pw">SEELONCE MAYDAY</span></p>
+   <p><span class="pw">OUT</span></p>
+  </div>
+  <p>When it's over, the controlling station lifts it:</p>
+  <div class="script" style="--k:var(--sec)">
+   <p><span class="pw">All ships, All ships, All ships</span></p>
+   <p><span class="pw">this is</span> Brixham Coastguard, Brixham Coastguard, Brixham Coastguard</p>
+   <p><span class="pw">SEELONCE FEENEE</span></p>
+   <p><span class="pw">OUT</span></p>
+  </div><p><a href="#v-emergency">↑ Back to Emergency</a></p></div>
+</section>
+
+<!-- ============ ROUTINE ============ -->
+<section class="view" id="v-routine" data-tab="routine">
+  <div><div class="eyebrow">Voice procedure</div><h1 style="font-size:26px">Routine calls</h1></div>
+
+  <div class="panel sec" id="setup"><h2>Switch on and set up</h2>
+    <p class="lead">Example: calling a marina a couple of miles away on channel 80.</p>
+    <ol class="steps">
+      <li><span>Switch the power supply to the radio on</span></li>
+      <li><span>Adjust the dimmer if necessary, to illuminate the display and controls</span></li>
+      <li><span>Turn the squelch right down, to produce a frying sound from the loudspeaker</span></li>
+      <li><span>Adjust the volume until the frying sound is loud but tolerable</span></li>
+      <li><span>Adjust the squelch until the frying sound <b>just</b> stops</span></li>
+      <li><span>Select the channel (here: 80)</span></li>
+      <li><span>Select low transmitter power</span></li>
+      <li><span><b>LISTEN</b>, to make sure the channel is not in use</span></li>
+      <li><span>Press the PTT to speak</span></li>
+      <li><span>Release the PTT to listen for a reply</span></li>
+    </ol>
+  </div>
+
+  <div class="panel sec" id="golden"><h2>Golden rules on air</h2>
+    <ul>
+      <li><b>Listen</b> before you transmit.</li>
+      <li><b>Think</b> before you speak: plan what you will say.</li>
+      <li>Hold the mic 2–5 cm from your mouth, slightly to one side.</li>
+      <li>Speak normally or slightly louder. Don't shout.</li>
+      <li><b>Press to talk, release to listen.</b></li>
+      <li>End with <b>Over</b> (reply expected) or <b>Out</b> (no reply). Never "over and out".</li>
+      <li>Identify yourself every time you press the PTT. Never repeat names more than three times.</li>
+      <li>Calls on ch 16 kept to a minimum; apart from distress and safety, never longer than one minute.</li>
+    </ul>
+  </div>
+
+  <div class="panel sec" id="call-vessel"><h2>Calling another vessel</h2>
+    <p>Call on <b>ch 16</b> (unless another channel was agreed), then move to an inter-ship working channel (6, 8, 72, 77). Use low power if possible. The calling vessel proposes the working channel. The whole ch 16 exchange should take less than a minute.</p>
+    <div class="script" style="--k:var(--accent);font-size:18px">
+      <p>Karenita, Karenita, <span class="pw">this is</span> Blue Tango, Blue Tango, <span class="pw">Over.</span></p>
+      <p><i>Blue Tango, <span class="pw">this is</span> Karenita, <span class="pw">Over.</span></i></p>
+      <p>Karenita, <span class="pw">this is</span> Blue Tango, Channel Seventy Two, please, Seven Two, <span class="pw">Over.</span></p>
+      <p><i>Blue Tango, <span class="pw">this is</span> Karenita, Channel Seventy Two, <span class="pw">Over.</span></i></p>
+    </div>
+    <p>Both switch to ch 72. Whoever said "over" last is waiting, so the other station calls:</p>
+    <div class="script" style="--k:var(--accent);font-size:18px">
+      <p>Karenita, Karenita, <span class="pw">this is</span> Blue Tango, Blue Tango, <span class="pw">Over.</span></p>
+      <p><i>Blue Tango, <span class="pw">this is</span> Karenita, <span class="pw">Over.</span></i></p>
+      <p>Karenita, <span class="pw">this is</span> Blue Tango. We're heading for Helford this evening, and wondered if you'd like to meet up with us there. <span class="pw">Over.</span></p>
+      <p><i>Blue Tango, <span class="pw">this is</span> Karenita. This sounds good to me. Shall we see you at eight, then? <span class="pw">Over.</span></i></p>
+      <p>Karenita, <span class="pw">this is</span> Blue Tango. Yes, we will see you there at eight. <span class="pw">Out.</span></p>
+      <p><i>Blue Tango, <span class="pw">this is</span> Karenita. <span class="pw">Out.</span></i></p>
+    </div>
+    <p>Both vessels switch back to channel 16.</p>
+  </div>
+
+  <div class="panel sec" id="call-coast"><h2>Calling a coast station (port, marina)</h2>
+    <p>Call <b>directly on the station's working channel</b>, not on ch 16. Coast stations pay per channel, so ch 16 may not be among them. Find channels in the Admiralty List of Radio Signals, Admiralty Maritime Communications or a nautical almanac. Say which channel you are on and describe your vessel briefly.</p>
+    <div class="script" style="--k:var(--accent);font-size:18px">
+      <p>Dover Port Control, Dover Port Control, <span class="pw">this is</span> Motor Yacht Galadriel, Galadriel, on Channel 74, <span class="pw">Over.</span></p>
+      <p><i>Galadriel, Dover Port Control, <span class="pw">Over.</span></i></p>
+      <p>Dover Port Control, <span class="pw">this is</span> Galadriel. I am the 15 metre motor cruiser about a mile south of your western entrance. I am about two minutes away and would like permission to enter. <span class="pw">Over.</span></p>
+      <p><i>Galadriel, Dover Port Control. We have a fast ferry about to leave. Do not enter port now, but wait to the south of the entrance, and stand by on this channel until we call you in. <span class="pw">Out.</span></i></p>
+      <p>Dover Port Control, <span class="pw">this is</span> Galadriel. Standing by. <span class="pw">Out.</span></p>
+    </div>
+  </div>
+
+  <div class="panel sec" id="call-cg"><h2>Calling the Coastguard</h2>
+    <p>Call on <b>ch 16</b>, as if calling a vessel. The <b>Coastguard chooses the working channel</b> (usually 67). Exception: Solent Coastguard is called on ch 67 for routine matters. <span class="tag">UK</span></p>
+    <div class="script" style="--k:var(--accent);font-size:18px">
+      <p>Clyde Coastguard, Clyde Coastguard, <span class="pw">this is</span> Gandalf, Gandalf, Gandalf, <span class="pw">Over.</span></p>
+      <p><i>Gandalf, <span class="pw">this is</span> Clyde Coastguard. Channel six seven, please, six seven, and stand by. <span class="pw">Over.</span></i></p>
+      <p>Clyde Coastguard, <span class="pw">this is</span> Gandalf. Channel six seven, standing by. <span class="pw">Over.</span></p>
+      <p><i>(on 67) Gandalf, <span class="pw">this is</span> Clyde Coastguard. <span class="pw">Over.</span></i></p>
+      <p>Clyde Coastguard, <span class="pw">this is</span> Gandalf. Just calling to tell you that we are about to start the liferaft demonstration off Largs Marina. <span class="pw">Over.</span></p>
+      <p><i>Gandalf, <span class="pw">this is</span> Clyde Coastguard. Thank you for the information. Please let us know when you have finished. <span class="pw">Out.</span></i></p>
+    </div>
+  </div>
+
+  <div class="panel sec" id="radiocheck"><h2>Radio check</h2>
+    <p>Only when needed (e.g. after fitting a new antenna). With any station willing to co-operate, on a channel they listen to: a marina on its working channel, a friend on an agreed channel, or the Coastguard on ch 16 (ch 67 in the Solent).</p>
+    <div class="script" style="--k:var(--accent);font-size:18px">
+      <p>Cardhu, Cardhu, <span class="pw">this is</span> Windrift, Windrift. <span class="pw">Radio check</span>, please. <span class="pw">Over.</span></p>
+      <p><i>Windrift, <span class="pw">this is</span> Cardhu. You are loud and clear. <span class="pw">Out.</span></i></p>
+    </div>
+  </div>
+
+  <div class="panel sec" id="garbled"><h2>Garbled and unanswered calls</h2>
+    <p><b>Clearly for you, but you missed who called:</b> reply with <span class="pw">"Station calling Karenita, this is Karenita, Over."</span></p>
+    <p><b>Not sure it was for you:</b> don't answer. The caller will repeat within a few minutes.</p>
+    <p><b>No answer to your call:</b> wait at least <b>2 minutes</b> between attempts, try <b>3 times</b>, then you may start again <b>3 minutes</b> later. Meanwhile check: antenna cable, battery voltage, dual watch off, volume up.</p>
+  </div>
+
+  <div class="panel sec" id="linkcalls"><h2>Link calls (public correspondence)</h2>
+    <p>A coast radio station connects your VHF call to the shore telephone network. Closed in the UK, Ireland, France and the Netherlands; still available in e.g. Belgium, Channel Islands, Denmark, Germany, Spain, Portugal.</p>
+    <ul>
+      <li>Sign up with a <b>Maritime Accounting Authority (MAA)</b> first; its <b>AAIC</b> (Accounting Authority Identity Code, 4 characters) goes on your Ship Radio Licence application.</li>
+      <li>Call on the station's working channel. Listen first: only go ahead if you hear <b>silence</b> (not an operator, one side of a phone call, phone noises or regular beeps).</li>
+      <li>You may hear beeps confirming your call is queued. When finished, call the station again on the same channel and end with "Thank you. Out."</li>
+      <li>Shore-to-ship: the station broadcasts a <b>traffic list</b> at set times. If you hear your name, call them and say "you have traffic for me".</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ REFERENCE ============ -->
+<section class="view" id="v-reference" data-tab="reference">
+  <div><div class="eyebrow">Look it up</div><h1 style="font-size:26px">Reference</h1></div>
+
+  <div class="panel sec" id="phonetic"><h2>Phonetic alphabet</h2>
+    <div class="phon" id="phon"><div><b>A</b><span>Alpha</span></div><div><b>B</b><span>Bravo</span></div><div><b>C</b><span>Charlie</span></div><div><b>D</b><span>Delta</span></div><div><b>E</b><span>Echo</span></div><div><b>F</b><span>Foxtrot</span></div><div><b>G</b><span>Golf</span></div><div><b>H</b><span>Hotel</span></div><div><b>I</b><span>India</span></div><div><b>J</b><span>Juliet</span></div><div><b>K</b><span>Kilo</span></div><div><b>L</b><span>Lima</span></div><div><b>M</b><span>Mike</span></div><div><b>N</b><span>November</span></div><div><b>O</b><span>Oscar</span></div><div><b>P</b><span>Papa</span></div><div><b>Q</b><span>Quebec</span></div><div><b>R</b><span>Romeo</span></div><div><b>S</b><span>Sierra</span></div><div><b>T</b><span>Tango</span></div><div><b>U</b><span>Uniform</span></div><div><b>V</b><span>Victor</span></div><div><b>W</b><span>Whiskey</span></div><div><b>X</b><span>X-Ray</span></div><div><b>Y</b><span>Yankee</span></div><div><b>Z</b><span>Zulu</span></div><div><b>1</b><span>One</span></div><div><b>2</b><span>Two</span></div><div><b>3</b><span>Three</span></div><div><b>4</b><span>Four</span></div><div><b>5</b><span>Five</span></div><div><b>6</b><span>Six</span></div><div><b>7</b><span>Seven</span></div><div><b>8</b><span>Eight</span></div><div><b>9</b><span>Niner</span></div><div><b>0</b><span>Zero</span></div></div>
+    <p class="lead js-only" style="font-size:14px;margin-top:10px">Spell your callsign: </p>
+    <div class="quick js-only"><input id="speller" placeholder="Type anything, e.g. MVYQ7" aria-label="Text to spell phonetically"><div id="spelled" class="script" style="font-size:18px;--k:var(--accent)"><span class="empty">The phonetic spelling appears here.</span></div></div>
+  </div>
+
+  <div class="panel sec" id="prowords"><h2>Prowords</h2>
+    <dl class="dl" id="pw"><dt>All after / All before</dt><dd>Asking for part of a message to be repeated: "say again all after a pound of sausages"</dd><dt>Correct / Wrong</dt><dd>"Correct" confirms a read-back. "Wrong" (not "incorrect") sounds completely different</dd><dt>Correction</dt><dd>Putting a mistake right: "a hundred and sixteen carrots, correction, one pound of carrots"</dd><dt>In figures / In letters</dt><dd>Distinguishing numbers and words: "Five Ashes Lane" vs "5, Ashes Lane"</dd><dt>I say again</dt><dd>I am going to repeat what I just said</dd><dt>I spell</dt><dd>I am going to spell the last word, using the phonetic alphabet</dd><dt>Out</dt><dd>End of transmission, no reply expected</dd><dt>Over</dt><dd>End of transmission, reply expected</dd><dt>Radio check</dt><dd>Please comment on the strength and quality of my transmission</dd><dt>Read back</dt><dd>Please read back the message I just passed</dd><dt>Received</dt><dd>I have received your message (not "roger")</dd><dt>Say again</dt><dd>Please repeat what you just said</dd><dt>Station calling</dt><dd>Instead of a name when you didn't hear who called you</dd><dt>Text</dt><dd>Start of a message to be written down and relayed verbatim</dd><dt>Traffic</dt><dd>General term for radio communications</dd><dt>This is</dt><dd>Identifying yourself at the start of a call</dd><dt>Wait</dt><dd>Wait, ideally with a time: "Wait five minutes"</dd><dt>Word after / Word before</dt><dd>Asking for a single word to be repeated or spelt</dd></dl>
+    <h4 style="margin-top:14px">Distress, urgency and safety prowords</h4>
+    <dl class="dl">
+      <dt>Mayday</dt><dd>Distress (from French <i>m'aidez</i>). Grave and imminent danger.</dd>
+      <dt>Mayday Relay</dt><dd>Passing on a distress message for another vessel.</dd>
+      <dt>Received Mayday</dt><dd>Acknowledging a distress message.</dd>
+      <dt>Seelonce Mayday</dt><dd>Radio silence: distress traffic in progress. Used by the casualty or the station controlling distress traffic.</dd>
+      <dt>Seelonce Feenee</dt><dd>Radio silence lifted; normal working may resume.</dd>
+      <dt>Pan-pan</dt><dd>Urgency (from French <i>panne</i>, breakdown). Very urgent message about the safety of a vessel or person.</dd>
+      <dt>Sécurité</dt><dd>Safety (pronounced "Securitay"). Navigational or meteorological warning.</dd>
+    </dl>
+    <p class="lead" style="font-size:14px">"Panpan Medico" is no longer used. "Medevac" only refers to medical transports in war.</p>
+  </div>
+
+  <div class="panel sec" id="special-ch"><h2>Channels worth memorising</h2>
+    <div class="tbl"><table><thead><tr><th>Ch</th><th>Use</th></tr></thead><tbody>
+      <tr><td class="n">0</td><td>Private channel, UK Search and Rescue organisations (Coastguard, RNLI) <span class="tag">UK</span></td></tr>
+      <tr><td class="n">6, 8</td><td>Inter-ship</td></tr>
+      <tr><td class="n">11, 12, 14</td><td>Port operations</td></tr>
+      <tr><td class="n">13</td><td>Bridge-to-bridge, navigational safety</td></tr>
+      <tr class="hot"><td class="n">16</td><td><b>Distress, Safety and Calling</b></td></tr>
+      <tr><td class="n">62, 63, 64</td><td>Maritime Safety Information broadcasts <span class="tag">UK</span></td></tr>
+      <tr><td class="n">67</td><td>Small craft safety channel <span class="tag">UK</span></td></tr>
+      <tr class="hot"><td class="n">70</td><td><b>DSC only, no voice</b></td></tr>
+      <tr><td class="n">72, 77</td><td>Inter-ship</td></tr>
+      <tr><td class="n">75, 76</td><td>Guard band either side of 16: port ops/on-board only, max 1 W</td></tr>
+      <tr><td class="n">80</td><td>Marinas (duplex) <span class="tag">UK</span></td></tr>
+      <tr><td class="n">M, M2</td><td>UK private channels for marinas, yacht clubs, recreational craft; M may show as 37 or P1 <span class="tag">UK</span></td></tr>
+    </tbody></table></div>
+  </div>
+
+  <div class="panel sec" id="channels"><h2>Channel selection chart</h2>
+    <p class="lead" style="font-size:15px">Frequencies in MHz. Duplex channels: ship transmits on the lower frequency. With semi-duplex equipment, two vessels cannot talk on a duplex channel.</p>
+    <div class="filter js-only" id="chfilter">
+      <button data-f="all" aria-pressed="true">All</button>
+      <button data-f="ship">Inter-ship</button>
+      <button data-f="port">Port ops</button>
+      <button data-f="pc">Public corr.</button>
+      <button data-f="simplex">Simplex</button>
+    </div>
+    <div class="tbl" style="max-height:70vh"><table><thead><tr><th>Ch</th><th>Ship TX</th><th>Coast TX</th><th>Use</th><th>Notes</th></tr></thead><tbody id="chbody"><tr class=""><td class="n"><b>01</b></td><td class="n">156.050</td><td class="n">160.650</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>02</b></td><td class="n">156.100</td><td class="n">160.700</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>03</b></td><td class="n">156.150</td><td class="n">160.750</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>04</b></td><td class="n">156.200</td><td class="n">160.800</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>05</b></td><td class="n">156.250</td><td class="n">160.850</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>06</b></td><td class="n">156.300</td><td class="n">–</td><td>Inter-ship</td><td>Ship to ship</td></tr><tr class=""><td class="n"><b>07</b></td><td class="n">156.350</td><td class="n">160.950</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>08</b></td><td class="n">156.400</td><td class="n">–</td><td>Inter-ship</td><td>Ship to ship</td></tr><tr class=""><td class="n"><b>09</b></td><td class="n">156.450</td><td class="n">156.450</td><td>Inter-ship · Port ops</td><td>Used by pilots</td></tr><tr class=""><td class="n"><b>10</b></td><td class="n">156.500</td><td class="n">156.500</td><td>Inter-ship · Port ops</td><td>Used by HM Coastguard</td></tr><tr class=""><td class="n"><b>11</b></td><td class="n">156.550</td><td class="n">156.550</td><td>Port ops</td><td>Port operations</td></tr><tr class=""><td class="n"><b>12</b></td><td class="n">156.600</td><td class="n">156.600</td><td>Port ops</td><td>Port operations</td></tr><tr class=""><td class="n"><b>13</b></td><td class="n">156.650</td><td class="n">156.650</td><td>Inter-ship · Port ops</td><td>Bridge-to-bridge working</td></tr><tr class=""><td class="n"><b>14</b></td><td class="n">156.700</td><td class="n">156.700</td><td>Port ops</td><td>Port operations</td></tr><tr class=""><td class="n"><b>15</b></td><td class="n">156.750</td><td class="n">156.750</td><td>Inter-ship · Port ops</td><td>On-board working</td></tr><tr class="hot"><td class="n"><b>16</b></td><td class="n">156.800</td><td class="n">156.800</td><td>–</td><td><b>DISTRESS, SAFETY AND CALLING</b></td></tr><tr class=""><td class="n"><b>17</b></td><td class="n">156.850</td><td class="n">156.850</td><td>Inter-ship · Port ops</td><td>On-board working</td></tr><tr class=""><td class="n"><b>18</b></td><td class="n">156.900</td><td class="n">161.500</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>19</b></td><td class="n">156.950</td><td class="n">161.550</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>20</b></td><td class="n">157.000</td><td class="n">161.600</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>21</b></td><td class="n">157.050</td><td class="n">161.650</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>22</b></td><td class="n">157.100</td><td class="n">161.700</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>23</b></td><td class="n">157.150</td><td class="n">161.750</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>24</b></td><td class="n">157.200</td><td class="n">161.800</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>25</b></td><td class="n">157.250</td><td class="n">161.850</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>26</b></td><td class="n">157.300</td><td class="n">161.900</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>27</b></td><td class="n">157.350</td><td class="n">161.950</td><td>Port ops (two freq.) · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>28</b></td><td class="n">157.400</td><td class="n">162.000</td><td>Port ops (two freq.) · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>60</b></td><td class="n">156.025</td><td class="n">160.625</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>61</b></td><td class="n">156.075</td><td class="n">160.675</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>62</b></td><td class="n">156.125</td><td class="n">160.725</td><td>Port ops · Public corr.</td><td>HMCG MSI broadcasts (UK)</td></tr><tr class=""><td class="n"><b>63</b></td><td class="n">156.175</td><td class="n">160.775</td><td>Port ops · Public corr.</td><td>HMCG MSI broadcasts (UK)</td></tr><tr class=""><td class="n"><b>64</b></td><td class="n">156.225</td><td class="n">160.825</td><td>Port ops · Public corr.</td><td>HMCG MSI broadcasts (UK)</td></tr><tr class=""><td class="n"><b>65</b></td><td class="n">156.275</td><td class="n">160.875</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>66</b></td><td class="n">156.325</td><td class="n">160.925</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>67</b></td><td class="n">156.375</td><td class="n">156.375</td><td>Inter-ship · Port ops</td><td>UK small ship safety</td></tr><tr class=""><td class="n"><b>68</b></td><td class="n">156.425</td><td class="n">156.425</td><td>Port ops</td><td></td></tr><tr class=""><td class="n"><b>69</b></td><td class="n">156.475</td><td class="n">156.475</td><td>Inter-ship · Port ops</td><td>Port operations</td></tr><tr class="hot"><td class="n"><b>70</b></td><td class="n">156.525</td><td class="n">156.525</td><td>–</td><td><b>DSC ONLY. NOT FOR VOICE</b></td></tr><tr class=""><td class="n"><b>71</b></td><td class="n">156.575</td><td class="n">156.575</td><td>Port ops</td><td></td></tr><tr class=""><td class="n"><b>72</b></td><td class="n">156.625</td><td class="n">–</td><td>Inter-ship</td><td>Ship to ship</td></tr><tr class=""><td class="n"><b>73</b></td><td class="n">156.675</td><td class="n">156.675</td><td>Inter-ship · Port ops</td><td>Used by HM Coastguard</td></tr><tr class=""><td class="n"><b>74</b></td><td class="n">156.725</td><td class="n">156.725</td><td>Port ops</td><td></td></tr><tr class=""><td class="n"><b>75</b></td><td class="n">156.775</td><td class="n">156.775</td><td>Port ops</td><td>Guard band: navigation comms, 1 W</td></tr><tr class=""><td class="n"><b>76</b></td><td class="n">156.825</td><td class="n">156.825</td><td>Port ops</td><td>Guard band: navigation comms, 1 W</td></tr><tr class=""><td class="n"><b>77</b></td><td class="n">156.875</td><td class="n">–</td><td>Inter-ship</td><td>Ship to ship</td></tr><tr class=""><td class="n"><b>78</b></td><td class="n">156.925</td><td class="n">161.525</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>79</b></td><td class="n">156.975</td><td class="n">161.575</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>80</b></td><td class="n">157.025</td><td class="n">161.625</td><td>Port ops · Public corr.</td><td>Marinas (UK only)</td></tr><tr class=""><td class="n"><b>81</b></td><td class="n">157.075</td><td class="n">161.675</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>82</b></td><td class="n">157.125</td><td class="n">161.725</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>83</b></td><td class="n">157.175</td><td class="n">161.775</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>84</b></td><td class="n">157.225</td><td class="n">161.825</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>85</b></td><td class="n">157.275</td><td class="n">161.875</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>86</b></td><td class="n">157.325</td><td class="n">161.925</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>87</b></td><td class="n">157.375</td><td class="n">157.375</td><td>Port ops</td><td></td></tr><tr class=""><td class="n"><b>88</b></td><td class="n">157.425</td><td class="n">157.425</td><td>Port ops</td><td></td></tr><tr class=""><td class="n"><b>AIS 1</b></td><td class="n">161.975</td><td class="n">161.975</td><td>–</td><td>AIS</td></tr><tr class=""><td class="n"><b>AIS 2</b></td><td class="n">162.025</td><td class="n">162.025</td><td>–</td><td>AIS</td></tr><tr class=""><td class="n"><b>M (37)</b></td><td class="n">157.850</td><td class="n">157.850</td><td>Port ops</td><td>UK private: marinas, clubs, recreational craft</td></tr><tr class=""><td class="n"><b>M2</b></td><td class="n">161.425</td><td class="n">161.425</td><td>Port ops</td><td>UK private: marinas, clubs, recreational craft</td></tr></tbody></table></div>
+  </div>
+
+  <div class="panel sec" id="range"><h2>VHF range</h2>
+    <p>Radio horizon (nautical miles) ≈ <b>3 × √(antenna height in metres)</b>. Two stations can talk when their horizons overlap: add them up.</p>
+    <div class="tbl"><table><thead><tr><th></th><th>Dinghy 1 m</th><th>Motor 4 m</th><th>Yacht 16 m</th><th>Ship 36 m</th><th>Coast 100 m</th></tr></thead><tbody>
+      <tr><td><b>Own horizon</b></td><td class="n">3</td><td class="n">6</td><td class="n">12</td><td class="n">18</td><td class="n">30</td></tr>
+      <tr><td>Dinghy</td><td class="n">6</td><td class="n">9</td><td class="n">15</td><td class="n">21</td><td class="n">33</td></tr>
+      <tr><td>Motor boat</td><td class="n">9</td><td class="n">12</td><td class="n">18</td><td class="n">24</td><td class="n">36</td></tr>
+      <tr><td>Sailing yacht</td><td class="n">15</td><td class="n">18</td><td class="n">24</td><td class="n">30</td><td class="n">42</td></tr>
+      <tr><td>Ship</td><td class="n">21</td><td class="n">24</td><td class="n">30</td><td class="n">36</td><td class="n">48</td></tr>
+      <tr><td>Coast station</td><td class="n">33</td><td class="n">36</td><td class="n">42</td><td class="n">48</td><td class="n">–</td></tr>
+    </tbody></table></div>
+  </div>
+
+  <div class="panel sec" id="mmsi"><h2>MMSI formats</h2>
+    <dl class="dl">
+      <dt>Ship</dt><dd><span class="mono">MID + 6 digits</span>. 9 digits; first three = Maritime Identification Digits (country). UK: 232, 233, 234, 235. e.g. <span class="mono">232089001</span></dd>
+      <dt>Coast station</dt><dd><span class="mono">00 + MID + 4 digits</span>. e.g. Milford Haven Coastguard <span class="mono">002320017</span></dd>
+      <dt>Group</dt><dd><span class="mono">0 + MID + 5 digits</span>. e.g. <span class="mono">023208591</span>. Can be stored and deleted freely.</dd>
+      <dt>AIS EPIRB</dt><dd>Manufacturer's 9-digit code beginning <span class="mono">974</span></dd>
+      <dt>EPIRB / PLB</dt><dd>15-character <b>Hex ID</b></dd>
+    </dl>
+    <p class="note">Your own MMSI can usually be entered into a Class D controller only <b>once</b>. A mistake means returning it to the supplier.</p>
+  </div>
+
+  <div class="panel sec" id="smcp"><h2>Standard Marine Communication Phrases</h2>
+    <p class="lead" style="font-size:15px">IMO's "standard English" for the sea. Not compulsory.</p>
+    <h4>Message markers</h4>
+    <dl class="dl">
+      <dt>QUESTION</dt><dd>The following message is a question</dd>
+      <dt>ANSWER</dt><dd>Reply to a previous question</dd>
+      <dt>REQUEST</dt><dd>Asking for action from others</dd>
+      <dt>INFORMATION</dt><dd>Observed facts only</dd>
+      <dt>INTENTION</dt><dd>Immediate navigational actions you intend to take</dd>
+      <dt>WARNING</dt><dd>Dangers to other traffic</dd>
+      <dt>ADVICE</dt><dd>A recommendation to influence the recipient</dd>
+      <dt>INSTRUCTION</dt><dd>A regulation-based instruction</dd>
+    </dl>
+    <h4>Standard responses</h4>
+    <ul>
+      <li>Affirmative: "Yes, …" + the phrase in full. Negative: "No, …" + the phrase in full.</li>
+      <li>Information coming soon: "Stand by". Can't be obtained: "No information".</li>
+      <li>Not properly heard: "Say again". Not understood: "Message not understood".</li>
+    </ul>
+    <h4>Readability and signal strength</h4>
+    <div class="tbl"><table><thead><tr><th>#</th><th>"I read you…"</th><th>Signal strength</th></tr></thead><tbody>
+      <tr><td class="n">1</td><td>bad</td><td>barely perceptible</td></tr>
+      <tr><td class="n">2</td><td>poor</td><td>weak</td></tr>
+      <tr><td class="n">3</td><td>fair</td><td>fairly good</td></tr>
+      <tr><td class="n">4</td><td>good</td><td>good</td></tr>
+      <tr><td class="n">5</td><td>excellent</td><td>very good</td></tr>
+    </tbody></table></div>
+    <h4>Useful phrases</h4>
+    <ul>
+      <li>What is your name (and call sign)? · How do you read me?</li>
+      <li>Stand by on channel … · Change to channel …</li>
+      <li>I cannot read you. · I cannot understand you.</li>
+      <li>I am passing a message for vessel … · Correction …</li>
+      <li>I am (not) ready to receive your message.</li>
+      <li>I do not have channel … Please use channel …</li>
+    </ul>
+    <h4>Conventions</h4>
+    <ul>
+      <li><b>Repetition:</b> "repeat" for vital parts: "You will load 163 repeat 163 tons bunkers", "Do not repeat not overtake".</li>
+      <li><b>Position:</b> degrees and minutes (decimals if needed) N/S, E/W; or bearing <b>FROM</b> a well-defined charted mark, 360° true, plus distance.</li>
+      <li><b>Courses and bearings:</b> 360° notation from true north unless stated. Relative bearings from the bow, e.g. "030° on your port bow".</li>
+      <li><b>Speed:</b> through the water unless "ground speed" is said.</li>
+      <li><b>Numbers:</b> digit by digit: "one-five-zero" for 150; "two point five" for 2.5.</li>
+      <li><b>Names:</b> as on the chart or Sailing Directions; else give lat/long.</li>
+      <li><b>Time:</b> 24-hour notation, stating UTC, zone time or local time.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ STUDY ============ -->
+<section class="view" id="v-study" data-tab="study">
+  <div><div class="eyebrow">SRC exam</div><h1 style="font-size:26px">Study the handbook</h1>
+  <p class="lead">The 11 chapters, condensed. Tap a chapter to open it.</p></div>
+
+  <div class="panel sec" id="keyfacts"><h2>Key facts to memorise</h2>
+    <ol class="facts">
+      <li><b>Distress</b> = a vessel, vehicle, aircraft or person in <b>grave and imminent danger</b>.</li>
+      <li>Distress message order: <b>MIPDANIO</b> — Mayday, Identity, Position, Distress, Assistance, Number, Information, Over. Exam marks are often lost by forgetting the <b>Mayday</b> and <b>Identity</b> parts.</li>
+      <li>Mayday call: Mayday ×3, this is, name ×3, callsign (and MMSI). Not addressed to anyone, no "over".</li>
+      <li>Ch 16 = distress, safety, calling. Ch 70 = DSC only. Ch 75/76 = guard band, max 1 W.</li>
+      <li>Max power 25 W; every set must have a low-power setting of 1 W or less. Handhelds typically 3–6 W.</li>
+      <li>VHF horizon ≈ 3 × √(height in m) nautical miles. Range = sum of both horizons.</li>
+      <li>Marine VHF ≈ 156 MHz, wavelength ≈ 1.92 m, FM. Optimum antenna ≈ 93 cm.</li>
+      <li>Unanswered call: wait ≥ 2 min, max 3 tries, restart after 3 min.</li>
+      <li>Hearing a Mayday: allow the Coastguard <b>5 minutes</b>; only acknowledge if you can help; otherwise keep silence and write it down.</li>
+      <li>DSC distress button: covered, hold ~<b>5 s</b>. Alert repeats about every <b>4 min</b> until acknowledged/cancelled. Always follow with voice Mayday on ch 16.</li>
+      <li>Class D cannot acknowledge or relay DSC distress alerts. Don't use Class A/B to do so either, unless SAR authorities instruct.</li>
+      <li>DSC urgency/safety announcement carries only your MMSI and the working channel: always follow up by voice.</li>
+      <li>False DSC alert: switch off controller, back on, ch 16, high power, "All stations ×3… cancel my distress alert… Out".</li>
+      <li>MMSI: ship MID+6; coast 00+MID+4; group 0+MID+5. UK MIDs 232–235.</li>
+      <li>EPIRB 406 MHz + homing 121.5 MHz + light. Hex ID 15 chars. Battery ~5 yrs, hydrostatic release every 2 yrs, test each season, never send an alert while testing.</li>
+      <li>Radar-SART: 12 dots, 0.6 M apart, become arcs within ~1 M, circles when close. AIS-SART: red cross in a circle. Mount ≥ 1 m; not with a radar reflector.</li>
+      <li>Navtex 518 kHz (international, English) and 490 kHz (national). Leave it switched on.</li>
+      <li>GMDSS sea areas: A1 VHF, A2 MF, A3 Inmarsat, A4 polar (beyond Inmarsat).</li>
+      <li>Ship Radio Licence = the vessel (like car tax). Authority to Operate (SRC/LRC) = the person (like a driving licence).</li>
+      <li>Secrecy: don't eavesdrop, don't gossip.</li>
+    </ol>
+  </div>
+
+  <details class="ch-d sec" id="c1"><summary><span class="no">1</span><h3>Introduction</h3></summary><div class="body">
+    <h4>Types of message</h4>
+    <ul><li>Distress, Urgency and Safety</li><li>Routine: between vessels; with harbour authorities (port operations); with traffic monitoring/control authorities</li><li>Public correspondence ("link calls"), paid</li><li>On-board communications</li></ul>
+    <h4>Types of user</h4>
+    <p>Anything afloat with a radio is a <b>Ship Radio Station</b>, from cruise liner to canoe. Shore stations (Coastguard, port, marina) are <b>Coast Radio Stations</b>, licensed separately and more restrictively. Aircraft such as Coastguard helicopters also carry marine VHF.</p>
+    <h4>Types of equipment</h4>
+    <p><b>Fixed</b>: mounted, powered from the boat's electrics, separate antenna. <b>Portable</b>: own rechargeable battery and stubby antenna.</p>
+  </div></details>
+
+  <details class="ch-d sec" id="c2"><summary><span class="no">2</span><h3>How radio works</h3></summary><div class="body">
+    <h4>Frequency and wavelength</h4>
+    <p>1 Hz = 1 cycle per second; kHz = thousand, MHz = million, GHz = billion. Radio waves travel at 300,000,000 m/s.</p>
+    <p class="note"><b>Wavelength = 300,000,000 / Frequency.</b> Marine VHF ≈ 156 MHz, so wavelength ≈ 300/156 ≈ 1.92 m.</p>
+    <h4>Bands</h4>
+    <ul><li><b>LF/VLF</b>: diffract easily around obstacles and the horizon; long-range broadcast and navigation.</li>
+    <li><b>MF</b>: medium range, regional broadcast, beacons.</li>
+    <li><b>HF</b>: bounced back by the ionosphere; world-wide communication.</li>
+    <li><b>VHF/UHF</b>: line of sight, not bent over hills or the horizon; local use. Range depends on antenna heights.</li></ul>
+    <p class="note">VHF horizon (miles) ≈ <b>3 × √(antenna height in m)</b>. Motor cruiser at 4 m → 6 M; yacht at 16 m → 12 M; together ≈ 18 M. Full table under Reference → VHF range.</p>
+    <h4>Modulation</h4>
+    <p><b>AM</b> varies the wave's amplitude (MF broadcasting; SSB in marine MF). <b>FM</b> varies the frequency; technically superior, used for VHF.</p>
+    <h4>Antennas</h4>
+    <p>A vertical antenna works best slightly shorter than half a wavelength: about <b>93 cm</b> for marine VHF. Power comes out of the sides, not the ends. Every 3 dB doubles the signal.</p>
+    <ul><li><b>3 dBi</b>: tolerant of heel and pitch; recommended for sailing yachts.</li>
+    <li><b>6 dBi</b>: twice as focused, suffers when tilted; motorboats, if mounted upright.</li>
+    <li><b>1.5 dBi</b>: least focused, fine at an angle; portables.</li></ul>
+    <p>Use proper marine feeder cable, not domestic TV cable. Have an antenna installed professionally where possible.</p>
+    <h4>Batteries</h4>
+    <ul><li><b>Alkaline</b>: not rechargeable; good reserve for some portables. 1.5 V/cell.</li>
+    <li><b>Lithium</b>: not rechargeable, long shelf life; EPIRBs, emergency radios.</li>
+    <li><b>Lead-acid</b>: heavy, rechargeable, economical. Heavy duty (engine starting, avoid &gt;30% discharge), deep cycle/traction (domestic), leisure (compromise). Gel/AGM versions need their own chargers.</li>
+    <li><b>NiCad</b>: thousands of cycles, but self-discharge and "memory effect"; lower voltage than alkaline.</li>
+    <li><b>NiMH</b>: more capacity than NiCad, little memory effect, self-discharges.</li>
+    <li><b>Lithium-ion</b>: most energy per weight, expensive, sensitive to overcharging.</li></ul>
+    <p class="note">Recharge NiCads only when flat. Top up other rechargeables whenever you can. Don't overcharge any rechargeable, especially Li-ion. Never recharge alkaline or lithium.</p>
+  </div></details>
+
+  <details class="ch-d sec" id="c3"><summary><span class="no">3</span><h3>Rules and regulations</h3></summary><div class="body">
+    <h4>Who makes the rules</h4>
+    <p><b>ITU</b> (International Telecommunication Union) holds a World Radio Conference every 2–3 years; result: the <b>Radio Regulations</b>, an international treaty. <b>IMO</b> regulates shipping generally (COLREGs, traffic separation, <b>SOLAS</b>). In the UK: <b>Ofcom</b> (technical, licensing) and the <b>MCA</b> (equipment, qualifications). UK penalties: up to £5000, six months' prison, confiscation. <span class="tag">UK</span></p>
+    <h4>Two licences needed</h4>
+    <p><b>Ship Radio Licence</b>: for the vessel, like taxing a car. UK: free via Ofcom, valid up to 10 years unless owner, address or equipment changes; carry on board; covers all radios incl. the tender's portable. Gives a <b>callsign</b> (4–5 letters/numbers) and optionally an <b>MMSI</b>. <span class="tag">UK</span></p>
+    <p><b>Ship Portable Radio Licence</b>: for a person; one portable VHF (plus a PLB/EPIRB) on multiple vessels, UK waters only; gives a "T" number instead of a callsign. <span class="tag">UK</span></p>
+    <p><b>Coast Station Licences</b>: not free; types for private UK channels, international, marina (channels M, M2, 80), training schools, suppliers.</p>
+    <p><b>Authority to Operate</b>: for the operator, like a driving licence, for life. Voluntary-fit vessels: <b>SRC</b> (VHF) or <b>LRC</b> (VHF, MF, HF, satellite).</p>
+    <h4>Type approval</h4>
+    <p>Equipment must conform to the <b>Radio Equipment Directive (RED)</b>, with a declaration of conformity and the <b>CE mark</b>; SOLAS vessels need <b>MED</b> approval (ship's wheel mark). Many US-market radios are illegal to install under a UK licence.</p>
+    <h4>Radio log</h4>
+    <p>Regulations require a record of distress, urgency and safety messages and important events. UK pleasure craft are exempt, but noting them in the deck log is good practice.</p>
+    <h4>Secrecy</h4>
+    <p>It is an offence to intercept communications not meant for the public, or to divulge what you heard. <b>Don't eavesdrop. Don't gossip.</b></p>
+    <h4>The ten commandments</h4>
+    <ol><li>Do not transmit without the authority of the master</li><li>Do not transmit false or deceptive distress or safety signals</li><li>Do not transmit without identification</li><li>Do not shut down before finishing all operations from a distress, urgency or safety call</li><li>Do not broadcast, other than distress messages</li><li>Do not transmit music</li><li>Do not make unnecessary transmissions</li><li>Do not use profane, indecent or obscene language</li><li>Do not use unauthorised frequencies</li><li>Do not transmit messages for shore except via a licensed coast station</li></ol>
+    <p><b>Broadcasting</b> = transmitting without saying who it is for and without expecting a reply. Test for "necessary": does it relate to the ship's business?</p>
+  </div></details>
+
+  <details class="ch-d sec" id="c4"><summary><span class="no">4</span><h3>Operating a marine VHF radio</h3></summary><div class="body">
+    <dl class="dl">
+      <dt>Power on</dt><dd>Often a press-button; on portables often combined with volume.</dd>
+      <dt>Volume</dt><dd>Loudspeaker level. Some handsets mute the speaker when lifted.</dd>
+      <dt>Squelch</dt><dd>Receiver sensitivity, not volume. Turn up until the frying noise just stops; further risks losing weak signals.</dd>
+      <dt>TX power</dt><dd>Max 25 W (60+ miles in good conditions). Must have ≤ 1 W low power (5–10 miles with a good antenna). Low power saves battery and lets others nearby reuse the channel. Portables usually 3–6 W.</dd>
+      <dt>Channel</dt><dd>Channels replace frequencies, e.g. 156.375 MHz = ch 67. Many sets have a one-touch ch 16 button.</dd>
+      <dt>PTT</dt><dd>Press To Talk (Pressel); release to listen.</dd>
+      <dt>Dual / tri watch, scan</dt><dd>Mainly on 16, flicking to another channel. You cannot transmit in dual watch.</dd>
+      <dt>Dimmer</dt><dd>Adjust display lighting for night use.</dd>
+    </dl>
+    <p>The 10-step set-up is under Routine → Switch on and set up.</p>
+  </div></details>
+
+  <details class="ch-d sec" id="c5"><summary><span class="no">5</span><h3>VHF channels</h3></summary><div class="body">
+    <p>Originally 28 channels 50 kHz apart (1–28); channels 60–88 were interleaved later. Every channel has a frequency (or two) and a designated purpose: two boats talking on port-ops ch 12 is possible, but disruptive, dangerous and illegal.</p>
+    <h4>Simplex, duplex, semi-duplex</h4>
+    <ul><li><b>Simplex</b>: one frequency, take turns (single-track road).</li>
+    <li><b>Duplex</b>: two frequencies, both talk at once (two-lane road). Used for link calls and some port ops.</li>
+    <li><b>Semi-duplex</b>: duplex channel on a set with one antenna; works like simplex. Ch 80: coast transmits 161.625, ship 157.025, so ships can't talk to each other on it.</li></ul>
+    <h4>Private channels</h4>
+    <p>157.450–160.600 MHz left to national governments. UK: ch 0 (156.000) SAR only; <b>M</b> (157.850) and <b>M2</b> (161.425) for marinas, clubs and pleasure craft, UK waters only, no certificate needed. M may display as 37 or P1. <span class="tag">UK</span></p>
+    <h4>US channels</h4>
+    <p>Many international duplex channels are simplex in the US system. Calling a UK marina on US ch 80: they hear you, you won't hear them. Check your radio's setting.</p>
+    <h4>Ch 16, guard band and ch 70</h4>
+    <p>Ch 16 = Distress, Safety and Calling. Ch <b>75 and 76</b> form the guard band; now allowed for port ops and on-board use at max 1 W. Calls on 16: minimal, never over a minute except distress/safety. Ch 70 is digital (DSC) only, never voice.</p>
+  </div></details>
+
+  <details class="ch-d sec" id="c6"><summary><span class="no">6</span><h3>Voice procedure 1: routine calls</h3></summary><div class="body">
+    <p>Plain English with natural rhythm beats half-remembered jargon. Full scripts are on the <b>Routine</b> tab: calling a vessel, a coast station, the Coastguard, radio check, garbled and unanswered calls, link calls. Prowords and the phonetic alphabet are under <b>Reference</b>.</p>
+    <p class="note">Station called is formally "in control", but best practice now is that the vessel that initiated the call proposes the working channel. With a coast station or the Coastguard, they choose it.</p>
+  </div></details>
+
+  <details class="ch-d sec" id="c7"><summary><span class="no">7</span><h3>Voice procedure 2: distress</h3></summary><div class="body">
+    <p>A distress call must be authorised by the person in charge of the vessel at the time.</p>
+    <h4>Is it distress? Examples from the book</h4>
+    <ul><li>Dog overboard: not a vessel/vehicle/aircraft/person → <b>not distress</b>.</li>
+    <li>Skipper overboard: unless 100% sure of recovery → <b>distress</b>.</li>
+    <li>Dismasted, rig round prop, blown onto rocks 1–2 miles off → <b>distress</b>.</li>
+    <li>Motor boat fouled, drifting 30 miles offshore → not imminent → <b>not distress</b> (Pan-pan).</li>
+    <li>Aground on mud in a sheltered estuary, falling tide → not grave → <b>not distress</b>.</li>
+    <li>Skipper with severe chest pain → judgement of whoever is now in charge.</li></ul>
+    <h4>Call and message</h4>
+    <p>The distress call is the only allowed broadcast. Any channel is legal, but use <b>ch 16, high power</b>. The <b>call</b> is the shout for help; the <b>message</b> (MIPDANIO) gives rescuers the information. Every subsequent message about the incident starts with "Mayday".</p>
+    <h4>Specifying position</h4>
+    <ul><li>Lat/long from GPS: check it is valid (just switched on? antenna damaged?). Low battery: transmitting may switch the GPS off.</li>
+    <li>Or bearing and distance <b>FROM</b> a charted landmark, bearings in three figures, degrees true, miles: "one six five degrees from Black Rock Buoy, two decimal four miles". Think: a helicopter flies <b>from</b> the landmark <b>towards</b> you.</li></ul>
+    <h4>Receiving, acknowledging, silence, relay</h4>
+    <p>See the Emergency tab: "I hear a Mayday", "Seelonce" and "Mayday Relay".</p>
+  </div></details>
+
+  <details class="ch-d sec" id="c8"><summary><span class="no">8</span><h3>Voice procedure 3: urgency and safety</h3></summary><div class="body">
+    <p><b>Pan-pan</b>: very urgent message about the safety of a ship, aircraft, vehicle or person. Priority over everything except distress. Not a broadcast: addressed to someone, often "All stations". Ch 16, high power, message follows immediately (PDANIO is a good template).</p>
+    <p><b>Medical advice</b>: Pan-pan addressed to the Coastguard, "request medical advice". UK: you'll be moved to a duplex channel (62, 63, 64) and linked to a doctor.</p>
+    <p><b>Sécurité</b>: gale and navigational warnings, mostly from coast stations. Announced on 16, message on a working channel. A vessel spotting a hazard (e.g. a container) could send one, but telling the Coastguard is usually more useful.</p>
+  </div></details>
+
+  <details class="ch-d sec" id="c9"><summary><span class="no">9</span><h3>GMDSS</h3></summary><div class="body">
+    <p>Global Maritime Distress and Safety System: decided by IMO 1979, phased in 1992–1999. Ships carry at least <b>two independent means</b> of alerting SAR ashore, plus ship-to-ship and safety-information reception.</p>
+    <h4>Sea areas</h4>
+    <dl class="dl"><dt>A1</dt><dd>Within VHF coverage of a DSC coast station</dd><dt>A2</dt><dd>Within MF coverage</dd><dt>A3</dt><dd>Within Inmarsat coverage</dd><dt>A4</dt><dd>Beyond Inmarsat (within ~1200 miles of the poles)</dd></dl>
+    <h4>Navtex</h4>
+    <p>Written navigational warnings and weather forecasts. <b>518 kHz</b>: international, always English. <b>490 kHz</b>: national/local. Each transmitter has a 20-minute slot every 4 hours. Program it to ignore unwanted stations/types; it skips repeats. Leave it on, or it forgets what it has received.</p>
+    <h4>EPIRBs (406 MHz)</h4>
+    <ul><li>Sends a coded distress alert with the vessel's identity, detected by Cospas-Sarsat satellites; 15-character <b>Hex ID</b>; may include GNSS position.</li>
+    <li>Also a <b>121.5 MHz</b> homing signal and a bright flashing light.</li>
+    <li><b>Cospas-Sarsat</b> (1979; USSR, USA, Canada, France): ≥ 4 low polar-orbit satellites under 1000 km, ~14 orbits/day; position by <b>Doppler</b>. May only download when over a ground station.</li>
+    <li><b>Geosar</b>: 3 geostationary satellites at ~36,000 km; immediate relay, but need position in the signal.</li>
+    <li><b>MEOSAR</b>: payloads on GPS, Galileo, Glonass satellites; combines both advantages.</li>
+    <li><b>Category 1</b>: float-free, auto-activated at 2–4 m depth; stowed in bracket on upper deck. <b>Category 2</b>: manual.</li>
+    <li>Test each season per manufacturer; battery usually every <b>5 years</b>; hydrostatic release serviced/replaced every <b>2 years</b>. Never send an alert while testing.</li>
+    <li>Register it (UK Beacon Registry); include on the Ship Radio Licence.</li>
+    <li>Avoid false alarms: switch off when not in use, wrap in two layers of kitchen foil for transport. If triggered by accident: switch off, tell the Coastguard by any means.</li>
+    <li><b>PLB</b>: personal, 406 MHz, may have 121.5 homing.</li></ul>
+    <h4>SARTs</h4>
+    <ul><li><b>Radar-SART</b> (transponder): answers X-band radar with 12 pulses: a line of 12 dots, 0.6 M apart, outwards from the SART; within ~1 M they become arcs, then 12 concentric circles.</li>
+    <li><b>AIS-SART</b> (transmitter): GNSS position on AIS; red cross in a circle on the plotter; 9-digit ID.</li>
+    <li>Need radar or AIS on the searching vessel; line of sight. ~5 M normally, under 2 M lying on a liferaft floor, up to 40 M (aircraft). Mount ≥ 1 m above sea; don't use with a radar reflector.</li></ul>
+  </div></details>
+
+  <details class="ch-d sec" id="c10"><summary><span class="no">10</span><h3>DSC: introduction and routine calls</h3></summary><div class="body">
+    <p>Digital Selective Calling automates ch 16 procedures. Since April 2000 all radios sold have DSC built in or connectable. A DSC message (format specifier, called MMSI, own MMSI, suggested working channel) lasts ~0.5 s on <b>ch 70</b>. Only the called station's controller alarms; accepting it sends an acknowledgement and switches both radios to the working channel.</p>
+    <h4>Controller classes</h4>
+    <dl class="dl"><dt>A</dt><dd>All facilities incl. HF/MF control, acknowledge/relay distress, geographical area calls. Commercial.</dd>
+    <dt>B</dt><dd>Reduced; minimum for vessels required to carry MF and VHF. No HF, no area calls.</dd>
+    <dt>D</dt><dd>Small craft, VHF only, reduced capability.</dd>
+    <dt>E</dt><dd>Small craft, MF/HF only.</dd></dl>
+    <h4>Call types and priorities</h4>
+    <p>Types: <b>Distress, All ships, Individual, Group</b>. Priorities: Distress (Mayday), Urgency (Pan-pan), Safety (Sécurité), Ship's business (not on Class D), Routine.</p>
+    <h4>Position</h4>
+    <p>Connect a GPS so the controller always knows the position (updates about every second). Position and time can be entered manually as back-up.</p>
+    <h4>Sending a routine call (example: Icom DS100)</h4>
+    <ol><li>Press &lt;Call&gt;</li><li>Select call type (Individual; Group; All ships; Distress), &lt;Enter&gt;</li><li>Enter the MMSI manually or pick from the phone book, &lt;Enter&gt;</li><li>Select a working channel, &lt;Enter&gt;</li><li>Press &lt;Call&gt; and &lt;Enter&gt; together to transmit</li></ol>
+    <p class="note">Other makes differ: on a Simrad DSC 1400, &lt;Enter&gt; sends the whole call immediately. Read the manual.</p>
+    <h4>Receiving</h4>
+    <p><b>Individual</b>: phone-like alarm; one key accepts, acknowledges and switches channel. <b>Group</b>: accepting only mutes the alarm and switches channel; no acknowledgement is sent.</p>
+    <p>On a Class A or B set, do <b>not</b> use DSC to relay or acknowledge distress messages: use voice.</p>
+  </div></details>
+
+  <details class="ch-d sec" id="c11"><summary><span class="no">11</span><h3>DSC distress, urgency and safety</h3></summary><div class="body">
+    <p>Same definition of distress. The distress button composes an alert with MMSI and position, sent to all stations on ch 70. Covered button, held ~5 s.</p>
+    <h4>Nature of distress options</h4>
+    <p>Undesignated (default), Fire or explosion, Flooding, Collision, Grounding, Listing / in danger of capsizing, Sinking, Disabled and adrift, Abandoning ship, Piracy, Man overboard.</p>
+    <p class="note">Read the manual. Practise composing distress alerts. Never send one unless you are really in distress.</p>
+    <h4>After sending</h4>
+    <p>The alert repeats at random intervals of ~4 min until acknowledged or cancelled. It holds less information than a voice Mayday and non-DSC vessels can't receive it, so <b>always follow with a voice Mayday on 16</b>, including your MMSI.</p>
+    <h4>Receiving a DSC distress alert</h4>
+    <ul><li>Allow a coast station up to 5 minutes.</li><li>If you can't help effectively, don't respond.</li><li>If you can help and hear nothing within 5 min: acknowledge <b>by voice</b> on 16.</li><li>Try to relay to a coast station by any means.</li><li>Otherwise keep radio silence.</li></ul>
+    <p>Class D can't acknowledge or relay DSC alerts; Class A/B shouldn't unless SAR authorities ask. If an alert is not acknowledged within 5 min, contact the casualty by voice on 16 and inform the Coastguard by voice on 16. You may still send a voice Mayday Relay.</p>
+    <h4>Urgency and safety announcements</h4>
+    <ol><li>&lt;Call&gt;</li><li>Select "All ships", &lt;Enter&gt;</li><li>Select "Urgency" or "Safety", &lt;Enter&gt;</li><li>Select working channel (usually 16), &lt;Enter&gt;</li><li>&lt;Call&gt; + &lt;Enter&gt; together</li><li>Follow up with the voice Pan-pan or Sécurité</li></ol>
+    <p>Receiving one: accepting mutes the alarm and switches channel; no acknowledgement is sent.</p>
+  </div></details>
+
+  <details class="ch-d sec" id="syllabus"><summary><span class="no">A1</span><h3>Exam syllabus (CEPT SRC)</h3></summary><div class="body">
+    <h4>A. General knowledge</h4>
+    <ul><li>Types of communication: distress/urgency/safety, SAR, public correspondence, port ops and ship movement, intership, on-board</li><li>Types of station: ship, coast, RCCs, pilot/VTS/port, aircraft</li><li>VHF channels: frequency, propagation and range, simplex/semi-duplex/duplex, use and restrictions, distress/calling/intership/port/public/national small-craft channels</li><li>GMDSS overview: structure, sea areas, role of RCCs</li></ul>
+    <h4>B. Equipment</h4>
+    <ul><li>Navtex: purpose, message format (transmitter ID, type, number), selection, messages that cannot be rejected</li><li>VHF radiotelephone: channel selection, dual watch, basic controls (power, PTT, high/low power, volume, squelch, dimmer); handheld VHF</li><li>DSC: categories and priorities, call types, MMSI (MID, ship, coast, group), distress button, data entry, position updating, received messages, watchkeeping</li><li>Antennas, interfacing (position device), power sources and batteries</li></ul>
+    <h4>C. DSC procedures</h4>
+    <ul><li>Sending a distress alert; acknowledgement by coast station; shore-to-ship relay; alert by a station not in distress</li><li>DSC urgency and safety announcements</li><li>Protecting distress frequencies: no false alerts, status of ch 16 and 70, traffic during distress, test procedures, guard bands, cancelling a false alert</li><li>EPIRBs (406 MHz: registration, coding, testing, 121.5 homing, float-free, battery) and SARTs (height, range, battery); handheld VHF</li></ul>
+    <h4>D. Radiotelephony procedures</h4>
+    <ul><li>MAYDAY call and message, RECEIVED MAYDAY, control of distress traffic, SEELONCE MAYDAY / FEENEE, MAYDAY RELAY</li><li>PAN-PAN, radiomedical; SECURITE</li><li>IMO SMCP awareness; phonetic alphabet</li><li>Traffic routines: callsigns, establishing contact, unanswered and garbled calls; calling coast stations; charges, AAIC</li></ul>
+    <h4>E. Regulations</h4>
+    <ul><li>National and international documentation (lists of coast and ship stations, MMSI assignments)</li><li>Operator's certificate, ship station licence, record keeping, secrecy, prohibited transmissions, watchkeeping</li></ul>
+  </div></details>
+
+  <footer class="src">Condensed from the <i>VHF Handbook</i> (SRC course book, UK edition). Items marked <span class="tag">UK</span> apply to UK waters.</footer>
+</section>
+
+</div></main>
+
+<nav class="tabs" aria-label="Sections"><div class="row">
+  <a class="t-em" href="#v-emergency" data-tab="emergency" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/></svg>Emergency</a>
+  <a href="#v-routine" data-tab="routine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15a8 8 0 0 1 8-8M4 15h4l2 4h4l2-4h4a8 8 0 0 0-8-8"/></svg>Routine</a>
+  <a href="#v-reference" data-tab="reference"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Reference</a>
+  <a href="#v-study" data-tab="study"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l9-3 9 3-9 3-9-3zM6 8v6c0 2 3 4 6 4s6-2 6-4V8"/></svg>Study</a>
+</div></nav>
+
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sh-title">
+  <div class="sheet-head"><div class="row"><h2 id="sh-title">MAYDAY</h2><button id="sh-close">Close</button></div></div>
+  <div class="sheet-body"><div class="wrap" id="sh-body"></div></div>
+</div>
+
+<script>
+document.documentElement.classList.add("js");
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- phonetic ---------- */
+const PH={A:"Alpha",B:"Bravo",C:"Charlie",D:"Delta",E:"Echo",F:"Foxtrot",G:"Golf",H:"Hotel",I:"India",J:"Juliet",K:"Kilo",L:"Lima",M:"Mike",N:"November",O:"Oscar",P:"Papa",Q:"Quebec",R:"Romeo",S:"Sierra",T:"Tango",U:"Uniform",V:"Victor",W:"Whiskey",X:"X-Ray",Y:"Yankee",Z:"Zulu",
+"0":"Zero","1":"One","2":"Two","3":"Three","4":"Four","5":"Five","6":"Six","7":"Seven","8":"Eight","9":"Niner"};
+const spell=s=>[...String(s).toUpperCase()].filter(c=>PH[c]).map(c=>PH[c]).join(", ");
+$("#phon").innerHTML=[..."ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"].map(k=>`<div><b>${k}</b><span>${PH[k]}</span></div>`).join("");
+$("#speller").addEventListener("input",e=>{const v=spell(e.target.value);$("#spelled").innerHTML=v?esc(v):'<span class="empty">The phonetic spelling appears here.</span>'});
+
+/* ---------- prowords ---------- */
+const PW=[["All after / All before","Asking for part of a message to be repeated: \"say again all after a pound of sausages\""],["Correct / Wrong","\"Correct\" confirms a read-back. \"Wrong\" (not \"incorrect\") sounds completely different"],["Correction","Putting a mistake right: \"a hundred and sixteen carrots, correction, one pound of carrots\""],["In figures / In letters","Distinguishing numbers and words: \"Five Ashes Lane\" vs \"5, Ashes Lane\""],["I say again","I am going to repeat what I just said"],["I spell","I am going to spell the last word, using the phonetic alphabet"],["Out","End of transmission, no reply expected"],["Over","End of transmission, reply expected"],["Radio check","Please comment on the strength and quality of my transmission"],["Read back","Please read back the message I just passed"],["Received","I have received your message (not \"roger\")"],["Say again","Please repeat what you just said"],["Station calling","Instead of a name when you didn't hear who called you"],["Text","Start of a message to be written down and relayed verbatim"],["Traffic","General term for radio communications"],["This is","Identifying yourself at the start of a call"],["Wait","Wait, ideally with a time: \"Wait five minutes\""],["Word after / Word before","Asking for a single word to be repeated or spelt"]];
+$("#pw").innerHTML=PW.map(([a,b])=>`<dt>${a}</dt><dd>${esc(b)}</dd>`).join("");
+
+/* ---------- channels ---------- */
+// [ch, ship, coast, intership, portSingle, portTwo, publicCorr, note]
+const CH=[["01","156.050","160.650",0,1,1,1,""],["02","156.100","160.700",0,1,1,1,""],["03","156.150","160.750",0,1,1,1,""],["04","156.200","160.800",0,1,1,1,""],["05","156.250","160.850",0,1,1,1,""],["06","156.300","",1,0,0,0,"Ship to ship"],["07","156.350","160.950",0,1,1,1,""],["08","156.400","",1,0,0,0,"Ship to ship"],["09","156.450","156.450",1,1,0,0,"Used by pilots"],["10","156.500","156.500",1,1,0,0,"Used by HM Coastguard"],["11","156.550","156.550",0,1,0,0,"Port operations"],["12","156.600","156.600",0,1,0,0,"Port operations"],["13","156.650","156.650",1,1,0,0,"Bridge-to-bridge working"],["14","156.700","156.700",0,1,0,0,"Port operations"],["15","156.750","156.750",1,1,0,0,"On-board working"],["16","156.800","156.800",0,0,0,0,"DISTRESS, SAFETY AND CALLING"],["17","156.850","156.850",1,1,0,0,"On-board working"],["18","156.900","161.500",0,1,1,1,""],["19","156.950","161.550",0,1,1,1,""],["20","157.000","161.600",0,1,1,1,""],["21","157.050","161.650",0,1,1,1,""],["22","157.100","161.700",0,1,1,1,""],["23","157.150","161.750",0,1,1,1,""],["24","157.200","161.800",0,1,1,1,""],["25","157.250","161.850",0,1,1,1,""],["26","157.300","161.900",0,1,1,1,""],["27","157.350","161.950",0,0,1,1,""],["28","157.400","162.000",0,0,1,1,""],["60","156.025","160.625",0,1,1,1,""],["61","156.075","160.675",0,1,1,1,""],["62","156.125","160.725",0,1,1,1,"HMCG MSI broadcasts (UK)"],["63","156.175","160.775",0,1,1,1,"HMCG MSI broadcasts (UK)"],["64","156.225","160.825",0,1,1,1,"HMCG MSI broadcasts (UK)"],["65","156.275","160.875",0,1,1,1,""],["66","156.325","160.925",0,1,1,1,""],["67","156.375","156.375",1,1,0,0,"UK small ship safety"],["68","156.425","156.425",0,1,0,0,""],["69","156.475","156.475",1,1,0,0,"Port operations"],["70","156.525","156.525",0,0,0,0,"DSC ONLY. NOT FOR VOICE"],["71","156.575","156.575",0,1,0,0,""],["72","156.625","",1,0,0,0,"Ship to ship"],["73","156.675","156.675",1,1,0,0,"Used by HM Coastguard"],["74","156.725","156.725",0,1,0,0,""],["75","156.775","156.775",0,1,0,0,"Guard band: navigation comms, 1 W"],["76","156.825","156.825",0,1,0,0,"Guard band: navigation comms, 1 W"],["77","156.875","",1,0,0,0,"Ship to ship"],["78","156.925","161.525",0,1,1,1,""],["79","156.975","161.575",0,1,1,1,""],["80","157.025","161.625",0,1,1,1,"Marinas (UK only)"],["81","157.075","161.675",0,1,1,1,""],["82","157.125","161.725",0,1,1,1,""],["83","157.175","161.775",0,1,1,1,""],["84","157.225","161.825",0,1,1,1,""],["85","157.275","161.875",0,1,1,1,""],["86","157.325","161.925",0,1,1,1,""],["87","157.375","157.375",0,1,0,0,""],["88","157.425","157.425",0,1,0,0,""],["AIS 1","161.975","161.975",0,0,0,0,"AIS"],["AIS 2","162.025","162.025",0,0,0,0,"AIS"],["M (37)","157.850","157.850",0,1,0,0,"UK private: marinas, clubs, recreational craft"],["M2","161.425","161.425",0,1,0,0,"UK private: marinas, clubs, recreational craft"]];
+function drawCh(f){
+  $("#chbody").innerHTML=CH.filter(r=>{const simplex=!r[2]||r[1]===r[2];
+    return f==="all"||(f==="ship"&&r[3])||(f==="port"&&(r[4]||r[5]))||(f==="pc"&&r[6])||(f==="simplex"&&simplex);
+  }).map(r=>{const use=[r[3]&&"Inter-ship",(r[4]||r[5])&&("Port ops"+(r[5]&&!r[4]?" (two freq.)":"")),r[6]&&"Public corr."].filter(Boolean).join(" · ");
+    const hot=r[0]==="16"||r[0]==="70";
+    return `<tr class="${hot?"hot":""}"><td class="n"><b>${r[0]}</b></td><td class="n">${r[1]}</td><td class="n">${r[2]||"–"}</td><td>${use||"–"}</td><td>${hot?"<b>"+r[7]+"</b>":r[7]}</td></tr>`}).join("");
+}
+drawCh("all");
+$("#chfilter").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;$$("#chfilter button").forEach(x=>x.setAttribute("aria-pressed",x===b));drawCh(b.dataset.f)});
+
+/* ---------- boat profile ---------- */
+const FIELDS=["name","call","mmsi","pob","desc"];
+let boat={};try{boat=JSON.parse(store.get("vhf-boat")||"{}")||{}}catch(e){boat={}}
+FIELDS.forEach(f=>{const el=$("#b-"+f);el.value=boat[f]||"";el.addEventListener("input",()=>{boat[f]=el.value.trim();store.set("vhf-boat",JSON.stringify(boat));$("#b-saved").textContent="Saved on this device";})});
+const F=(v,ph)=>v?`<span class="fill">${esc(v)}</span>`:`<span class="fill empty">[${ph}]</span>`;
+const nm=()=>F(boat.name,"boat name");
+const cs=()=>boat.call?F(spell(boat.call),"callsign"):F("","callsign, spelled phonetically");
+const mm=()=>F(boat.mmsi,"MMSI");
+
+/* ---------- emergency sheets ---------- */
+const state={nature:"Sinking",pos:"",assist:"Require immediate assistance",extra:"",relayName:"",relayPos:"",relayNature:"",relayPob:"",relayInfo:"",cg:""};
+const NATURES=["Sinking","On fire","Flooding","Aground","Collision","Capsizing","Disabled and adrift","Man overboard","Abandoning ship"];
+function posHelp(){return `<label>Position (lat/long, or bearing FROM a charted mark)<input id="i-pos" value="${esc(state.pos)}" placeholder="e.g. 50 32.3 N 003 25.4 W  /  165° from Black Rock Buoy 2.4 miles"></label>`}
+const SHEETS={
+mayday:{t:"MAYDAY",k:"--mayday",render(){return `
+  <div class="note warn"><b>Grave and imminent danger</b> to a vessel or person. Authorised by the person in charge. If you have DSC: press the red Distress button first (see DSC distress alert), then give this voice call.</div>
+  <ol class="steps"><li><span>Channel <b>16</b></span></li><li><span><b>High power</b></span></li><li><span>Press PTT, speak <b>slowly and clearly</b></span></li></ol>
+  <div class="quick">${posHelp()}
+   <div><div class="eyebrow" style="margin-bottom:6px">Nature of distress</div><div class="chips" id="i-nature">${NATURES.map(n=>`<button aria-pressed="${n===state.nature}">${n}</button>`).join("")}</div></div>
+   <label>Extra information (optional)<input id="i-extra" value="${esc(state.extra)}" placeholder="e.g. we expect to abandon into a liferaft in five minutes"></label></div>
+  <div class="eyebrow">Distress call</div>
+  <div class="script">
+   <p><span class="pw">MAYDAY, MAYDAY, MAYDAY</span></p>
+   <p><span class="pw">this is</span></p>
+   <p>${nm()}, ${nm()}, ${nm()}</p>
+   <p>${cs()}</p>
+   <p>MMSI ${mm()}</p>
+  </div>
+  <div class="eyebrow">Distress message, straight after (MIPDANIO)</div>
+  <div class="script">
+   <p><span class="lbl">M</span><span class="pw">MAYDAY</span></p>
+   <p><span class="lbl">I</span>${nm()}, ${cs()}, MMSI ${mm()}</p>
+   <p><span class="lbl">P</span>My position is ${F(state.pos,"position")}</p>
+   <p><span class="lbl">D</span>${F(state.nature,"nature of distress")}</p>
+   <p><span class="lbl">A</span>${esc(state.assist)}</p>
+   <p><span class="lbl">N</span>${F(boat.pob,"number")} people on board</p>
+   <p><span class="lbl">I</span>${F(boat.desc,"short description of boat")}${state.extra?". "+F(state.extra,""):""}</p>
+   <p><span class="lbl">O</span><span class="pw">OVER</span></p>
+  </div>
+  <div class="panel"><h2 style="font-size:17px">Then</h2><ul>
+   <li>Listen. Reply will be like: "<i>Mayday ${boat.name?esc(boat.name):"…"}, this is … Coastguard, Received Mayday, Stand by.</i>"</li>
+   <li>No answer? Repeat the call and message.</li>
+   <li>Every following message about this incident starts with <b>Mayday</b>.</li>
+   <li>Don't switch off until all distress traffic is finished.</li></ul></div>`}},
+dsc:{t:"DSC DISTRESS ALERT",k:"--mayday",render(){return `
+  <ol class="steps">
+   <li><span>Lift the cover of the red <b>Distress</b> button.</span></li>
+   <li><span>If there's time: press and release it (or use the Call menu) and pick the <b>nature of distress</b>: Fire/explosion, Flooding, Collision, Grounding, Listing, Sinking, Disabled and adrift, Abandoning ship, Piracy, Man overboard. Otherwise it sends "Undesignated".</span></li>
+   <li><span><b>Press and hold</b> Distress for about <b>5 seconds</b> until it transmits. Your MMSI and GPS position are included.</span></li>
+   <li><span>The alert repeats automatically about every 4 minutes until acknowledged or cancelled.</span></li>
+   <li><span>Radio switches to ch 16. Immediately give the <b>voice Mayday</b> with your MMSI.</span></li>
+  </ol>
+  <a class="bigbtn b-mayday" href="#s-mayday" data-open="mayday"><b>Voice MAYDAY</b><span>Open the script with your boat details</span><i aria-hidden="true">›</i></a>
+  <div class="note">Sent it by accident? Use <a href="#s-false" data-open="false">False alert sent</a>.</div>`}},
+relay:{t:"MAYDAY RELAY",k:"--mayday",render(){return `
+  <div class="note warn">Use when another vessel is in distress and its Mayday has not been acknowledged (about a minute with no traffic suggesting contact), or you see a vessel in distress that can't call for itself. <b>Not</b> by DSC on a Class D set: by voice.</div>
+  <ol class="steps"><li><span>Channel <b>16</b>, high power</span></li><li><span>Address the Coastguard. No reply? Repeat with "All stations".</span></li></ol>
+  <div class="quick">
+   <label>Coastguard (or leave empty for All stations)<input id="r-cg" value="${esc(state.cg)}" placeholder="e.g. Falmouth Coastguard"></label>
+   <label>Vessel in distress: name, callsign, MMSI<input id="r-name" value="${esc(state.relayName)}" placeholder="e.g. Hydro Ace, MVYQ7, 232089001"></label>
+   <label>Its position<input id="r-pos" value="${esc(state.relayPos)}" placeholder="as heard, or e.g. 120° from Blunt Point 5 miles"></label>
+   <label>Nature of distress<input id="r-nat" value="${esc(state.relayNature)}" placeholder="e.g. Aground / red flare seen"></label>
+   <label>Persons on board<input id="r-pob" value="${esc(state.relayPob)}" placeholder="e.g. Three"></label>
+   <label>Other information<input id="r-info" value="${esc(state.relayInfo)}" placeholder="e.g. twelve metre motor cruiser, white deck and hull"></label></div>
+  <div class="script">
+   <p><span class="pw">MAYDAY RELAY, MAYDAY RELAY, MAYDAY RELAY</span></p>
+   <p>${state.cg?F(state.cg,"")+", "+F(state.cg,"")+", "+F(state.cg,""):"<span class='pw'>All stations, All stations, All stations</span>"}</p>
+   <p><span class="pw">this is</span> ${nm()}, ${nm()}, ${nm()}</p>
+   <p>${cs()}, MMSI ${mm()}</p>
+   <p><span class="lbl">M</span><span class="pw">MAYDAY</span></p>
+   <p><span class="lbl">I</span>${F(state.relayName,"vessel in distress")}</p>
+   <p><span class="lbl">P</span>Position ${F(state.relayPos,"its position")}</p>
+   <p><span class="lbl">D</span>${F(state.relayNature,"nature of distress")}</p>
+   <p><span class="lbl">A</span>Require immediate assistance</p>
+   <p><span class="lbl">N</span>${F(state.relayPob,"number")} people on board</p>
+   <p><span class="lbl">I</span>${F(state.relayInfo,"description")}</p>
+   <p><span class="lbl">O</span><span class="pw">OVER</span></p>
+  </div>
+  <p class="lead">Your own name goes after "this is", not the casualty's. If you saw a signal rather than heard a message, give equivalent information: "red flare seen approximately one two zero degrees from Blunt Point, five miles".</p>`}},
+pan:{t:"PAN-PAN",k:"--pan",render(){return `
+  <div class="note">Very urgent message about the safety of a vessel or person, but not grave and imminent. Example: disabled and drifting, far from danger. Priority over everything except distress.</div>
+  <ol class="steps"><li><span>DSC (optional): Call → All ships → Urgency → ch 16 → send</span></li><li><span>Channel <b>16</b>, <b>high power</b></span></li><li><span>Address it (usually All stations); message follows straight away</span></li></ol>
+  <div class="quick">${posHelp()}
+   <label>What's wrong<input id="p-nat" value="${esc(state.panNat||"")}" placeholder="e.g. Adrift in the traffic separation scheme"></label>
+   <label>Help needed<input id="p-ass" value="${esc(state.panAss||"")}" placeholder="e.g. Request a tow"></label></div>
+  <div class="script" style="--k:var(--pan)">
+   <p><span class="pw">PAN-PAN, PAN-PAN, PAN-PAN</span></p>
+   <p><span class="pw">All stations, All stations, All stations</span></p>
+   <p><span class="pw">this is</span> ${nm()}, ${nm()}, ${nm()}</p>
+   <p>${cs()}, MMSI ${mm()}</p>
+   <p><span class="lbl">P</span>My position ${F(state.pos,"position")}</p>
+   <p><span class="lbl">D</span>${F(state.panNat,"what's wrong")}</p>
+   <p><span class="lbl">A</span>${F(state.panAss,"help needed")}</p>
+   <p><span class="lbl">N</span>${F(boat.pob,"number")} persons on board</p>
+   <p><span class="lbl">I</span>${F(boat.desc,"description")}</p>
+   <p><span class="lbl">O</span><span class="pw">OVER</span></p>
+  </div>`}},
+medico:{t:"MEDICAL ADVICE",k:"--pan",render(){return `
+  <div class="note">A Pan-pan addressed to the <b>Coastguard</b>, not All stations. ("Panpan Medico" is no longer used.)</div>
+  <ol class="steps"><li><span>Channel <b>16</b>, high power</span></li></ol>
+  <div class="quick"><label>Coastguard<input id="m-cg" value="${esc(state.cg)}" placeholder="e.g. Clyde Coastguard"></label></div>
+  <div class="script" style="--k:var(--pan)">
+   <p><span class="pw">PAN-PAN, PAN-PAN, PAN-PAN</span></p>
+   <p>${F(state.cg,"Coastguard")}, ${F(state.cg,"Coastguard")}, ${F(state.cg,"Coastguard")}</p>
+   <p><span class="pw">this is</span> ${nm()}, ${nm()}, ${nm()}</p>
+   <p>${cs()}, MMSI ${mm()}</p>
+   <p>Request urgent medical advice</p>
+   <p><span class="pw">OVER</span></p>
+  </div>
+  <p class="lead">Expect to be moved to a duplex channel (UK: 62, 63 or 64) and linked to a doctor. Have your position and vessel details ready in case it escalates to a lifeboat or helicopter.</p>`}},
+heard:{t:"I HEAR A MAYDAY",k:"--mayday",render(){return `
+  <ol class="steps">
+   <li><span><b>Write it down</b>: name, callsign/MMSI, position, problem, people on board.</span></li>
+   <li><span>Keep <b>radio silence</b> on that channel unless you are acknowledging and helping.</span></li>
+   <li><span>A coast station has probably heard it: give them <b>5 minutes</b> to respond.</span></li>
+   <li><span>Can't help effectively? <b>Don't acknowledge.</b></span></li>
+   <li><span>No response and you can help: acknowledge by voice, then report your position, speed and ETA.</span></li>
+   <li><span>No acknowledgement at all and no sign of contact with rescuers: send a <a href="#s-relay" data-open="relay">Mayday Relay</a>.</span></li>
+   <li><span>DSC alert received: same rules. Class D can't acknowledge or relay by DSC; if not acknowledged within 5 min, call the casualty and the Coastguard <b>by voice on 16</b>.</span></li>
+  </ol>
+  <div class="eyebrow">Acknowledge</div>
+  <div class="script">
+   <p><span class="pw">MAYDAY</span> ${F(state.relayName,"casualty name")}</p>
+   <p><span class="pw">this is</span> ${nm()}, ${nm()}, ${nm()}</p>
+   <p><span class="pw">RECEIVED MAYDAY</span></p>
+   <p><span class="pw">OUT</span></p>
+  </div>
+  <div class="eyebrow">Follow up</div>
+  <div class="quick">${posHelp()}<label>Your speed and ETA<input id="h-eta" value="${esc(state.eta||"")}" placeholder="e.g. My speed two five knots. My ETA ten minutes"></label>
+   <label>Casualty name<input id="h-cas" value="${esc(state.relayName)}" placeholder="e.g. Hydro Ace"></label></div>
+  <div class="script">
+   <p><span class="pw">MAYDAY</span> ${F(state.relayName,"casualty name")}</p>
+   <p><span class="pw">this is</span> ${nm()}, ${nm()}, ${nm()}</p>
+   <p>My position ${F(state.pos,"your position")}</p>
+   <p>${F(state.eta,"speed and ETA")}</p>
+   <p><span class="pw">OUT</span></p>
+  </div>`}},
+false:{t:"FALSE ALERT",k:"--mayday",render(){return `
+  <div class="note warn">First rule: <b>don't repeat it.</b></div>
+  <ol class="steps">
+   <li><span><b>Switch the DSC controller off</b> (usually the radio off) to stop automatic repeats. If your set has a dedicated <b>cancel distress</b> function, use that instead.</span></li>
+   <li><span>Switch back on, select <b>ch 16</b> and <b>high power</b>.</span></li>
+   <li><span>Send this cancel message:</span></li>
+  </ol>
+  <div class="script">
+   <p><span class="pw">All stations, All stations, All stations</span></p>
+   <p><span class="pw">this is</span> ${nm()}, ${nm()}, ${nm()}</p>
+   <p>${cs()}</p>
+   <p>MMSI ${mm()}, <span class="pw">I say again</span>, MMSI ${mm()}</p>
+   <p>Cancel my distress alert, <span class="pw">I say again</span>, cancel my distress alert</p>
+   <p><span class="pw">OUT</span></p>
+  </div>
+  <div class="panel"><h2 style="font-size:17px">EPIRB set off by accident?</h2><p>Switch it off immediately and tell the nearest Search and Rescue authority (the Coastguard) by any means available that a false alert has been made.</p></div>`}},
+securite:{t:"SÉCURITÉ",k:"--sec",render(){return `
+  <div class="note">Important navigational or meteorological warning. Pronounced "Securitay". Announce on ch 16, give the message on a working channel. Spotted a hazard yourself (e.g. a floating container)? Usually better to tell the Coastguard.</div>
+  <ol class="steps"><li><span>DSC (optional): Call → All ships → Safety → working channel → send</span></li><li><span>Announce on <b>16</b></span></li><li><span>Switch to the working channel and repeat the call with the message</span></li></ol>
+  <div class="script" style="--k:var(--sec)">
+   <p><span class="pw">SÉCURITÉ, SÉCURITÉ, SÉCURITÉ</span></p>
+   <p><span class="pw">All ships, All ships, All ships</span></p>
+   <p><span class="pw">this is</span> ${nm()}, ${nm()}, ${nm()}</p>
+   <p>For navigational warning listen channel <span class="fill">[working ch]</span></p>
+   <p><span class="pw">OUT</span></p>
+  </div>
+  <p class="lead">Book example: "Securitay ×3, All ships ×3, this is Yarmouth Coastguard ×3, for new gale warning for sea areas Humber, Thames, listen Channel eight four. Out."</p>`}},
+seelonce:{t:"SEELONCE",k:"--sec",render(){return `
+  <p>Distress traffic automatically means radio silence on that channel for everyone not involved. The casualty or the station controlling the distress traffic (e.g. the Coastguard) can impose it:</p>
+  <div class="script" style="--k:var(--mayday)">
+   <p><span class="pw">All ships, All ships, All ships</span></p>
+   <p><span class="pw">this is</span> Brixham Coastguard, Brixham Coastguard, Brixham Coastguard</p>
+   <p><span class="pw">SEELONCE MAYDAY</span>, <span class="pw">I say again</span>, <span class="pw">SEELONCE MAYDAY</span></p>
+   <p><span class="pw">OUT</span></p>
+  </div>
+  <p>When it's over, the controlling station lifts it:</p>
+  <div class="script" style="--k:var(--sec)">
+   <p><span class="pw">All ships, All ships, All ships</span></p>
+   <p><span class="pw">this is</span> Brixham Coastguard, Brixham Coastguard, Brixham Coastguard</p>
+   <p><span class="pw">SEELONCE FEENEE</span></p>
+   <p><span class="pw">OUT</span></p>
+  </div>`}}
+};
+const BIND={"i-pos":"pos","i-extra":"extra","r-cg":"cg","m-cg":"cg","r-name":"relayName","h-cas":"relayName","r-pos":"relayPos","r-nat":"relayNature","r-pob":"relayPob","r-info":"relayInfo","p-nat":"panNat","p-ass":"panAss","h-eta":"eta"};
+let current=null,wake=null;
+function renderSheet(keepFocus){
+  const s=SHEETS[current];const active=document.activeElement&&document.activeElement.id;const caret=active&&document.activeElement.selectionStart;
+  $("#sh-title").textContent=s.t;$("#sheet").style.setProperty("--k",`var(${s.k})`);
+  $("#sh-body").innerHTML=s.render();
+  if(keepFocus&&active&&$("#"+active)){const el=$("#"+active);el.focus();try{el.setSelectionRange(caret,caret)}catch(e){}}
+}
+function openSheet(id){current=id;renderSheet();const sh=$("#sheet");sh.hidden=false;sh.scrollTop=0;document.body.style.overflow="hidden";$("#sh-close").focus();
+  try{navigator.wakeLock&&navigator.wakeLock.request("screen").then(w=>wake=w).catch(()=>{})}catch(e){}}
+function closeSheet(){$("#sheet").hidden=true;document.body.style.overflow="";current=null;try{wake&&wake.release()}catch(e){}wake=null}
+$("#sh-close").addEventListener("click",closeSheet);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&current)closeSheet()});
+function refreshScripts(){const tmp=document.createElement("div");tmp.innerHTML=SHEETS[current].render();
+  const now=$$("#sh-body .script"),next=[...tmp.querySelectorAll(".script")];now.forEach((el,i)=>{if(next[i])el.innerHTML=next[i].innerHTML})}
+$("#sh-body").addEventListener("input",e=>{const k=BIND[e.target.id];if(k){state[k]=e.target.value;refreshScripts()}});
+$("#sh-body").addEventListener("click",e=>{const b=e.target.closest("#i-nature button");if(b){state.nature=b.textContent;renderSheet()}});
+document.addEventListener("click",e=>{const o=e.target.closest("[data-open]");if(o){e.preventDefault();openSheet(o.dataset.open)}});
+
+/* ---------- tabs ---------- */
+function showTab(t){$$(".view").forEach(v=>v.hidden=v.dataset.tab!==t);$$("nav.tabs a").forEach(b=>b.dataset.tab===t?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));store.set("vhf-tab",t)}
+$$("nav.tabs a").forEach(b=>b.addEventListener("click",e=>{e.preventDefault();showTab(b.dataset.tab);window.scrollTo(0,0)}));
+function goTo(id){const el=document.getElementById(id);if(!el)return;const v=el.closest(".view");if(v)showTab(v.dataset.tab);if(el.tagName==="DETAILS")el.open=true;
+  requestAnimationFrame(()=>{el.scrollIntoView({block:"start"});window.scrollBy(0,-70);el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")})}
+const h0=location.hash.slice(1);const h=h0.startsWith("v-")?h0.slice(2):h0.startsWith("s-")?"emergency":h0;
+if(h&&document.getElementById(h)){goTo(h)}else{showTab(["emergency","routine","reference","study"].includes(h)?h:"emergency")}
+
+/* ---------- search ---------- */
+const idx=$$(".sec").map(el=>({id:el.id,title:(el.querySelector("h2,h3")||{}).textContent||el.id,text:el.textContent.replace(/\s+/g," ")}));
+Object.entries(SHEETS).forEach(([k,s])=>{const tmp=document.createElement("div");tmp.innerHTML=s.render();idx.push({sheet:k,title:"Emergency: "+s.t,text:tmp.textContent.replace(/\s+/g," ")})});
+const res=$("#results");
+$("#q").addEventListener("input",e=>{const q=e.target.value.trim().toLowerCase();if(q.length<2){res.hidden=true;res.innerHTML="";return}
+  const terms=q.split(/\s+/);const hits=idx.map(d=>{const t=d.text.toLowerCase();if(!terms.every(w=>t.includes(w)))return null;const i=t.indexOf(terms[0]);const tt=d.title.toLowerCase().includes(terms[0])?2:0;return{d,score:tt+(d.sheet?1:0),snip:d.text.slice(Math.max(0,i-30),i+80)}}).filter(Boolean).sort((a,b)=>b.score-a.score).slice(0,8);
+  res.hidden=false;res.innerHTML=hits.length?hits.map((h,i)=>`<button data-i="${i}"><b>${esc(h.d.title)}</b><small>…${esc(h.snip)}…</small></button>`).join(""):'<small style="color:var(--muted)">No matches. Try another word.</small>';
+  res.onclick=ev=>{const b=ev.target.closest("button");if(!b)return;const h=hits[+b.dataset.i];res.hidden=true;$("#q").value="";$("#q").blur();if(h.d.sheet)openSheet(h.d.sheet);else goTo(h.d.id)}});
+
+/* ---------- night mode ---------- */
+const nb=$("#night");function setNight(on){document.documentElement.classList.toggle("night",on);nb.setAttribute("aria-pressed",on);store.set("vhf-night",on?"1":"0")}
+setNight(store.get("vhf-night")==="1");nb.addEventListener("click",()=>setNight(!document.documentElement.classList.contains("night")));
+})();
+</script>
+<script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}</script></body></html>

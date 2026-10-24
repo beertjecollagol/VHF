@@ -608,6 +608,46 @@ footer.src{font-size:13px;color:var(--muted);text-align:center}
 <!-- ============ REFERENCE ============ -->
 <section class="view" id="v-reference" data-tab="reference">
   <div><div class="eyebrow">Look it up</div><h1 style="font-size:26px">Reference</h1></div>
+
+  <div class="panel sec" id="myradio"><h2>My radio: Icom IC-M94DE</h2>
+    <p class="lead" style="font-size:15px">Handheld marine VHF with DSC, GPS and AIS receiver.</p>
+    <dl class="dl">
+      <dt>Power</dt><dd>6 W high; Low via the High/Low soft key ("HI"/"LOW" on screen). Some channels are low-power only.</dd>
+      <dt>DSC</dt><dd>Class H. Distress key on the back, under a cover.</dd>
+      <dt>GPS</dt><dd>Built in: position goes into DSC alerts automatically. Navigation to up to 50 waypoints.</dd>
+      <dt>AIS</dt><dd>Receive only: shows ships around you on a plotter (AIS soft key or [MENU] → AIS → Plotter), with a CPA/TCPA alarm. It does not transmit AIS.</dd>
+      <dt>Floats</dt><dd>Float'n Flash: screen, keys and distress key flash when it's in the water. IPX7 (1 m for 30 min).</dd>
+      <dt>Battery</dt><dd>BP-306 Li-ion, ~2400 mAh, about 10 h normal use. Weight 358 g.</dd>
+      <dt>Audio</dt><dd>1500 mW, noise cancelling, AquaQuake to clear water from the speaker.</dd>
+      <dt>Watch</dt><dd>Dualwatch (with ch 16) and Tri-watch (16 + call channel).</dd>
+    </dl>
+    <h4>Keys you need</h4>
+    <ul>
+      <li><b>[16/C]</b>: channel 16. Hold 1 s: call channel.</li>
+      <li><b>[VOL/SQL]</b>: once = volume, twice = squelch; adjust with the arrows, then [ENT]. Hold = open squelch to listen.</li>
+      <li><b>[DISTRESS]</b> (under the cover): hold 3 s to send a distress alert.</li>
+      <li><b>Man Overboard</b> soft key: starts MOB mode (press again to stop). With MOB Auto Set on, the nature of distress becomes "Man Overboard" for 30 s after an MOB waypoint or water detection. Pressing [DISTRESS] while Float'n Flash is active sends an MOB distress alert.</li>
+      <li><b>Individual DSC call:</b> Compose Other → Message Type → Individual → Address (or Manual Input) → Channel → send.</li>
+    </ul>
+    <h4>Set up once</h4>
+    <ul>
+      <li><b>MMSI</b>: entered once at the first power-on (hold power, then [ENT]). Skip it and DSC calls are blocked. Get it right: you can't change it yourself.</li>
+      <li><b>ATIS ID</b>: [MENU] → ATIS ID Input, 10 digits, once. The manual says this is available on the <b>HOL and FRG versions only</b>.</li>
+      <li><b>Channel group</b>: [MENU] → Settings → Radio → Channel Group (International, ATIS, … depending on version).</li>
+    </ul>
+    <p class="cx cnote" data-c="nl"><b class="cflag">NL</b><b>Check before you buy:</b> on Dutch inland waters ATIS is mandatory and power max 1 W, and DSC is not allowed. Make sure the radio you buy can take an ATIS code (Dutch/German version, or ask the dealer); a UK version may not. Check that LOW is 1 W or less. Register it with RDI and program the ATIS code you receive.</p>
+    <p class="cx cnote" data-c="no"><b class="cflag">NO</b>Program the MMSI from your Norwegian VHF licence, or the DISTRESS key won't work.</p>
+    <h4>Battery care</h4>
+    <ul><li>Switch the radio off before charging; charge at 15–40 °C; about 4 h. Don't transmit while charging; don't charge a wet pack.</li>
+      <li>Replace the pack about every 5 years or after 300–500 charges. In extreme temperatures the radio forces Low power.</li></ul>
+    <h4>Documents</h4>
+    <ul>
+      <li><a href="https://icomuk.co.uk/IC-M94DE/Handheld-VHF-Marine-Radio" target="_blank" rel="noopener">Product page (Icom UK)</a> · <a href="https://icomuk.co.uk/files/icom/PDF/productManual/IC-M94D_M94DE_ENG_IM_5.pdf" target="_blank" rel="noopener">Instruction manual (PDF)</a> · <a href="https://icomuk.co.uk/files/icom/PDF/productLeaflet/IC-M94DE.pdf" target="_blank" rel="noopener">Leaflet (PDF)</a></li>
+      <li><a href="https://icomuk.co.uk/files/icom/PDF/radioGuide/DSC_Handheld_Facts_18.pdf" target="_blank" rel="noopener">Handheld DSC VHF radios</a> · <a href="https://icomuk.co.uk/files/icom/PDF/radioGuide/GUIDE_TO_MARINE_RADIO_18.pdf" target="_blank" rel="noopener">Icom guide to marine radio</a> · <a href="https://icomuk.co.uk/files/icom/PDF/radioGuide/ATIS-UPGRADE_2018.pdf" target="_blank" rel="noopener">ATIS upgrade</a> · <a href="https://icomuk.co.uk/files/icom/PDF/radioGuide/INLAND_WATERWAYS_2018.pdf" target="_blank" rel="noopener">VHF on inland waterways</a> · <a href="https://icomuk.co.uk/files/icom/PDF/radioGuide/DAY_TO_DAY_VHF_CARE_FM37.pdf" target="_blank" rel="noopener">Day-to-day VHF care</a> · <a href="https://icomuk.co.uk/Radio-Guides" target="_blank" rel="noopener">All Icom radio guides</a></li>
+    </ul>
+    <p class="srcs">From the Icom UK product page and the IC-M94D/M94DE manual. Checked 24 Oct 2026. Some details depend on the radio's version: check your own manual.</p>
+  </div>
+
   <div class="cx panel sec" id="country-uk" data-c="uk"><h2><span class="cflag">UK</span>Local rules</h2>
     <p>The handbook is written for UK waters, so the rest of this app already reflects UK practice. Items marked <span class="tag">UK</span> are UK-only.</p></div>
 
@@ -1155,6 +1195,7 @@ mayday:{t:"MAYDAY",k:"--mayday",render(){return `
    <li>Every following message about this incident starts with <b>Mayday</b>.</li>
    <li>Don't switch off until all distress traffic is finished.</li></ul></div>`}},
 dsc:{t:"DSC DISTRESS ALERT",k:"--mayday",render(){return `
+  <p class="cnote"><b class="cflag">ICOM</b><b>Your IC-M94DE:</b> lift the key cover, hold <b>[DISTRESS] for 3 seconds</b> (three countdown beeps, then a long beep). To add the nature first: <b>Compose Distress</b> soft key → [ENT] → choose → then hold [DISTRESS]. It repeats every 3.5–4.5 min and switches to ch 16 by itself.</p>
   <ol class="steps">
    <li><span>Lift the cover of the red <b>Distress</b> button.</span></li>
    <li><span>If there's time: press and release it (or use the Call menu) and pick the <b>nature of distress</b>: Fire/explosion, Flooding, Collision, Grounding, Listing, Sinking, Disabled and adrift, Abandoning ship, Piracy, Man overboard. Otherwise it sends "Undesignated".</span></li>
@@ -1249,6 +1290,7 @@ heard:{t:"I HEAR A MAYDAY",k:"--mayday",render(){return `
   </div>`}},
 false:{t:"FALSE ALERT",k:"--mayday",render(){return `
   <div class="note warn">First rule: <b>don't repeat it.</b></div>
+  <p class="cnote"><b class="cflag">ICOM</b><b>Your IC-M94DE:</b> while it shows "Waiting for ACK", press the <b>cancel</b> soft key. It sends a Distress Cancel and selects ch 16. Then hold [PTT] and give the voice cancel below, and press the finish key.</p>
   <ol class="steps">
    <li><span><b>Switch the DSC controller off</b> (usually the radio off) to stop automatic repeats. If your set has a dedicated <b>cancel distress</b> function, use that instead.</span></li>
    <li><span>Switch back on, select <b>ch 16</b> and <b>high power</b>.</span></li>

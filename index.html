@@ -673,6 +673,50 @@ footer.src{font-size:13px;color:var(--muted);text-align:center}
     <p class="srcs">From the Icom UK product page and the IC-M94D/M94DE manual. Checked 24 Oct 2026. Some details depend on the radio's version: check your own manual.</p>
   </div>
 
+  <div class="panel sec" id="hire"><h2>Hiring a boat <span class="lead" style="font-size:14px;font-weight:400">(boot huren)</span></h2>
+    <p>Which name and identity you give depends on the boat and on which radio you use. The rule: the <b>name</b> is the boat's (so rescuers know what to look for); the <b>radio identity</b> (MMSI, call sign) belongs to the transmitter you are using.</p>
+    <div class="tbl"><table><thead><tr><th>Situation</th><th>Say as name</th><th>Identity (call sign / MMSI)</th></tr></thead><tbody>
+      <tr><td>Boat has a fixed VHF: <b>use it</b> (more power, higher antenna)</td><td>Boat's name</td><td>The <b>boat's</b> call sign and MMSI</td></tr>
+      <tr><td>Boat has a name, you use <b>your handheld</b></td><td>Boat's name</td><td><b>Your handheld's</b> MMSI (and your own call sign if RDI gave you one). Not the boat's call sign</td></tr>
+      <tr><td>Boat has <b>no name and no VHF</b>, you use your handheld</td><td>A short description, e.g. "white rental motorboat"; add hull or registration number, or "rental boat from [company]"</td><td><b>Your handheld's</b> MMSI (and own call sign)</td></tr>
+    </tbody></table></div>
+    <p class="note">A DSC alert from your handheld always sends <b>your handheld's MMSI</b> plus its GPS position, whatever boat you are on.</p>
+
+    <h4>Before you cast off</h4>
+    <ul>
+      <li>Ask the hire company for the boat's <b>name, call sign and MMSI</b>, and whether the fixed VHF has DSC and a GPS connected.</li>
+      <li>No name? Take a <b>photo</b> of the boat and note colour, length, type and any number on the hull.</li>
+      <li>Enter it under <a href="#boat">Emergency → My boat</a> (description and persons on board), so the scripts are ready.</li>
+      <li>Check your handheld: charged, on the right channel group, ATIS code programmed for Dutch inland waters.</li>
+      <li>Save the emergency numbers with country code in your phone (see the country rules below).</li>
+    </ul>
+
+    <h4>Example: Mayday from a boat without a name, on your handheld</h4>
+    <div class="script" style="--k:var(--mayday);font-size:17px">
+      <p><span class="pw">MAYDAY, MAYDAY, MAYDAY</span></p>
+      <p><span class="pw">this is</span> white rental motorboat, white rental motorboat, white rental motorboat</p>
+      <p>MMSI <span class="fill">[your handheld's MMSI]</span></p>
+      <p><span class="lbl">M</span><span class="pw">MAYDAY</span> white rental motorboat, MMSI <span class="fill">[MMSI]</span></p>
+      <p><span class="lbl">P</span>My position <span class="fill">[position]</span></p>
+      <p><span class="lbl">D</span><span class="fill">[what is wrong]</span></p>
+      <p><span class="lbl">A</span>Require immediate assistance</p>
+      <p><span class="lbl">N</span><span class="fill">[number]</span> persons on board</p>
+      <p><span class="lbl">I</span><span class="fill">[length, colour, anything that stands out]</span></p>
+      <p><span class="lbl">O</span><span class="pw">OVER</span></p>
+    </div>
+
+    <h4>Only a handheld: keep in mind</h4>
+    <ul>
+      <li>Range is limited (6 W, low antenna). Hold the radio as high as possible and use <b>high power</b> in distress.</li>
+      <li>Open a second line: phone <b>112</b> as well.</li>
+      <li>The DSC alert gives rescuers your exact GPS position, even if your description is vague.</li>
+    </ul>
+    <p class="cx cnote" data-c="nl"><b class="cflag">NL</b>Inland: voice on ch 10 / blokkanaal (large waters ch 16), max 1 W, no DSC; phone <span class="phone">112</span> or Kustwacht <span class="phone">+31 88 958 4000</span> (0900-0111 only works from a Dutch phone in NL).</p>
+    <p class="cx env cnote" data-c="no"><b class="cflag">NO</b>Phone <span class="phone">112</span> or Kystradio <span class="phone">+47 51 69 00 44</span> (Sør) / <span class="phone">+47 75 52 89 25</span> (Nord). 120 may not work from a foreign SIM.</p>
+    <p class="cx nbv cnote" lang="nb" data-c="no"><b class="cflag">NO</b>Ring <span class="phone">112</span> eller Kystradio <span class="phone">+47 51 69 00 44</span> (Sør) / <span class="phone">+47 75 52 89 25</span> (Nord). 120 virker kanskje ikke med utenlandsk SIM.</p>
+    <p class="cx cnote" data-c="uk"><b class="cflag">UK</b>Phone <span class="phone">999</span> or <span class="phone">112</span> and ask for the Coastguard.</p>
+  </div>
+
   <div class="cx panel sec" id="country-uk" data-c="uk"><h2><span class="cflag">UK</span>Local rules</h2>
     <p>The handbook is written for UK waters, so the rest of this app already reflects UK practice. Items marked <span class="tag">UK</span> are UK-only.</p></div>
 

@@ -180,6 +180,47 @@ details.ch-d h4{font-size:16px;margin:16px 0 4px;color:var(--accent)}
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);
   padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}
 nav.tabs .row{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+/* exam */
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:4px;gap:4px}
+.seg button{border:0;background:transparent;border-radius:999px;padding:8px;font-weight:700;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.exrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px}
+.exrow select{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 10px;font-size:16px}
+.exchk{display:flex;gap:6px;align-items:center;font-size:15px}
+.primary{border:0;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:10px 20px;font-weight:700;cursor:pointer}
+.ghost{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 18px;font-weight:700;cursor:pointer}
+.ghost:disabled{opacity:.4}
+.linkbtn{border:0;background:none;color:var(--accent);font-weight:700;cursor:pointer}
+.exbar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.meter{flex:1;height:6px;background:var(--soft);border-radius:3px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--accent);transition:width .2s}
+.qtext{font-size:19px;margin:6px 0 12px}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;cursor:pointer;font-size:16px}
+.opt .mono{font-weight:600;color:var(--muted)}
+.opt.sel{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.opt.sel .mono{color:var(--accent)}
+.opt.good{border-color:var(--sec);background:var(--sec-soft)}
+.opt.bad{border-color:var(--mayday);background:var(--mayday-soft)}
+.opt:disabled{cursor:default;color:var(--ink)}
+.scorecard{border-left:6px solid var(--sec)}
+.scorecard.fail{border-left-color:var(--pan)}
+.scorecard .big{font-size:40px;font-weight:600;line-height:1}
+.chipst{display:inline-block;font-size:13px;border:1px solid var(--line);border-radius:999px;padding:2px 10px;background:var(--bg)}
+.rv{border-left:5px solid var(--sec)} .rv.no{border-left-color:var(--mayday)}
+.rv p{margin:.3em 0}
+.rv-bad{color:var(--mayday)} .rv-good{color:var(--sec);font-weight:700}
+details.sc>summary .no{color:var(--k)}
+.sc-tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--k);white-space:nowrap}
+details.sc>summary::after{content:none}
+.scin{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:10px;font-size:16px;margin-top:4px}
+.checks{display:grid;gap:6px;margin-top:6px}
+.checks label{display:flex;gap:8px;align-items:flex-start;font-size:15px}
+.checks input{margin-top:4px;width:18px;height:18px;flex:0 0 auto}
+.sc-score{color:var(--muted);font-size:14px}
+nav.tabs .row{grid-template-columns:repeat(5,1fr)!important}
+nav.tabs a{font-size:12px}
+
 nav.tabs button{border:0;background:transparent;padding:10px 4px 12px;cursor:pointer;display:grid;justify-items:center;gap:2px;color:var(--muted);font-size:13px;font-weight:700}
 nav.tabs button svg{width:22px;height:22px}
 nav.tabs button[aria-current="page"]{color:var(--accent)}
@@ -839,6 +880,45 @@ footer.src{font-size:13px;color:var(--muted);text-align:center}
   <footer class="src">Condensed from the <i>VHF Handbook</i> (SRC course book, UK edition). Items marked <span class="tag">UK</span> apply to UK waters.</footer>
 </section>
 
+<!-- ============ EXAM ============ -->
+<section class="view" id="v-exam" data-tab="exam">
+  <div><div class="eyebrow">Practice</div><h1 style="font-size:26px">SRC practice exam</h1>
+  <p class="lead">Questions and scenarios written from the handbook. Not official exam papers.</p></div>
+  <p class="note nojs-only">The practice exam needs JavaScript. Open this page in Safari or as the home-screen app.</p>
+
+  <div class="seg js-only" role="tablist" aria-label="Exam part">
+    <button id="seg-theory" aria-pressed="true">Theory</button>
+    <button id="seg-practical" aria-pressed="false">Practical</button>
+  </div>
+
+  <div id="ex-theory" class="js-only">
+    <div class="panel" id="ex-start">
+      <h2>Theory: multiple choice</h2>
+      <p>Random questions from a bank of <b id="ex-bank">0</b>, covering all chapters. Answer all of them, then see your score with an explanation for every question.</p>
+      <div class="exrow">
+        <label for="ex-n" class="eyebrow">Questions</label>
+        <select id="ex-n"><option value="20">20</option><option value="30" selected>30</option><option value="0">All</option></select>
+        <label class="exchk"><input type="checkbox" id="ex-instant"> Show answer right away</label>
+      </div>
+      <div class="exrow"><button class="primary" id="ex-go">Start practice exam</button><span class="lead" id="ex-best" style="font-size:14px"></span></div>
+    </div>
+    <div id="ex-run" hidden>
+      <div class="exbar"><span id="ex-count" class="mono"></span><div class="meter"><i id="ex-meter"></i></div><button class="linkbtn" id="ex-quit">Stop</button></div>
+      <div class="panel qcard" id="ex-q"></div>
+      <div class="exrow" style="justify-content:space-between"><button class="ghost" id="ex-prev">Previous</button><button class="primary" id="ex-next">Next</button></div>
+    </div>
+    <div id="ex-result" hidden></div>
+  </div>
+
+  <div id="ex-practical" class="js-only" hidden>
+    <div class="panel">
+      <h2>Practical: radio scenarios</h2>
+      <p>In the practical part you operate the radio and say the call out loud. For each scenario: read the situation, give the call aloud (or type it), then open the model answer and tick what you got right.</p>
+    </div>
+    <div id="sc-list" style="display:grid;gap:12px"></div>
+  </div>
+</section>
+
 </div></main>
 
 <nav class="tabs" aria-label="Sections"><div class="row">
@@ -846,6 +926,7 @@ footer.src{font-size:13px;color:var(--muted);text-align:center}
   <a href="#v-routine" data-tab="routine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15a8 8 0 0 1 8-8M4 15h4l2 4h4l2-4h4a8 8 0 0 0-8-8"/></svg>Routine</a>
   <a href="#v-reference" data-tab="reference"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Reference</a>
   <a href="#v-study" data-tab="study"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l9-3 9 3-9 3-9-3zM6 8v6c0 2 3 4 6 4s6-2 6-4V8"/></svg>Study</a>
+  <a href="#v-exam" data-tab="exam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Exam</a>
 </div></nav>
 
 <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sh-title">
@@ -1089,7 +1170,7 @@ $$("nav.tabs a").forEach(b=>b.addEventListener("click",e=>{e.preventDefault();sh
 function goTo(id){const el=document.getElementById(id);if(!el)return;const v=el.closest(".view");if(v)showTab(v.dataset.tab);if(el.tagName==="DETAILS")el.open=true;
   requestAnimationFrame(()=>{el.scrollIntoView({block:"start"});window.scrollBy(0,-70);el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")})}
 const h0=location.hash.slice(1);const h=h0.startsWith("v-")?h0.slice(2):h0.startsWith("s-")?"emergency":h0;
-if(h&&document.getElementById(h)){goTo(h)}else{showTab(["emergency","routine","reference","study"].includes(h)?h:"emergency")}
+if(h&&document.getElementById(h)){goTo(h)}else{showTab(["emergency","routine","reference","study","exam"].includes(h)?h:"emergency")}
 
 /* ---------- search ---------- */
 const idx=$$(".sec").map(el=>({id:el.id,title:(el.querySelector("h2,h3")||{}).textContent||el.id,text:el.textContent.replace(/\s+/g," ")}));
@@ -1103,6 +1184,217 @@ $("#q").addEventListener("input",e=>{const q=e.target.value.trim().toLowerCase()
 /* ---------- night mode ---------- */
 const nb=$("#night");function setNight(on){document.documentElement.classList.toggle("night",on);nb.setAttribute("aria-pressed",on);store.set("vhf-night",on?"1":"0")}
 setNight(store.get("vhf-night")==="1");nb.addEventListener("click",()=>setNight(!document.documentElement.classList.contains("night")));
+})();
+</script>
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+
+/* [chapter, question, [options], correctIndex, explanation] */
+const Q=[
+[7,"Which situation qualifies as distress under the Radio Regulations?",["A vessel, vehicle, aircraft or person in grave and imminent danger","Any vessel that needs a tow","Any situation where the skipper feels unsafe","A vessel that has run out of fuel"],0,"Distress = a vessel, vehicle, aircraft or person in grave and imminent danger. Both tests must be met."],
+[7,"Your dog falls overboard and is in danger of drowning. What is this?",["Not a distress situation","A distress situation","An urgency situation, always","A safety situation"],0,"A dog is not a vessel, vehicle, aircraft or person, so it is not distress, however distressing."],
+[7,"A motor boat has fishing gear round its propellers and is drifting 30 miles from land in calm weather. Which call fits best?",["Pan-pan","Mayday","Sécurité","Mayday Relay"],0,"It concerns a vessel, but the danger is not imminent. That fails the distress test, so an urgency call (Pan-pan) is appropriate."],
+[7,"A yacht is aground on mud in a sheltered estuary on a falling tide. Is this distress?",["No: the danger is not grave","Yes: the danger has already happened","Yes: any grounding is distress","No: only engine failures count"],0,"There is no reason to expect loss of the vessel or of life, so it fails the 'grave' part of the test."],
+[7,"What does MIPDANIO stand for?",["Mayday, Identity, Position, Distress, Assistance, Number, Information, Over","Mayday, Information, Position, Danger, Alert, Name, Identity, Out","MMSI, Identity, Position, Distress, Assistance, Name, Intentions, Over","Mayday, Identity, Persons, Distress, Assistance, Navigation, Information, Out"],0,"The order of the distress message: Mayday, Identity, Position, Distress, Assistance, Number, Information, Over."],
+[7,"Which parts of the distress message do students most often forget in the SRC exam?",["Mayday and Identity","Position and Over","Number and Information","Assistance and Distress"],0,"The book warns that many students lose marks by leaving out the 'Mayday' and 'Identity' at the start of the distress message."],
+[7,"Why does the distress call not end with 'Over'?",["It is immediately followed by the distress message","It is addressed only to the Coastguard","'Over' is never used in distress traffic","It ends with 'Out' instead"],0,"The call is the shout for help. It is not addressed to anyone and runs straight on into the distress message, which ends with 'Over'."],
+[7,"Who must authorise a distress call?",["The person in charge of the vessel at the time","The owner of the vessel","Any crew member with an SRC","The Coastguard"],0,"No transmission without the master's authority; for distress the person actually in charge at the time must authorise it."],
+[7,"You give your position relative to a landmark. Which is correct?",["Bearing FROM the landmark, three figures, degrees true, plus distance","Bearing TO the landmark in degrees magnetic","Distance only, the direction is not needed","Bearing from your vessel, in degrees relative to the bow"],0,"Express the position FROM the charted object: e.g. 'one six five degrees from Black Rock Buoy, two decimal four miles'. Degrees true and miles unless stated."],
+[7,"You hear a Mayday. A coast station has probably heard it too. What should you do first?",["Write it down and allow the coast station about 5 minutes to respond","Acknowledge immediately","Send a Mayday Relay straight away","Switch to channel 70"],0,"Allow 5 minutes for the coast station; don't acknowledge unless you can help; keep radio silence; write the message down."],
+[7,"You hear a Mayday but are not in a position to help. What do you do?",["Do not acknowledge, keep radio silence on that channel","Acknowledge to reassure the casualty","Tell the casualty you cannot help","Change to low power and acknowledge"],0,"If you cannot offer effective assistance, do not acknowledge. Maintain radio silence unless you are acknowledging and assisting."],
+[7,"What is the correct acknowledgement of a distress message?",["Mayday, [casualty], this is [own vessel] ×3, Received Mayday, Out","Roger Mayday, Over","Seelonce Mayday, [casualty], Out","Mayday Relay, Received, Out"],0,"Start with Mayday, name the casualty, identify yourself, then 'Received Mayday'."],
+[7,"Who may use 'Seelonce Mayday'?",["The casualty or the station controlling the distress traffic","Any vessel that hears the Mayday","Only rescue helicopters","Only the vessel that sent a Mayday Relay"],0,"The casualty or the station in control of the distress traffic (such as the Coastguard) can impose radio silence with 'Seelonce Mayday'."],
+[7,"What does 'Seelonce Feenee' mean?",["Radio silence is lifted; normal working may resume","Silence: distress traffic in progress","The distress is over and the casualty is safe, all stations must reply","Switch to the working channel"],0,"Seelonce Feenee is announced by the controlling station when the need for radio silence is over."],
+[7,"When sending a Mayday Relay, whose name goes after 'this is'?",["Your own vessel's name","The casualty's name","The Coastguard's name","No name is needed"],0,"'This is' is followed by the name of the vessel transmitting the relay, not the vessel in distress."],
+[7,"You send a Mayday Relay to the Coastguard and get no reply. What next?",["Repeat it, addressed to All stations","Switch to channel 70 and send it by DSC","Wait an hour and try again","Give up: only the casualty may call All stations"],0,"If the Coastguard does not reply, repeat the process with 'All stations' in place of the Coastguard's name."],
+[7,"From which language do most distress prowords come?",["French","Latin","Spanish","German"],0,"Mayday from 'm'aidez', Pan-pan from 'panne', Sécurité, Seelonce, Feenee: all French-based."],
+[8,"What does Pan-pan signal?",["A very urgent message about the safety of a vessel or person","Grave and imminent danger","A navigational warning","A routine call with priority"],0,"Urgency: priority over everything except distress."],
+[8,"How is a Pan-pan call addressed?",["To someone, often 'All stations'","It is broadcast without an addressee, like a Mayday","Only to another vessel by name","Only by DSC"],0,"Unlike a Mayday, a Pan-pan is not a broadcast: it is addressed to someone, often All stations."],
+[8,"You need medical advice for an injured crew member. How do you call?",["Pan-pan, addressed to the Coastguard, 'request medical advice'","Pan-pan Medico to All stations","Mayday to the Coastguard","Sécurité on channel 16"],0,"Medical advice is a Pan-pan addressed to the Coastguard. 'Panpan Medico' is no longer used."],
+[8,"On which channel and power should an urgency call be made?",["Channel 16, high power","Channel 13, low power","Channel 70, high power","Any working channel, low power"],0,"The book: an urgency call should always be made on channel 16 using high power."],
+[8,"What is a Sécurité message usually about?",["Gale and navigational warnings","Medical emergencies","Engine failure","Port entry permission"],0,"Safety calls relate to gale and navigational warnings, usually sent by coast stations."],
+[8,"How is a Sécurité message normally handled?",["Announced on channel 16, message passed on a working channel","Entire message on channel 16","Message on channel 70 only","Message on channel 16 with low power"],0,"Safety calls are lower priority than distress and urgency, so only the announcement is on 16."],
+[6,"Which word ends a transmission when you expect a reply?",["Over","Out","Over and out","Roger"],0,"'Over' = I expect a reply. 'Out' = I do not. 'Over and out' is contradictory."],
+[6,"Which proword means 'I have received your message'?",["Received","Roger","Copy","Affirmative"],0,"The handbook uses 'Received' (not 'roger')."],
+[6,"You did not hear the name of the station calling you. How do you reply?",["Station calling [own name], this is [own name], Over","Who is calling? Over","Say again your name, Over","Unknown station, this is [own name], Out"],0,"Use 'Station calling' in place of the name or callsign you missed."],
+[6,"You hear a call you think might be for you but you are not sure. What do you do?",["Don't answer; the caller will repeat","Answer with 'Station calling'","Answer on channel 16 with high power","Switch to dual watch"],0,"Answering a call that wasn't for you may interfere with the reply from the intended station."],
+[6,"How long should you wait between attempts if your call is not answered?",["At least 2 minutes, maximum 3 attempts","30 seconds, maximum 5 attempts","No need to wait","At least 10 minutes"],0,"At least 2 minutes between attempts, try 3 times, then you may restart the sequence 3 minutes later."],
+[6,"You call another yacht on channel 16. Who proposes the working channel by current best practice?",["The vessel that initiated the call","The vessel that is called","The Coastguard","Whoever has the higher-power radio"],0,"Officially the called station is in control, but the vessel that initiated the call is best placed to have checked which channels are free."],
+[6,"You call the Coastguard on channel 16 for a routine matter. Who chooses the working channel?",["The Coastguard","You","Either, by agreement","Nobody: stay on 16"],0,"With coast stations and the Coastguard it is always the coast station that chooses the working channel (usually 67 in the UK)."],
+[6,"How should you normally call a port or marina?",["Directly on its working channel","Always on channel 16 first","On channel 70","On channel 13"],0,"Coast stations pay per channel and may not have 16. Call on their listed working channel."],
+[6,"Which proword do you use to correct a mistake you just made?",["Correction","Wrong","I say again","Disregard"],0,"'Correction' puts a mistake right. 'Wrong' is the reply when a read-back is incorrect."],
+[6,"What does the proword 'Wrong' mean?",["Your read-back is incorrect","I made a mistake","Wrong channel","The message was not received"],0,"'Correct' confirms a read-back; 'Wrong' says it was incorrect. Chosen because it sounds completely different."],
+[6,"How do you spell the figure 9 in the phonetic alphabet?",["Niner","Nine","Nove","November"],0,"Nine is pronounced 'Niner' to avoid confusion."],
+[6,"What is the phonetic word for the letter Q?",["Quebec","Queen","Quality","Quartz"],0,"Q = Quebec."],
+[6,"What must you include every time you press the PTT?",["Your own identification (name or callsign)","Your position","Your MMSI","The channel number"],0,"Identify yourself at least once every time you transmit; never more than three times."],
+[6,"How long may a call on channel 16 last, apart from distress and safety?",["Never more than one minute","Up to five minutes","As long as needed","Up to two minutes"],0,"Keep calls on 16 to a minimum; except distress and safety, never longer than one minute."],
+[5,"What is channel 70 used for?",["Digital Selective Calling only","Distress voice calls","Inter-ship","Port operations"],0,"Channel 70 is for DSC data only. Never use it for voice."],
+[5,"Which channels form the guard band around channel 16?",["75 and 76","15 and 17","70 and 72","06 and 08"],0,"75 and 76 are closest to 16 in frequency; allowed only for port ops/on-board use at max 1 W."],
+[5,"Which of these is an inter-ship channel?",["72","12","16","70"],0,"6, 8, 72 and 77 are inter-ship channels. 12 is port operations."],
+[5,"What is channel 13 used for?",["Bridge-to-bridge navigational safety","Distress","DSC","Public correspondence only"],0,"13 is for direct bridge-to-bridge contact on matters of navigational safety."],
+[5,"What is a simplex channel?",["One frequency: only one station can transmit at a time","Two frequencies: both can talk at once","A channel for DSC","A channel only coast stations use"],0,"Simplex = single frequency, take turns, like a single-track road."],
+[5,"Why can two yachts not talk to each other on channel 80 with normal small-craft radios?",["It is a duplex channel: ships transmit and receive on different frequencies","It is reserved for DSC","It is a guard band channel","It is only used in the USA"],0,"Ch 80 is duplex: ships transmit on 157.025 and receive on 161.625. Two ship stations can't hear each other."],
+[5,"Your radio is accidentally set to USA channels and you call a UK marina on channel 80. What happens?",["The marina hears you but you won't hear their reply","Nothing: the channels are identical","You can only receive","The radio refuses to transmit"],0,"Ch 80 is duplex internationally but simplex in the US system."],
+[4,"How do you set the squelch correctly?",["Turn it down until you hear noise, then up until the noise just stops","Turn it fully up","Turn it fully down","Set it to the same value as the volume"],0,"Squelch controls receiver sensitivity. Too far up and you lose weak signals."],
+[4,"What is the maximum transmitter power of a marine VHF?",["25 W","5 W","50 W","100 W"],0,"Max 25 W. Every set must also have a low-power setting of 1 W or less."],
+[4,"Why use low power (1 W) when possible?",["Others a few miles away can use the same channel, and it saves battery","It improves audio quality","It is required for channel 16","It increases range"],0,"High power from one selfish operator can disrupt communications over a wide area."],
+[4,"Can you transmit while the radio is in dual watch mode?",["No","Yes, on both channels at once","Yes, but only on channel 16","Yes, but only on low power"],0,"You cannot transmit in dual watch; some sets switch it off when you press PTT, others simply won't transmit."],
+[2,"Approximately how far is the VHF horizon of an antenna 16 m above the sea?",["12 nautical miles","4 nautical miles","48 nautical miles","16 nautical miles"],0,"3 × √16 = 3 × 4 = 12 miles."],
+[2,"A motor boat (antenna 4 m) and a yacht (antenna 16 m). Roughly what range between them?",["18 miles","10 miles","6 miles","64 miles"],0,"Horizons: 3×√4 = 6 and 3×√16 = 12. Add them: 18 miles."],
+[2,"Which modulation does marine VHF use?",["FM","AM","SSB","Morse"],0,"VHF communications use Frequency Modulation."],
+[2,"Approximately what is the wavelength of marine VHF?",["About 2 metres","About 20 cm","About 200 metres","About 2 km"],0,"300 / 156 MHz ≈ 1.92 m."],
+[2,"Which antenna gain is usually recommended for a sailing yacht?",["3 dBi","6 dBi","9 dBi","0 dBi"],0,"3 dBi is reasonably tolerant of heel and pitch. 6 dBi suits motorboats if mounted upright."],
+[2,"Which batteries should you never recharge?",["Alkaline and lithium","NiCad and NiMH","Lead-acid","Lithium-ion"],0,"Alkaline and (primary) lithium batteries are not rechargeable."],
+[3,"What does a Ship Radio Licence relate to?",["The vessel and its radio equipment","The operator","The marina","The country of registration only"],0,"Like taxing a car: it relates to the vessel. The Authority to Operate (SRC) relates to the person."],
+[3,"Which certificate covers VHF radiotelephony for voluntary-fit vessels?",["Short Range Certificate (SRC)","Long Range Certificate (LRC)","Ship Radio Licence","Coast Station Licence"],0,"SRC = VHF. LRC also covers MF, HF and satellite."],
+[3,"Which is one of the 'ten commandments' of radio?",["Do not transmit without identification","Always use high power","Always call on channel 70 first","Always say 'over and out'"],0,"Also: no music, no profanity, no false distress signals, no unnecessary transmissions, no broadcasting except distress."],
+[3,"What does 'broadcasting' mean in radio regulations?",["Transmitting without saying who it's for and without expecting a reply","Transmitting on high power","Transmitting on channel 16","Calling more than three stations"],0,"Only a distress call may be broadcast by a ship station."],
+[3,"Radio secrecy means:",["Don't eavesdrop and don't divulge what you overhear","Never give your position","Never use your callsign","Use encrypted channels"],0,"It's an offence to intercept communications not meant for the public, or to divulge them."],
+[10,"How many digits does an MMSI have?",["9","7","12","15"],0,"Maritime Mobile Service Identity: nine digits."],
+[10,"What do the first three digits of a ship's MMSI indicate?",["The country (Maritime Identification Digits)","The vessel type","The year of issue","The radio manufacturer"],0,"The MID shows which country issued it (UK: 232–235)."],
+[10,"A coast station MMSI starts with:",["00","0 followed by the MID","974","The MID"],0,"Coast station: 00 + MID + 4 digits. Group: 0 + MID + 5 digits."],
+[10,"Which class of DSC controller is intended for small craft on VHF?",["Class D","Class A","Class B","Class E"],0,"Class D: small craft, VHF only, reduced capability. Class E is MF/HF."],
+[10,"You accept a DSC group call. What happens?",["The alarm stops and the radio switches to the working channel; no acknowledgement is sent","An acknowledgement is sent to the caller","The call is relayed to the group","Nothing; group calls cannot be accepted"],0,"Only individual calls are acknowledged. Group calls just mute the alarm and switch channel."],
+[10,"Which four call types does DSC use?",["Distress, All ships, Individual, Group","Mayday, Pan-pan, Sécurité, Routine","Coast, Ship, Group, Area","Alert, Call, Reply, Relay"],0,"These tell the receiving controller what follows and how to react."],
+[10,"How does a DSC controller know your position?",["From a connected GPS, or entered manually","From the Coastguard","From the MMSI","It does not need a position"],0,"Interface it to a GPS (updates every second or so); position and time can be keyed in as back-up."],
+[11,"How do you send a DSC distress alert?",["Lift the cover and hold the Distress button for about 5 seconds","Press Distress briefly once","Select channel 70 and speak","Press PTT for 5 seconds"],0,"The button is covered and must be held for several seconds (usually five) to prevent false alerts."],
+[11,"After a DSC distress alert is sent and not acknowledged, what does the controller do?",["Repeats it automatically about every 4 minutes","Stops after one attempt","Repeats every 30 seconds","Switches to channel 13"],0,"It repeats at random intervals of roughly 4 minutes until acknowledged or cancelled."],
+[11,"What should always follow a DSC distress alert?",["A voice Mayday call and message on channel 16, including your MMSI","A Sécurité on channel 70","Nothing, the alert is enough","A routine DSC call to the Coastguard"],0,"A DSC alert holds less information and non-DSC vessels can't receive it."],
+[11,"Can a Class D controller acknowledge or relay a DSC distress alert?",["No","Yes, always","Only acknowledge","Only relay"],0,"Class D controllers deliberately cannot. Use voice on channel 16."],
+[11,"You accidentally send a DSC distress alert. What is the first thing to do?",["Switch the DSC controller off to stop repeats (or use its cancel function)","Wait for the Coastguard to call","Send another alert to cancel","Switch to channel 70 and explain"],0,"Then switch on, channel 16, high power: 'All stations ×3, this is …, MMSI …, cancel my distress alert, Out'."],
+[11,"A DSC urgency or safety announcement contains:",["Only your MMSI and the working channel","Your position and nature of distress","The full message text","Nothing; it's just an alarm"],0,"So it must always be followed immediately by the voice Pan-pan or Sécurité."],
+[11,"You receive a DSC distress alert that nobody acknowledges within 5 minutes. What do you do?",["Call the casualty by voice on 16 and inform the Coastguard by voice on 16","Acknowledge it by DSC","Relay it by DSC with a Class D set","Ignore it"],0,"Use voice, not DSC."],
+[9,"What does GMDSS stand for?",["Global Maritime Distress and Safety System","General Marine Digital Signal Service","Global Mobile Distress Satellite System","Ground Marine Direction and Search System"],0,"Decided by IMO in 1979, phased in from 1992 to 1999."],
+[9,"GMDSS sea area A1 is:",["Within VHF coverage of a DSC coast station","Within MF coverage","Within Inmarsat coverage","Polar regions"],0,"A1 VHF, A2 MF, A3 Inmarsat, A4 beyond Inmarsat (polar)."],
+[9,"On which frequency is the international Navtex service broadcast (always in English)?",["518 kHz","490 kHz","156.8 MHz","406 MHz"],0,"490 kHz is the national/local service."],
+[9,"On which frequencies does a modern EPIRB transmit?",["406 MHz alert plus 121.5 MHz homing","156.8 MHz only","518 kHz","Channel 70"],0,"406 MHz to Cospas-Sarsat, plus a 121.5 MHz homing signal and a flashing light."],
+[9,"How is a Category 1 EPIRB activated?",["Automatically, when released by water pressure at 2–4 m depth","Only manually","By the Coastguard remotely","By DSC"],0,"Category 1 floats free and activates automatically. Category 2 must be removed and activated manually."],
+[9,"How often should an EPIRB hydrostatic release be serviced or replaced?",["Every 2 years","Every 5 years","Every 10 years","Never"],0,"Battery usually every 5 years; hydrostatic release every 2 years; test every season."],
+[9,"How does a Radar-SART appear on a radar screen?",["A line of 12 dots outward from its position","A red cross in a circle","A single bright dot","A flashing triangle"],0,"12 dots ~0.6 M apart; arcs within about a mile, circles when very close. A red cross in a circle is an AIS-SART."],
+[9,"Where should a SART be mounted?",["As high as possible, at least 1 m above sea level","On the liferaft floor","Next to a radar reflector","Below the waterline"],0,"Range drops below 2 M if it lies on the liferaft floor. Don't use it with a radar reflector."],
+[9,"An EPIRB is set off by accident. What do you do?",["Switch it off and tell the Coastguard by any means","Leave it on until a helicopter arrives","Throw it overboard","Send a DSC distress alert to cancel it"],0,"Contact the nearest SAR authority and explain that a false alert has been made."],
+[9,"What identifies a 406 MHz EPIRB?",["A 15-character Hex ID","The vessel's callsign","A 9-digit MMSI only","The serial number of the radio"],0,"Every EPIRB has a unique code that must be registered."]
+];
+
+/* ---------- theory ---------- */
+$("#ex-bank").textContent=Q.length;
+const best=store.get("vhf-exam-best");if(best)$("#ex-best").textContent="Best so far: "+best;
+let run=null;
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function start(){
+  const n=+$("#ex-n").value||Q.length;
+  const picks=shuffle(Q.map((_,i)=>i)).slice(0,n).map(i=>{const q=Q[i];const order=shuffle([0,1,2,3]);return{ch:q[0],q:q[1],opts:order.map(o=>q[2][o]),ok:order.indexOf(q[3]),ex:q[4],ans:null}});
+  run={items:picks,i:0,instant:$("#ex-instant").checked};
+  $("#ex-start").hidden=true;$("#ex-result").hidden=true;$("#ex-run").hidden=false;draw();
+}
+function draw(){
+  const it=run.items[run.i],N=run.items.length,done=run.items.filter(x=>x.ans!==null).length;
+  $("#ex-count").textContent=(run.i+1)+" / "+N;$("#ex-meter").style.width=(done/N*100)+"%";
+  const reveal=run.instant&&it.ans!==null;
+  $("#ex-q").innerHTML=`<div class="eyebrow">Chapter ${it.ch}</div><h2 class="qtext">${esc(it.q)}</h2><div class="opts">${it.opts.map((o,k)=>{
+    let cls="opt";if(it.ans===k)cls+=" sel";if(reveal&&k===it.ok)cls+=" good";if(reveal&&it.ans===k&&k!==it.ok)cls+=" bad";
+    return `<button class="${cls}" data-k="${k}" ${reveal?"disabled":""}><span class="mono">${"ABCD"[k]}</span><span>${esc(o)}</span></button>`}).join("")}</div>${reveal?`<p class="note ${it.ans===it.ok?"":"warn"}"><b>${it.ans===it.ok?"Correct.":"Not quite."}</b> ${esc(it.ex)}</p>`:""}`;
+  $("#ex-prev").disabled=run.i===0;
+  $("#ex-next").textContent=run.i===N-1?"Finish":"Next";
+}
+$("#ex-q").addEventListener("click",e=>{const b=e.target.closest(".opt");if(!b||!run)return;const it=run.items[run.i];if(run.instant&&it.ans!==null)return;it.ans=+b.dataset.k;draw()});
+$("#ex-next").addEventListener("click",()=>{if(run.i<run.items.length-1){run.i++;draw();window.scrollTo(0,$("#v-exam").offsetTop-70)}else finish()});
+$("#ex-prev").addEventListener("click",()=>{if(run.i>0){run.i--;draw()}});
+$("#ex-quit").addEventListener("click",()=>{run=null;$("#ex-run").hidden=true;$("#ex-start").hidden=false});
+function finish(){
+  const open=run.items.filter(x=>x.ans===null).length;
+  if(open&&!$("#ex-confirm")){const p=document.createElement("p");p.id="ex-confirm";p.className="note warn";p.innerHTML=`${open} question${open>1?"s":""} not answered yet. Tap <b>Finish</b> again to hand in anyway.`;$("#ex-run").appendChild(p);return}
+  const c=$("#ex-confirm");if(c)c.remove();
+  const N=run.items.length,score=run.items.filter(x=>x.ans===x.ok).length,pct=Math.round(score/N*100),pass=pct>=70;
+  const prev=store.get("vhf-exam-best");const prevPct=prev?parseInt(prev.split("(")[1]):-1;
+  if(pct>prevPct){store.set("vhf-exam-best",`${score}/${N} (${pct}%)`);$("#ex-best").textContent="Best so far: "+score+"/"+N+" ("+pct+"%)"}
+  const byCh={};run.items.forEach(x=>{byCh[x.ch]=byCh[x.ch]||[0,0];byCh[x.ch][1]++;if(x.ans===x.ok)byCh[x.ch][0]++});
+  $("#ex-run").hidden=true;const r=$("#ex-result");r.hidden=false;
+  r.innerHTML=`<div class="panel scorecard ${pass?"pass":"fail"}"><div class="big mono">${score}/${N}</div><div><b>${pct}%</b> · ${pass?"Good: at this level you're well prepared.":"Keep practising: aim for 70% or more."}</div>
+   <div class="chips" style="margin-top:10px">${Object.keys(byCh).sort((a,b)=>a-b).map(k=>`<span class="chipst">Ch ${k}: ${byCh[k][0]}/${byCh[k][1]}</span>`).join("")}</div>
+   <div class="exrow" style="margin-top:12px"><button class="primary" id="ex-again">New exam</button><button class="ghost" id="ex-wrong">Show only mistakes</button></div></div>
+   <div id="ex-review" style="display:grid;gap:10px">${run.items.map((x,i)=>`<div class="panel rv ${x.ans===x.ok?"ok":"no"}"><div class="eyebrow">${i+1} · Chapter ${x.ch} · ${x.ans===x.ok?"Correct":"Wrong"}</div><p style="font-weight:700">${esc(x.q)}</p>
+     ${x.ans!==null&&x.ans!==x.ok?`<p class="rv-bad">Your answer: ${esc(x.opts[x.ans])}</p>`:x.ans===null?`<p class="rv-bad">Not answered</p>`:""}<p class="rv-good">Answer: ${esc(x.opts[x.ok])}</p><p class="lead" style="font-size:15px">${esc(x.ex)}</p></div>`).join("")}</div>`;
+  $("#ex-again").onclick=()=>{r.hidden=true;$("#ex-start").hidden=false;run=null;window.scrollTo(0,0)};
+  $("#ex-wrong").onclick=e=>{const on=e.target.getAttribute("aria-pressed")!=="true";e.target.setAttribute("aria-pressed",on);e.target.textContent=on?"Show all":"Show only mistakes";r.querySelectorAll(".rv.ok").forEach(x=>x.hidden=on)};
+  window.scrollTo(0,$("#v-exam").offsetTop-70);
+}
+$("#ex-go").addEventListener("click",start);
+
+/* ---------- practical ---------- */
+const V={name:"Sea Otter",call:"Mike Delta Echo Two Four",cs:"MDE24",mmsi:"235001234",desc:"ten metre white motor cruiser",pob:"four"};
+const pre=`You are on the <b>${V.name}</b>, a ${V.desc}. Callsign <span class="mono">${V.cs}</span>, MMSI <span class="mono">${V.mmsi}</span>, ${V.pob} people on board.`;
+const SC=[
+{t:"Fire in the engine room",k:"mayday",sit:`${pre} A fire has broken out in the engine room and you cannot put it out. Your GPS shows <b>51° 52.4′ N, 001° 32.7′ E</b>. The skipper tells you to call for help. Your radio has DSC.`,
+ task:"Send the DSC alert and the voice distress call and message.",
+ model:["<i>DSC:</i> lift cover, select nature 'Fire/explosion' if time allows, hold Distress ~5 s.","<i>Voice, ch 16, high power:</i>","MAYDAY, MAYDAY, MAYDAY","this is Sea Otter, Sea Otter, Sea Otter, Mike Delta Echo Two Four, MMSI 235001234","MAYDAY, Sea Otter, Mike Delta Echo Two Four, MMSI 235001234","My position five one degrees five two decimal four minutes north, zero zero one degrees three two decimal seven minutes east","On fire in the engine room","Require immediate assistance","Four people on board","Ten metre white motor cruiser. We may have to abandon into a liferaft","OVER"],
+ check:["DSC alert sent (button held ~5 s)","Channel 16, high power","Mayday ×3","'this is' + name ×3 + callsign + MMSI","Mayday repeated at start of message","Identity in the message","Position (lat/long, N/E correct)","Nature of distress","Assistance requested","Number of people","Other information","Ended with 'Over'"]},
+{t:"Man overboard",k:"mayday",sit:`${pre} A crew member has fallen overboard in rough water and you are not confident of getting them back. You are <b>two miles, bearing 210° true, from Gull Rock lighthouse</b>.`,
+ task:"Give the distress call and message, using the landmark for position.",
+ model:["MAYDAY, MAYDAY, MAYDAY","this is Sea Otter, Sea Otter, Sea Otter, Mike Delta Echo Two Four, MMSI 235001234","MAYDAY, Sea Otter, Mike Delta Echo Two Four, MMSI 235001234","My position two one zero degrees from Gull Rock lighthouse, two miles","Man overboard","Require immediate assistance","Three people remain on board, one person in the water","Ten metre white motor cruiser","OVER"],
+ check:["Recognised as distress (grave and imminent)","Mayday ×3, name ×3, callsign, MMSI","Mayday + identity at start of message","Position FROM the lighthouse, bearing in three figures","Nature: man overboard","Assistance requested","Number of people","Ended with 'Over'"]},
+{t:"Engine failure, drifting offshore",k:"pan",sit:`${pre} Your engine has failed. The weather is calm and you are drifting slowly, <b>20 miles off the coast</b>, in no immediate danger. Position <b>52° 10.0′ N, 002° 05.5′ E</b>. You would like a tow.`,
+ task:"Choose the right priority and give the call and message.",
+ model:["<i>Optional DSC: Call → All ships → Urgency → ch 16 → send.</i>","PAN-PAN, PAN-PAN, PAN-PAN","All stations, All stations, All stations","this is Sea Otter, Sea Otter, Sea Otter, Mike Delta Echo Two Four, MMSI 235001234","My position five two degrees one zero decimal zero minutes north, zero zero two degrees zero five decimal five minutes east","Engine failure, drifting","Request a tow","Four people on board","Ten metre white motor cruiser","OVER"],
+ check:["Chose Pan-pan, not Mayday (danger not imminent)","Channel 16, high power","Pan-pan ×3","Addressed to All stations","Identity","Position","Problem and help needed","Ended with 'Over'"]},
+{t:"Medical advice",k:"pan",sit:`${pre} A crew member has fallen down the companionway and has a painful, swollen wrist. Nobody on board has medical training. You are off the coast of Scotland, in the area of <b>Clyde Coastguard</b>.`,
+ task:"Ask for medical advice.",
+ model:["PAN-PAN, PAN-PAN, PAN-PAN","Clyde Coastguard, Clyde Coastguard, Clyde Coastguard","this is Sea Otter, Sea Otter, Sea Otter, Mike Delta Echo Two Four, MMSI 235001234","Request medical advice","OVER","<i>Then expect to be moved to a working channel (UK: 62, 63 or 64) and linked to a doctor; have your position ready.</i>"],
+ check:["Pan-pan (not Mayday, not 'Pan-pan Medico')","Addressed to the Coastguard, not All stations","Identity","'Request medical advice'","Ended with 'Over'"]},
+{t:"You hear a Mayday",k:"mayday",sit:`${pre} You hear: "Mayday, Mayday, Mayday, this is Blue Heron, Blue Heron, Blue Heron … position one mile east of Black Rock Buoy … sinking … two people on board … Over." After five minutes there is no reply from the Coastguard. You are <b>about 3 miles away</b>, doing 15 knots, so you can be there in about 12 minutes.`,
+ task:"What do you do, and what do you say?",
+ model:["<i>Write the message down. Wait ~5 minutes for a coast station. You can help, so acknowledge:</i>","MAYDAY Blue Heron","this is Sea Otter, Sea Otter, Sea Otter","RECEIVED MAYDAY","OUT","<i>Then, as soon as possible:</i>","MAYDAY Blue Heron, this is Sea Otter, Sea Otter, Sea Otter","My position three miles west of you [or lat/long]","My speed one five knots, my ETA one two minutes","OUT","<i>Then also inform the Coastguard (Mayday Relay) if they still haven't responded.</i>"],
+ check:["Wrote the message down","Waited ~5 min for the Coastguard","Started with 'Mayday' + casualty name","Identified own vessel","'Received Mayday'","Followed up with position, speed and ETA"]},
+{t:"Red flare, no radio traffic",k:"mayday",sit:`${pre} You see a red parachute flare <b>bearing 120° true from Blunt Point, about five miles</b>. You hear no radio traffic about it. Your area is covered by <b>Falmouth Coastguard</b>.`,
+ task:"Relay the distress.",
+ model:["MAYDAY RELAY, MAYDAY RELAY, MAYDAY RELAY","Falmouth Coastguard, Falmouth Coastguard, Falmouth Coastguard","this is Sea Otter, Sea Otter, Sea Otter, Mike Delta Echo Two Four, MMSI 235001234","MAYDAY","Red parachute flare seen, position one two zero degrees from Blunt Point, five miles","Vessel unknown, number of people unknown","Require immediate assistance","OVER","<i>No answer? Repeat with 'All stations' instead of the Coastguard.</i>"],
+ check:["Mayday Relay ×3 (not Mayday)","Addressed to the Coastguard","Own name after 'this is'","Position of the flare FROM a landmark","What was seen","Ended with 'Over'","Knows to repeat to All stations if unanswered"]},
+{t:"Accidental DSC alert",k:"mayday",sit:`${pre} While cleaning the radio, your child lifted the cover and held the red Distress button. The display shows a distress alert has been sent.`,
+ task:"Cancel the false alert.",
+ model:["<i>Switch the DSC controller/radio off to stop repeats (or use the set's 'cancel distress' function).</i>","<i>Switch on, channel 16, high power:</i>","All stations, All stations, All stations","this is Sea Otter, Sea Otter, Sea Otter, Mike Delta Echo Two Four","MMSI 235001234, I say again, MMSI 235001234","Cancel my distress alert, I say again, cancel my distress alert","OUT"],
+ check:["Did NOT send it again","Switched off / used cancel function","Channel 16, high power","All stations ×3","Name ×3, callsign","MMSI said twice","'Cancel my distress alert' said twice","Ended with 'Out'"]},
+{t:"Floating container",k:"sec",sit:`${pre} You pass a large semi-submerged shipping container, a danger to other vessels, at <b>51° 45.0′ N, 001° 40.0′ E</b>.`,
+ task:"Warn other traffic (and/or inform the Coastguard).",
+ model:["<i>Usually most useful: tell the Coastguard (call on 16, they choose the working channel). Or a Sécurité yourself:</i>","SÉCURITÉ, SÉCURITÉ, SÉCURITÉ","All ships, All ships, All ships","this is Sea Otter, Sea Otter, Sea Otter","For navigational warning listen channel seven two [working channel]","OUT","<i>On the working channel: repeat Sécurité ×3, All ships ×3, this is Sea Otter ×3, then: semi-submerged container in position five one degrees four five decimal zero minutes north, zero zero one degrees four zero decimal zero minutes east. OUT.</i>"],
+ check:["Chose Sécurité (safety), not Pan-pan","Announced on 16, message on a working channel","Sécurité ×3, All ships ×3","Identity","Hazard and position","Ended with 'Out'"]},
+{t:"Arrange to meet another yacht",k:"routine",sit:`${pre} You want to arrange with the yacht <b>Kestrel</b> to meet in Harwich tonight. She is about two miles away and listening on 16.`,
+ task:"Make the call, move to a working channel and arrange the meeting.",
+ model:["<i>Set up, low power, listen on 16:</i>","Kestrel, Kestrel, this is Sea Otter, Sea Otter, Over","<i>Kestrel: Sea Otter, this is Kestrel, Over</i>","Kestrel, this is Sea Otter, channel seven two, please, seven two, Over","<i>Kestrel: Sea Otter, this is Kestrel, channel seven two, Over</i>","<i>On 72:</i> Kestrel, Kestrel, this is Sea Otter, Sea Otter, Over","… arrange the meeting …","Kestrel, this is Sea Otter, see you in Harwich at nineteen hundred, Out","<i>Back to 16.</i>"],
+ check:["Low power","Listened before transmitting","Called on 16 (name ×2–3, this is, own name)","Proposed an inter-ship channel (6, 8, 72, 77)","Repeated the channel number","Kept it short, ended with 'Out'","Returned to 16"]},
+{t:"Call a marina for a berth",k:"routine",sit:`${pre} You want a berth for tonight at <b>Riverside Marina</b>. The almanac says it works on <b>channel 80</b>. You are about ten minutes away.`,
+ task:"Set up the radio and make the call.",
+ model:["<i>Squelch down, volume, squelch up until noise just stops; channel 80; low power; listen.</i>","Riverside Marina, Riverside Marina, this is Sea Otter, Sea Otter, on channel eight zero, Over","<i>Marina: Sea Otter, Riverside Marina, Over</i>","Riverside Marina, this is Sea Otter. Ten metre motor cruiser, about ten minutes away, request a berth for one night, Over","<i>… reply …</i>","Riverside Marina, this is Sea Otter, thank you, Out"],
+ check:["Correct set-up order (squelch, volume, channel, low power)","Called directly on 80, not on 16","Said which channel","Described the vessel briefly","Ended correctly with 'Out'"]},
+{t:"Radio check after new antenna",k:"routine",sit:`${pre} You've just fitted a new antenna and want to know if your radio works. Your friend's boat <b>Puffin</b> is in the marina listening on channel 77.`,
+ task:"Do a radio check.",
+ model:["<i>Channel 77, low power, listen.</i>","Puffin, Puffin, this is Sea Otter, Sea Otter, radio check, please, Over","<i>Puffin: Sea Otter, this is Puffin, you are loud and clear, Out</i>"],
+ check:["Used a station willing to co-operate, on its channel","'Radio check' proword","Ended with 'Over'"]},
+{t:"A garbled call",k:"routine",sit:`${pre} You hear: "Sea Otter, Sea Otter, this is … [crackle] …, Over." You didn't catch the caller's name.`,
+ task:"Reply.",
+ model:["Station calling Sea Otter, this is Sea Otter, Over"],
+ check:["'Station calling' instead of the missing name","Own identification","Ended with 'Over'"]}
+];
+const K={mayday:"var(--mayday)",pan:"var(--pan)",sec:"var(--sec)",routine:"var(--accent)"};
+const LBL={mayday:"Distress",pan:"Urgency",sec:"Safety",routine:"Routine"};
+function scDone(){try{return JSON.parse(store.get("vhf-sc")||"{}")||{}}catch(e){return {}}}
+$("#sc-list").innerHTML=SC.map((s,i)=>`<details class="ch-d sc" id="sc-${i}" style="--k:${K[s.k]}"><summary><span class="no">${i+1}</span><h3>${esc(s.t)}</h3><span class="sc-tag">${LBL[s.k]}</span></summary><div class="body">
+  <p style="margin-top:12px">${s.sit}</p><p class="note"><b>Task:</b> ${esc(s.task)}</p>
+  <label class="eyebrow" for="sc-in-${i}">Your call (optional: or say it out loud)</label>
+  <textarea id="sc-in-${i}" rows="4" class="scin" placeholder="Type your call here…"></textarea>
+  <button class="ghost sc-show" data-i="${i}" style="margin-top:8px">Show model answer</button>
+  <div class="sc-ans" hidden><div class="script" style="--k:${K[s.k]};font-size:17px">${s.model.map(l=>`<p>${l}</p>`).join("")}</div>
+  <div class="eyebrow" style="margin-top:12px">Tick what you got right</div><div class="checks">${s.check.map((c,j)=>`<label><input type="checkbox" data-i="${i}" data-j="${j}"> ${esc(c)}</label>`).join("")}</div><p class="sc-score mono" id="sc-score-${i}"></p></div></div></details>`).join("");
+function scScore(i){const n=SC[i].check.length,c=document.querySelectorAll(`#sc-${i} .checks input:checked`).length;$("#sc-score-"+i).textContent=`${c}/${n} items`;const d=scDone();d[i]=c+"/"+n;store.set("vhf-sc",JSON.stringify(d))}
+$("#sc-list").addEventListener("click",e=>{const b=e.target.closest(".sc-show");if(!b)return;const a=b.nextElementSibling;a.hidden=!a.hidden;b.textContent=a.hidden?"Show model answer":"Hide model answer"});
+$("#sc-list").addEventListener("change",e=>{if(e.target.matches(".checks input"))scScore(+e.target.dataset.i)});
+const d0=scDone();Object.keys(d0).forEach(i=>{const t=document.querySelector(`#sc-${i} .sc-tag`);if(t)t.textContent+=" · last "+d0[i]});
+
+/* segments */
+function seg(p){$("#seg-theory").setAttribute("aria-pressed",p==="t");$("#seg-practical").setAttribute("aria-pressed",p==="p");$("#ex-theory").hidden=p!=="t";$("#ex-practical").hidden=p!=="p"}
+$("#seg-theory").onclick=()=>seg("t");$("#seg-practical").onclick=()=>seg("p");
 })();
 </script>
 <script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}</script></body></html>

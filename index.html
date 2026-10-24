@@ -785,7 +785,7 @@ footer.src{font-size:13px;color:var(--muted);text-align:center}
   <div class="panel sec" id="posconv"><h2>Position converter</h2>
     <p>Google Maps and phones show <b>decimal degrees</b> (50.9174962, -4.7981849). At sea you give <b>degrees and decimal minutes</b>: multiply the decimals by 60. Plus = N / E, minus = S / W. Longitude has three digits for the degrees.</p>
     <div class="quick js-only"><input id="rc-in" placeholder="paste e.g. 50.9174962, -4.7981849" aria-label="Decimal coordinates"><div id="rc-out" class="conv-out"><p class="lead" style="font-size:14px;margin:.4em 0">Paste latitude, longitude as decimals, e.g. 50.9174962, -4.7981849</p></div></div>
-    <p class="note">Example: 50.9174962, -4.7981849 → <b class="mono">50° 55.05′ N, 004° 47.89′ W</b>: "five zero degrees five five decimal zero five minutes north, zero zero four degrees four seven decimal eight niner minutes west".</p>
+    <p class="note">Example: 50.9174962, -4.7981849 → <b class="mono">50° 55.05' N, 004° 47.89' W</b>. On the radio, read the figures out digit by digit.</p>
   </div>
 
   <div class="panel sec" id="range"><h2>VHF range</h2>
@@ -1188,11 +1188,15 @@ function convertDec(str){
   if(!isFinite(lat)||!isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180)return null;
   function part(v,degW,pos,neg){const h=v<0?neg:pos;v=Math.abs(v);let d=Math.floor(v),mi=Math.round((v-d)*60*100)/100;if(mi>=60){d+=1;mi=0}
     const D=String(d).padStart(degW,"0"),M=mi.toFixed(2).padStart(5,"0"),[mI,mF]=M.split(".");
-    return{txt:`${D}° ${M}′ ${h}`,say:`${sayDigits(D)} degrees ${sayDigits(mI)} decimal ${sayDigits(mF)} minutes ${h==="N"?"north":h==="S"?"south":h==="E"?"east":"west"}`}}
+    return{txt:`${D}° ${M}' ${h}`,say:`${sayDigits(D)} degrees ${sayDigits(mI)} decimal ${sayDigits(mF)} minutes ${h==="N"?"north":h==="S"?"south":h==="E"?"east":"west"}`}}
   const a=part(lat,2,"N","S"),b=part(lon,3,"E","W");
   return{txt:a.txt+", "+b.txt,say:a.say+", "+b.say};
 }
-function convHTML(r,withUse){return r?`<p class="mono" style="font-size:18px;margin:.4em 0"><b>${r.txt}</b></p><p style="margin:.3em 0">${esc(r.say)}</p>${withUse?'<button class="primary conv-use" type="button">Use this position</button>':""}`:'<p class="lead" style="font-size:14px;margin:.4em 0">Paste latitude, longitude as decimals, e.g. 50.9174962, -4.7981849</p>'}
+function convHTML(r,withUse){return r?`<p class="mono conv-res" style="font-size:19px;margin:.4em 0;user-select:all;-webkit-user-select:all"><b>${esc(r.txt)}</b></p><div class="exrow" style="margin-top:4px"><button class="ghost conv-copy" type="button">Copy</button>${withUse?'<button class="primary conv-use" type="button">Use this position</button>':""}</div>`:'<p class="lead" style="font-size:14px;margin:.4em 0">Paste latitude, longitude as decimals, e.g. 50.9174962, -4.7981849</p>'}
+document.addEventListener("click",e=>{const b=e.target.closest(".conv-copy");if(!b)return;const t=b.closest(".conv-out").querySelector(".conv-res").textContent;
+  const done=()=>{b.textContent="Copied";setTimeout(()=>b.textContent="Copy",1500)};
+  try{navigator.clipboard.writeText(t).then(done,()=>{selectRes(b)})}catch(err){selectRes(b)}});
+function selectRes(b){const el=b.closest(".conv-out").querySelector(".conv-res");const r=document.createRange();r.selectNodeContents(el);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);b.textContent="Selected: copy it"}
 /* ---------- emergency sheets ---------- */
 const state={nature:"Sinking",pos:"",assist:"Require immediate assistance",extra:"",relayName:"",relayPos:"",relayNature:"",relayPob:"",relayInfo:"",cg:""};
 const NATURES=["Sinking","On fire","Flooding","Aground","Collision","Capsizing","Disabled and adrift","Man overboard","Abandoning ship"];
@@ -1431,7 +1435,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&current)closeSheet(
 function refreshScripts(){const tmp=document.createElement("div");tmp.innerHTML=SHEETS[current].render();
   const now=$$("#sh-body .script"),next=[...tmp.querySelectorAll(".script")];now.forEach((el,i)=>{if(next[i])el.innerHTML=next[i].innerHTML})}
 $("#sh-body").addEventListener("input",e=>{if(e.target.id==="i-conv"){$("#i-conv-out").innerHTML=e.target.value.trim()?convHTML(convertDec(e.target.value),true):"";return}const k=BIND[e.target.id];if(k){state[k]=e.target.value;refreshScripts()}});
-$("#sh-body").addEventListener("click",e=>{if(e.target.closest(".conv-use")){const r=convertDec($("#i-conv").value);if(r){state.pos=r.say;renderSheet()}return}const b=e.target.closest("#i-nature button");if(b){state.nature=b.textContent;renderSheet()}});
+$("#sh-body").addEventListener("click",e=>{if(e.target.closest(".conv-use")){const r=convertDec($("#i-conv").value);if(r){state.pos=r.txt;renderSheet()}return}const b=e.target.closest("#i-nature button");if(b){state.nature=b.textContent;renderSheet()}});
 $("#rc-in").addEventListener("input",e=>{$("#rc-out").innerHTML=convHTML(e.target.value.trim()?convertDec(e.target.value):null,false)});
 document.addEventListener("click",e=>{const o=e.target.closest("[data-open]");if(o){e.preventDefault();openSheet(o.dataset.open)}});
 

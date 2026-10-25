@@ -172,20 +172,35 @@ select.sc{width:100%;border:1px solid var(--line);background:var(--bg);border-ra
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-/* ---------- sound ---------- */
-let SOUND=false,AC=null,noiseNode=null;
-function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}return AC}
-function beep(f=1800,d=.08,v=.15){if(!SOUND||!ac())return;const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}
-let alarmT=null;
-function alarm(on){clearInterval(alarmT);alarmT=null;if(on){let hi=false;alarmT=setInterval(()=>{beep(hi?2100:1300,.18,.18);hi=!hi},220)}}
-function setNoise(on){if(!SOUND||!ac()){if(noiseNode){try{noiseNode.stop()}catch(e){}noiseNode=null}return}
-  if(on&&!noiseNode){const b=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
-    noiseNode=AC.createBufferSource();noiseNode.buffer=b;noiseNode.loop=true;const g=AC.createGain();g.gain.value=.04*(st.vol/5);const f=AC.createBiquadFilter();f.type="bandpass";f.frequency.value=2500;noiseNode.connect(f);f.connect(g);g.connect(AC.destination);noiseNode.start()}
-  if(!on&&noiseNode){try{noiseNode.stop()}catch(e){}noiseNode=null}}
-function speak(t){if(!SOUND||!window.speechSynthesis)return;try{const u=new SpeechSynthesisUtterance(t.replace(/<[^>]+>/g,""));u.lang="en-GB";u.rate=1.02;speechSynthesis.speak(u)}catch(e){}}
-function wake(){try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}if(AC&&AC.state!=="running"&&AC.resume)AC.resume().catch(()=>{})}
-document.addEventListener("pointerdown",()=>{if(SOUND)wake()},true);
-$("#snd").onclick=()=>{SOUND=!SOUND;$("#snd").setAttribute("aria-pressed",SOUND);$("#snd").textContent=SOUND?"Sound on":"Sound off";if(SOUND){ac();wake();beep(1500,.06);try{const u=new SpeechSynthesisUtterance("Sound on");u.lang="en-GB";u.volume=.6;speechSynthesis.speak(u)}catch(e){}logSys("Sound on. On an iPhone: if you hear nothing, flip the silent switch off and turn the volume up.")}else{alarm(false);setNoise(false);try{speechSynthesis.cancel()}catch(e){}}render()};
+/* ---------- sound (HTML audio: plays on iPhone even with the silent switch on, once unlocked by a tap) ---------- */
+let SOUND=false,UNLOCKED=false;
+function wav(gen,dur,rate=22050){const n=Math.floor(dur*rate),b=new DataView(new ArrayBuffer(44+n*2));const w=(o,str)=>{for(let k=0;k<str.length;k++)b.setUint8(o+k,str.charCodeAt(k))};
+  w(0,"RIFF");b.setUint32(4,36+n*2,true);w(8,"WAVE");w(12,"fmt ");b.setUint32(16,16,true);b.setUint16(20,1,true);b.setUint16(22,1,true);b.setUint32(24,rate,true);b.setUint32(28,rate*2,true);b.setUint16(32,2,true);b.setUint16(34,16,true);w(36,"data");b.setUint32(40,n*2,true);
+  for(let k=0;k<n;k++){let v=gen(k/rate,k/n);v=Math.max(-1,Math.min(1,v));b.setInt16(44+k*2,v*32767,true)}
+  let bin="";const u=new Uint8Array(b.buffer);for(let k=0;k<u.length;k+=8192)bin+=String.fromCharCode.apply(null,u.subarray(k,k+8192));return "data:audio/wav;base64,"+btoa(bin)}
+const env=(p,a=.01)=>Math.min(1,p/a,(1-p)/a);
+const tone=(f,d,v=.5)=>wav((t,p)=>v*Math.sin(2*Math.PI*f*t)*env(p,.05),d);
+const CLIPS={silent:wav(()=>0,.25),click:tone(2400,.03,.25),tick:tone(2000,.12,.5),long:tone(1000,.8,.5),key:tone(1500,.06,.4),dsc:wav((t,p)=>.35*Math.sin(2*Math.PI*(Math.floor(t*100)%2?2100:1300)*t)*env(p,.05),.5),
+  alarm:wav((t,p)=>.6*Math.sin(2*Math.PI*(Math.floor(t/.22)%2?2100:1300)*t)*env(p,.003),1.76),
+  noise:wav(()=>(Math.random()*2-1)*.18,2),aqua:tone(180,.6,.6)};
+const EL={a:new Audio(),b:new Audio(),alarm:new Audio(),noise:new Audio(),keep:new Audio()};
+EL.alarm.loop=true;EL.noise.loop=true;EL.keep.loop=true;
+Object.values(EL).forEach(a=>{a.preload="auto";a.setAttribute("playsinline","")});
+function unlock(){try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}
+  Object.entries(EL).forEach(([k,a])=>{a.src=CLIPS.silent;const p=a.play();if(p&&p.then)p.then(()=>{if(k!=="keep")a.pause()}).catch(()=>{})});UNLOCKED=true}
+let flip=false;
+function play(name){if(!SOUND)return;const a=(flip=!flip)?EL.a:EL.b;try{a.pause();a.src=CLIPS[name];a.currentTime=0;const p=a.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}}
+function beep(f){play(f>=2300?"click":f>=1900?"tick":f<=1000&&f>=900?"long":f<300?"aqua":f===1200?"dsc":"key")}
+let alarmOn=false;
+function alarm(on){if(on===alarmOn)return;alarmOn=on;try{if(on&&SOUND){EL.alarm.src=CLIPS.alarm;EL.alarm.currentTime=0;EL.alarm.play().catch(()=>{})}else EL.alarm.pause()}catch(e){}}
+let noiseOn=false;
+function setNoise(on){on=on&&SOUND;if(on===noiseOn)return;noiseOn=on;try{if(on){EL.noise.src=CLIPS.noise;EL.noise.play().catch(()=>{})}else EL.noise.pause()}catch(e){}}
+function speak(t){if(!SOUND||!window.speechSynthesis)return;try{const u=new SpeechSynthesisUtterance(t.replace(/<[^>]+>/g,""));u.lang="en-GB";u.rate=1.02;u.volume=1;speechSynthesis.speak(u)}catch(e){}}
+document.addEventListener("click",()=>{if(SOUND&&!UNLOCKED)unlock()},true);
+$("#snd").onclick=()=>{SOUND=!SOUND;$("#snd").setAttribute("aria-pressed",SOUND);$("#snd").textContent=SOUND?"Sound on":"Sound off";
+  if(SOUND){unlock();setTimeout(()=>play("key"),150);try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance("Sound on");u.lang="en-GB";speechSynthesis.speak(u)}catch(e){}
+    logSys("Sound on: you should hear a beep and 'Sound on'. Nothing? Turn the volume up (side buttons) and check that Bluetooth isn't sending audio elsewhere.")}
+  else{alarm(false);setNoise(false);try{EL.keep.pause()}catch(e){}try{speechSynthesis.cancel()}catch(e){}}render()};
 
 /* ---------- radio model ---------- */
 const CHS=[];for(let i=1;i<=28;i++)CHS.push(String(i).padStart(2,"0"));for(let i=60;i<=88;i++)if(i!==70)CHS.push(String(i));

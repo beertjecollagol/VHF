@@ -119,6 +119,7 @@ select.sc{width:100%;border:1px solid var(--line);background:var(--bg);border-ra
   <header class="top">
     <h1>IC-M94DE simulator</h1>
     <button class="tbtn" id="snd" aria-pressed="false" title="Beeps, alarms and spoken replies">Sound off</button>
+    <button class="tbtn" id="mic" aria-pressed="false" title="Record your transmissions (and transcribe them where the browser supports it)">Mic off</button>
     <a href="./" id="back">← Handbook</a>
   </header>
 
@@ -182,7 +183,9 @@ function setNoise(on){if(!SOUND||!ac()){if(noiseNode){try{noiseNode.stop()}catch
     noiseNode=AC.createBufferSource();noiseNode.buffer=b;noiseNode.loop=true;const g=AC.createGain();g.gain.value=.04*(st.vol/5);const f=AC.createBiquadFilter();f.type="bandpass";f.frequency.value=2500;noiseNode.connect(f);f.connect(g);g.connect(AC.destination);noiseNode.start()}
   if(!on&&noiseNode){try{noiseNode.stop()}catch(e){}noiseNode=null}}
 function speak(t){if(!SOUND||!window.speechSynthesis)return;try{const u=new SpeechSynthesisUtterance(t.replace(/<[^>]+>/g,""));u.lang="en-GB";u.rate=1.02;speechSynthesis.speak(u)}catch(e){}}
-$("#snd").onclick=()=>{SOUND=!SOUND;$("#snd").setAttribute("aria-pressed",SOUND);$("#snd").textContent=SOUND?"Sound on":"Sound off";if(SOUND){ac();AC&&AC.resume&&AC.resume();beep(1500,.06)}else{alarm(false);setNoise(false);try{speechSynthesis.cancel()}catch(e){}}render()};
+function wake(){try{if(navigator.audioSession)navigator.audioSession.type="playback"}catch(e){}if(AC&&AC.state!=="running"&&AC.resume)AC.resume().catch(()=>{})}
+document.addEventListener("pointerdown",()=>{if(SOUND)wake()},true);
+$("#snd").onclick=()=>{SOUND=!SOUND;$("#snd").setAttribute("aria-pressed",SOUND);$("#snd").textContent=SOUND?"Sound on":"Sound off";if(SOUND){ac();wake();beep(1500,.06);try{const u=new SpeechSynthesisUtterance("Sound on");u.lang="en-GB";u.volume=.6;speechSynthesis.speak(u)}catch(e){}logSys("Sound on. On an iPhone: if you hear nothing, flip the silent switch off and turn the volume up.")}else{alarm(false);setNoise(false);try{speechSynthesis.cancel()}catch(e){}}render()};
 
 /* ---------- radio model ---------- */
 const CHS=[];for(let i=1;i<=28;i++)CHS.push(String(i).padStart(2,"0"));for(let i=60;i<=88;i++)if(i!==70)CHS.push(String(i));
@@ -344,15 +347,69 @@ function sendDistress(){beep(1000,.8,.2);const nature=st.mobUntil>Date.now()?"Ma
   emit({type:"dsc_distress",nature});
   const delay=SC.active&&SC.cur.ackDelay!==undefined?SC.cur.ackDelay:null;
   if(delay!==null)setTimeout(()=>{if(st.screen!=="distwait")return;st.dist.ackFrom=SC.cur.cg+" "+(SC.cur.cgMmsi||"002320017");st.screen="distack";render();alarm(true);emit({type:"dsc_ack"})},delay)}
+/* ---------- microphone: record + (where supported) transcribe ---------- */
+let MIC=null,rec=null,chunks=[],SR=null,srText="",srBusy=false;
+const SRC=window.SpeechRecognition||window.webkitSpeechRecognition;
+$("#mic").onclick=async()=>{
+  if(MIC){MIC.getTracks().forEach(t=>t.stop());MIC=null;$("#mic").setAttribute("aria-pressed",false);$("#mic").textContent="Mic off";return}
+  try{MIC=await navigator.mediaDevices.getUserMedia({audio:true});$("#mic").setAttribute("aria-pressed",true);$("#mic").textContent="Mic on";
+    logSys("Microphone on: your transmissions are recorded"+(SRC?" and transcribed (English).":". Speech-to-text isn't supported in this browser, so you'll get the recording only."))}
+  catch(e){logSys("No microphone access. Allow it in your browser settings (it doesn't work inside the Claude app preview; open the GitHub page in Safari).")}};
+function recStart(){srText="";chunks=[];
+  if(MIC&&window.MediaRecorder){try{rec=new MediaRecorder(MIC);rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};rec.start()}catch(e){rec=null}}
+  if(MIC&&SRC){try{SR=new SRC();SR.lang="en-GB";SR.continuous=true;SR.interimResults=true;srBusy=true;
+    SR.onresult=ev=>{let t="";for(let i=0;i<ev.results.length;i++)t+=ev.results[i][0].transcript+" ";srText=t.trim()};
+    SR.onend=()=>{srBusy=false};SR.onerror=()=>{srBusy=false};SR.start()}catch(e){SR=null;srBusy=false}}}
+function recStop(cb){let url=null,pending=0;const fin=()=>{if(--pending<=0)cb(url,srText)};
+  pending=1;
+  if(rec&&rec.state!=="inactive"){pending++;rec.onstop=()=>{try{url=URL.createObjectURL(new Blob(chunks,{type:rec.mimeType||"audio/mp4"}))}catch(e){}fin()};try{rec.stop()}catch(e){fin()}}
+  if(SR&&srBusy){pending++;let doneSR=false;const end=()=>{if(doneSR)return;doneSR=true;fin()};SR.onend=end;setTimeout(end,1800);try{SR.stop()}catch(e){end()}}
+  fin()}
+/* keyword check of a transcript against a checklist item; true = found, null = can't tell */
+function autoTick(item,t){if(!t)return null;const x=" "+t.toLowerCase().replace(/[^a-z0-9 ]+/g," ").replace(/\s+/g," ")+" ";const it=item.toLowerCase();
+  const cnt=re=>(x.match(re)||[]).length;
+  if(/mayday relay/.test(it))return cnt(/mayday relay/g)>=(/×3/.test(it)?3:1);
+  if(/received mayday/.test(it))return/received mayday/.test(x);
+  if(/mayday ×3/.test(it))return cnt(/may ?day/g)>=3;
+  if(/mayday \+ identity/.test(it))return cnt(/may ?day/g)>=4&&/sea ?otter/.test(x);
+  if(/^mayday$|mayday \+ |'mayday'/.test(it))return/may ?day/.test(x);
+  if(/pan-pan ×3|pan-pan \(/.test(it))return cnt(/pan ?pan/g)>=3;
+  if(/sécurité ×3/.test(it))return cnt(/s[ae]cur|cure ?it|security/g)>=3;
+  if(/all stations ×3/.test(it))return cnt(/all stations/g)>=3;
+  if(/all ships ×3/.test(it))return cnt(/all ships/g)>=3;
+  if(/this is/.test(it)&&/×3/.test(it))return/this is/.test(x)&&cnt(/sea ?otter/g)>=3;
+  if(/this is/.test(it))return/this is/.test(x);
+  if(/call sign/.test(it)&&/mmsi/.test(it))return/mike|delta|echo/.test(x)&&/mmsi|eight two four|8 2 4|824/.test(x);
+  if(/mmsi/.test(it))return/mmsi|eight two four|824/.test(x);
+  if(/call sign/.test(it))return/mike|delta|echo/.test(x);
+  if(/position/.test(it))return/position|degrees|north|south|east|west|miles|from /.test(x);
+  if(/nature|what's wrong|problem|hazard|what you saw/.test(it))return/fire|sinking|flood|man overboard|engine|drift|container|flare|aground|collision|taking water/.test(x);
+  if(/assistance|help needed/.test(it))return/assistance|tow|help/.test(x);
+  if(/number|persons|people/.test(it))return/on board|persons|people/.test(x);
+  if(/listen channel|working channel|proposed/.test(it))return/channel|seven two|72/.test(x);
+  if(/radio check/.test(it))return/radio check/.test(x);
+  if(/station calling/.test(it))return/station calling/.test(x);
+  if(/cancel my distress/.test(it))return cnt(/cancel/g)>=2;
+  if(/medical/.test(it))return/medical/.test(x);
+  if(/'over'/.test(it))return/ over $/.test(x)||/ over /.test(x);
+  if(/'out'/.test(it))return/ out $/.test(x)||/ out /.test(x);
+  if(/speed and eta|eta/.test(it))return/knots|eta|minutes/.test(x);
+  return null}
 /* PTT */
 let txStart=0;
 const ptt=$("#ptt");
 ptt.addEventListener("pointerdown",e=>{e.preventDefault();if(!st.on)return;if(st.screen!=="main"&&st.screen!=="cancelled"){logSys("Finish or close the screen first (CLR), then transmit.");return}
   if(st.dual){st.dual=false;logSys("Dualwatch switched off: you can't transmit in dual watch.");emit({type:"dual",on:false})}
-  st.tx=true;txStart=Date.now();ptt.classList.add("down");try{speechSynthesis.cancel()}catch(err){}render()});
+  st.tx=true;txStart=Date.now();ptt.classList.add("down");try{speechSynthesis.cancel()}catch(err){}recStart();render()});
 const pttUp=()=>{if(!st.tx)return;st.tx=false;ptt.classList.remove("down");if(st.screen==="cancelled")st.screen="main";render();const d=(Date.now()-txStart)/1000;
-  if(d<1){logSys("Transmission too short: hold PTT while you speak, then release.");return}
-  logMe(`(you transmitted ${Math.round(d)} s on CH ${st.ch}, ${PW()==="HI"?"high":"low"} power)`);emit({type:"tx",ch:st.ch,pwr:PW(),dur:d})};
+  const ch=st.ch,pw=PW();
+  recStop((url,text)=>{
+    if(d<1){logSys("Transmission too short: hold PTT while you speak, then release.");return}
+    LASTTX={url,text};
+    logMe(`(you transmitted ${Math.round(d)} s on CH ${ch}, ${pw==="HI"?"high":"low"} power)`);
+    if(url||text){const el=$("#log").lastChild;el.innerHTML+=(text?`<br>«${esc(text)}»`:"")+(url?`<br><audio controls src="${url}" style="width:100%;height:32px;margin-top:4px"></audio>`:"")}
+    emit({type:"tx",ch,pwr:pw,dur:d})})};
+let LASTTX={url:null,text:""};
 ptt.addEventListener("pointerup",pttUp);ptt.addEventListener("pointerleave",pttUp);ptt.addEventListener("contextmenu",e=>e.preventDefault());
 document.addEventListener("keydown",e=>{if(e.code==="Space"&&!e.repeat&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();ptt.dispatchEvent(new PointerEvent("pointerdown"))}});
 document.addEventListener("keyup",e=>{if(e.code==="Space"){e.preventDefault();pttUp()}});
@@ -402,11 +459,14 @@ function finish(){if(!SC.active)return;SC.active=false;$("#ff").hidden=true;draw
 function showDlg(h){$("#dlgbox").innerHTML=h;$("#dlg").hidden=false}
 function hideDlg(){$("#dlg").hidden=true}
 function openCheck(v,done){
-  showDlg(`<h3>${esc(v.title)}</h3><p style="margin:.2em 0 .6em">What did you say? Tick what you included.</p>
-   <div class="chk">${v.checks.map((c,i)=>`<label><input type="checkbox" data-i="${i}"> ${esc(c)}</label>`).join("")}</div>
+  const T=LASTTX.text||"";const auto=v.checks.map(c=>autoTick(c,T));
+  showDlg(`<h3>${esc(v.title)}</h3>
+   ${LASTTX.url||T?`<div class="model" style="margin-bottom:8px">${T?`<p><b>What the simulator heard:</b> «${esc(T)}»</p>`:""}${LASTTX.url?`<audio controls src="${LASTTX.url}" style="width:100%;height:32px"></audio>`:""}</div>`:""}
+   <p style="margin:.2em 0 .6em">${T?"Items found in your words are ticked. Check them, and tick anything speech-to-text missed.":"What did you say? Tick what you included."}</p>
+   <div class="chk">${v.checks.map((c,i)=>`<label><input type="checkbox" data-i="${i}"${auto[i]===true?" checked":""}> ${esc(c)}</label>`).join("")}</div>
    <details><summary style="cursor:pointer;color:var(--accent);font-weight:700">Model answer</summary><div class="model">${v.model.map(l=>`<p>${l}</p>`).join("")}</div></details>
    <div class="btnrow"><button class="btn" id="chkok">Done</button></div>`);
-  $("#chkok").onclick=()=>{const got=$$("#dlgbox .chk input:checked").length;SC.checks[v.title]={got,of:v.checks.length};hideDlg();feedback(`${v.title}: ${got}/${v.checks.length} items.`,got===v.checks.length);done&&done()}}
+  $("#chkok").onclick=()=>{LASTTX={url:null,text:""};const got=$$("#dlgbox .chk input:checked").length;SC.checks[v.title]={got,of:v.checks.length};hideDlg();feedback(`${v.title}: ${got}/${v.checks.length} items.`,got===v.checks.length);done&&done()}}
 
 /* ---------- scenario helpers ---------- */
 const CS="Mike Delta Echo Two Four",MM="8 2 4 4 1 2 3 4 5";

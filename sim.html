@@ -1,0 +1,524 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="robots" content="noindex,nofollow"><meta name="apple-mobile-web-app-title" content="VHF"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#0e2233"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png"></head><body><title>IC-M94DE Simulator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: practice tool — scenario briefing on top, virtual handheld in the middle, radio speaker log + objectives below. */
+:root{
+  --bg:#f3f6f8; --surface:#fff; --ink:#0e2233; --muted:#55687a; --line:#d5dee6; --soft:#e8eef3;
+  --accent:#1b5b8c; --accent-ink:#fff; --mayday:#c3102b; --pan:#b86a00; --sec:#17765a; --ok:#17765a; --bad:#c3102b;
+  --body:#1d2125; --body2:#2b3036; --key:#3a4048; --key2:#4a515a; --keyink:#e9edf1;
+  --lcd:#c9d2b8; --lcdink:#1d2614; --lcddim:#5b6650;
+  --f:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --m:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0a131b;--surface:#112131;--ink:#e4edf4;--muted:#93a6b7;--line:#21374b;--soft:#18293a;--accent:#73b4ea;--accent-ink:#06121d;--mayday:#ff5d66;--pan:#f3aa3d;--sec:#4fc79d;--ok:#4fc79d;--bad:#ff5d66;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0a131b;--surface:#112131;--ink:#e4edf4;--muted:#93a6b7;--line:#21374b;--soft:#18293a;--accent:#73b4ea;--accent-ink:#06121d;--mayday:#ff5d66;--pan:#f3aa3d;--sec:#4fc79d;--ok:#4fc79d;--bad:#ff5d66;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.45}
+a{color:var(--accent)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 40px;display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+header.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+header.top h1{font-size:20px;margin:0;flex:1;min-width:0}
+header.top a,.tbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:700;text-decoration:none;color:var(--ink);cursor:pointer}
+.tbtn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+@media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}.left{display:contents!important}.p-scn{order:1}.devwrap{order:2}.p-obj{order:3}.p-log{order:4}}
+.last{width:100%;max-width:340px;font-size:14px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:6px 10px;min-height:2.4em}
+.last.sys{border-left-color:var(--pan)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+.panel h2{font-size:17px;margin:0 0 6px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+select.sc{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 10px;font-size:16px;color:var(--ink)}
+.brief{margin:.5em 0}
+.steps{list-style:none;padding:0;margin:6px 0 0;display:grid;gap:6px}
+.steps li{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start;font-size:15px}
+.steps li::before{content:"○";color:var(--muted);font-weight:700;text-align:center}
+.steps li.done::before{content:"✓";color:var(--ok)}
+.steps li.miss::before{content:"✗";color:var(--bad)}
+.steps li.cur{font-weight:700}
+.log{display:grid;gap:6px;max-height:260px;overflow-y:auto;font-size:15px}
+.log .m{border-left:4px solid var(--accent);background:var(--soft);padding:6px 10px;border-radius:0 8px 8px 0}
+.log .m.me{border-left-color:var(--muted)}
+.log .m.sys{border-left-color:var(--pan);font-style:italic}
+.log .m b.ch{font-family:var(--m);font-size:12px;margin-right:6px}
+.fb{font-size:14px;border-radius:8px;padding:8px 10px;margin-top:6px}
+.fb.ok{background:color-mix(in srgb,var(--ok) 15%,transparent)}
+.fb.bad{background:color-mix(in srgb,var(--bad) 15%,transparent)}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.btn{border:0;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:8px 16px;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line)}
+
+/* ---- device ---- */
+.devwrap{display:grid;justify-items:center;gap:8px;padding-top:92px;padding-left:30px;min-width:0}
+.devwrap .last,.devwrap .devnote{margin-left:-30px}
+.device{position:relative;width:300px;max-width:100%;background:linear-gradient(180deg,var(--body2),var(--body));border-radius:34px 34px 46px 46px;padding:22px 18px 26px;box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 2px 0 rgba(255,255,255,.08);user-select:none;-webkit-user-select:none;touch-action:manipulation;color:var(--keyink)}
+.antenna{pointer-events:none;position:absolute;left:46px;top:-86px;width:22px;height:96px;background:linear-gradient(90deg,#15181b,#2a2f35,#15181b);border-radius:11px 11px 4px 4px}
+.brand{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.12em;color:#aab3bd;margin-bottom:8px}
+.brand b{color:#fff;letter-spacing:.2em}
+.lcd{background:var(--lcd);color:var(--lcdink);border-radius:8px;height:176px;padding:6px 8px;font-family:var(--m);box-shadow:inset 0 2px 6px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.lcd.off{background:#59604f}
+.lcd.bl{box-shadow:inset 0 2px 6px rgba(0,0,0,.35),0 0 18px rgba(170,255,140,.55)}
+.lcd .row{display:flex;justify-content:space-between;align-items:center;font-size:11px;gap:4px}
+.lcd .big{font-size:58px;font-weight:600;line-height:1;letter-spacing:-.02em}
+.lcd .mid{display:flex;align-items:flex-end;justify-content:space-between;flex:1}
+.lcd .nm{font-size:12px}
+.lcd .ttl{font-size:13px;font-weight:600;border-bottom:1px solid var(--lcdink);margin-bottom:3px}
+.lcd .lst{font-size:12px;line-height:1.35;flex:1;overflow:hidden}
+.lcd .lst div{padding:0 3px}
+.lcd .lst .sel{background:var(--lcdink);color:var(--lcd)}
+.lcd .bar{height:10px;border:1px solid var(--lcdink);margin:4px 0}
+.lcd .bar i{display:block;height:100%;background:var(--lcdink)}
+.lcd .soft{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--lcdink);font-size:10px;text-align:center;padding-top:2px}
+.lcd .soft span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px}
+.lcd .alert{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;font-size:13px;gap:3px}
+.lcd .alert .h{font-size:16px;font-weight:600}
+.blink{animation:bl 1s steps(2,start) infinite}
+@keyframes bl{to{visibility:hidden}}
+.keys{display:grid;gap:8px;margin-top:12px}
+.softkeys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.k{border:0;border-radius:10px;background:linear-gradient(180deg,var(--key2),var(--key));color:var(--keyink);font-weight:700;font-size:13px;padding:10px 4px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.45);touch-action:none}
+.k:active,.k.down{transform:translateY(1px);box-shadow:none;filter:brightness(1.25)}
+.k small{display:block;font-weight:400;font-size:10px;opacity:.8}
+.k.sk{height:22px;padding:0;border-radius:6px}
+.nav{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:8px;align-items:center}
+.dpad{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,34px);gap:3px}
+.dpad .k{padding:0;font-size:15px}
+.dpad .c{grid-column:2;grid-row:2;font-size:11px}
+.col{display:grid;gap:8px}
+.k.red{background:linear-gradient(180deg,#d22a3b,#a0101f)}
+.k.ch16{background:linear-gradient(180deg,#5a6a7a,#3a4652)}
+.ptt{position:absolute;left:-30px;top:120px;width:24px;height:120px;border-radius:12px 4px 4px 12px;border:0;background:linear-gradient(90deg,#111,#3a3f45);color:#ddd;font-size:10px;font-weight:700;writing-mode:vertical-rl;cursor:pointer;touch-action:none}
+.ptt.down{background:linear-gradient(90deg,#7a1a22,#c3102b)}
+.rear{margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:#141619;border-radius:12px;padding:8px 10px}
+.rear small{font-size:10px;color:#9aa3ad}
+.distress{position:relative;width:118px;height:44px}
+.distress .dk{position:absolute;inset:0;border:0;border-radius:10px;background:linear-gradient(180deg,#e0303f,#9b0d1b);color:#fff;font-weight:700;font-size:12px;letter-spacing:.06em;cursor:pointer;touch-action:none}
+.distress .cover{position:absolute;inset:-3px;border:2px solid #f2c200;border-radius:12px;background:repeating-linear-gradient(45deg,rgba(242,194,0,.85) 0 8px,rgba(20,20,20,.85) 8px 16px);color:#111;font-size:11px;font-weight:800;cursor:pointer;display:grid;place-items:center;transition:transform .25s}
+.distress.open .cover{transform:translateY(-34px) rotateX(55deg);opacity:.35;pointer-events:none}
+.devnote{font-size:12px;color:var(--muted);text-align:center;max-width:320px}
+.led{position:absolute;right:26px;top:10px;width:8px;height:8px;border-radius:50%;background:#333}
+.led.tx{background:#ff3344;box-shadow:0 0 8px #ff3344}
+.led.rx{background:#36d36a;box-shadow:0 0 8px #36d36a}
+@media (max-width:360px){.device{width:270px;padding:18px 12px 20px}.lcd .big{font-size:50px}}
+
+/* self-check */
+.dlg{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.45);display:grid;place-items:end center;padding:12px}
+.dlg .box{background:var(--surface);color:var(--ink);border-radius:14px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.dlg h3{margin:0 0 6px;font-size:18px}
+.chk{display:grid;gap:6px;margin:8px 0}
+.chk label{display:flex;gap:8px;align-items:flex-start;font-size:15px}
+.chk input{width:18px;height:18px;margin-top:3px;flex:0 0 auto}
+.model{background:var(--soft);border-radius:8px;padding:8px 10px;font-size:15px}
+.model p{margin:.2em 0}
+.score{font-size:28px;font-weight:700;font-family:var(--m)}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>IC-M94DE simulator</h1>
+    <button class="tbtn" id="snd" aria-pressed="false" title="Beeps, alarms and spoken replies">Sound off</button>
+    <a href="./" id="back">← Handbook</a>
+  </header>
+
+  <div class="grid">
+    <div class="left" style="display:grid;gap:14px;min-width:0">
+      <div class="panel p-scn">
+        <label class="eyebrow" for="scsel">Scenario</label>
+        <select class="sc" id="scsel"></select>
+        <p class="brief" id="brief"></p>
+        <div class="btnrow"><button class="btn" id="start">Start scenario</button><button class="btn ghost" id="reset">Reset radio</button><button class="btn ghost" id="ff" hidden>Skip 5 minutes</button></div>
+      </div>
+      <div class="panel p-obj"><h2>Objectives</h2><ol class="steps" id="steps"></ol><div id="fb"></div></div>
+      <div class="panel p-log"><h2>Speaker</h2><p class="eyebrow" style="margin:0 0 6px">What you hear on your channel</p><div class="log" id="log" aria-live="polite"></div></div>
+    </div>
+
+    <div class="devwrap">
+      <div class="device" id="dev">
+        <div class="antenna" aria-hidden="true"></div>
+        <span class="led" id="led"></span>
+        <button class="ptt" id="ptt" aria-label="Push to talk (hold)">PTT</button>
+        <div class="brand"><b>ICOM</b><span>IC-M94DE</span></div>
+        <div class="lcd off" id="lcd" aria-live="polite"></div>
+        <div class="keys">
+          <div class="softkeys"><button class="k sk" data-k="s0" aria-label="Soft key 1"></button><button class="k sk" data-k="s1" aria-label="Soft key 2"></button><button class="k sk" data-k="s2" aria-label="Soft key 3"></button></div>
+          <div class="nav">
+            <div class="col"><button class="k" data-k="clr">CLR</button><button class="k ch16" data-k="c16">16/C</button></div>
+            <div class="dpad">
+              <span></span><button class="k" data-k="up" aria-label="Up">▲</button><span></span>
+              <button class="k" data-k="left" aria-label="Left">◄</button><button class="k c" data-k="ent">ENT</button><button class="k" data-k="right" aria-label="Right">►</button>
+              <span></span><button class="k" data-k="down" aria-label="Down">▼</button><span></span>
+            </div>
+            <div class="col"><button class="k" data-k="menu">MENU</button><button class="k" data-k="vol">VOL<small>SQL</small></button></div>
+          </div>
+          <button class="k red" data-k="pwr">⏻ POWER <small>hold 1 s</small></button>
+        </div>
+        <div class="rear"><small>REAR<br>Distress key</small>
+          <div class="distress" id="dwrap"><button class="dk" id="dkey">DISTRESS<br><span style="font-weight:400;font-size:10px">hold 3 s</span></button><button class="cover" id="dcover">LIFT COVER</button></div>
+        </div>
+      </div>
+      <div class="last" id="last" aria-live="polite">Speaker: nothing heard yet.</div>
+      <p class="devnote">Hold <b>PTT</b> (left side) to talk, release to listen. Simplified simulator based on the Icom manual; menus are shortened. Check your own manual.</p>
+    </div>
+  </div>
+</div>
+
+<div class="dlg" id="dlg" hidden><div class="box" id="dlgbox"></div></div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- sound ---------- */
+let SOUND=false,AC=null,noiseNode=null;
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}return AC}
+function beep(f=1800,d=.08,v=.15){if(!SOUND||!ac())return;const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}
+let alarmT=null;
+function alarm(on){clearInterval(alarmT);alarmT=null;if(on){let hi=false;alarmT=setInterval(()=>{beep(hi?2100:1300,.18,.18);hi=!hi},220)}}
+function setNoise(on){if(!SOUND||!ac()){if(noiseNode){try{noiseNode.stop()}catch(e){}noiseNode=null}return}
+  if(on&&!noiseNode){const b=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+    noiseNode=AC.createBufferSource();noiseNode.buffer=b;noiseNode.loop=true;const g=AC.createGain();g.gain.value=.04*(st.vol/5);const f=AC.createBiquadFilter();f.type="bandpass";f.frequency.value=2500;noiseNode.connect(f);f.connect(g);g.connect(AC.destination);noiseNode.start()}
+  if(!on&&noiseNode){try{noiseNode.stop()}catch(e){}noiseNode=null}}
+function speak(t){if(!SOUND||!window.speechSynthesis)return;try{const u=new SpeechSynthesisUtterance(t.replace(/<[^>]+>/g,""));u.lang="en-GB";u.rate=1.02;speechSynthesis.speak(u)}catch(e){}}
+$("#snd").onclick=()=>{SOUND=!SOUND;$("#snd").setAttribute("aria-pressed",SOUND);$("#snd").textContent=SOUND?"Sound on":"Sound off";if(SOUND){ac();AC&&AC.resume&&AC.resume();beep(1500,.06)}else{alarm(false);setNoise(false);try{speechSynthesis.cancel()}catch(e){}}render()};
+
+/* ---------- radio model ---------- */
+const CHS=[];for(let i=1;i<=28;i++)CHS.push(String(i).padStart(2,"0"));for(let i=60;i<=88;i++)if(i!==70)CHS.push(String(i));
+const LOWONLY=["15","17","75","76"];
+const CHNAME={"16":"DISTRESS","06":"INTERSHIP","08":"INTERSHIP","72":"INTERSHIP","77":"INTERSHIP","13":"BRIDGE","12":"PORT OPS","14":"PORT OPS","11":"PORT OPS","67":"SMALL CRAFT","80":"MARINA","10":"SAR / CG","73":"SAR / CG","09":"PILOTS","62":"MSI","63":"MSI","64":"MSI"};
+const NATURES=["Undesignated","Fire/Explosion","Flooding","Collision","Grounding","Listing","Sinking","Disabled & Adrift","Abandoning Ship","Piracy","Man Overboard"];
+const SOFTS=["Hi/Lo","Dual","Compose Distress","Compose Other","MOB","Scan","AquaQuake","AIS"];
+const OWN={name:"Sea Otter",mmsi:"824412345",call:"MDE24"};
+let st;
+function fresh(){return{on:false,ch:"16",pwr:"HI",vol:5,sql:3,dual:false,screen:"main",softPage:0,menuIdx:0,list:null,nature:"Undesignated",natureSet:false,mobUntil:0,cover:false,tx:false,dist:null,co:null,rcvd:null,bl:false,sel:0}}
+st=fresh();
+
+function PW(){return LOWONLY.includes(st.ch)?"LOW":st.pwr}
+function chName(){if(st.dual)return "DUAL 16";return CHNAME[st.ch]||""}
+function noisy(){return st.on&&st.sql<2&&!st.tx&&st.screen!=="off"}
+function softLabels(){
+  if(st.screen==="distwait")return["Cancel","Resend","Pause"];
+  if(st.screen==="distack")return["Close","Info","Hi/Lo"];
+  if(st.screen==="rcvd")return["Ignore","Hold","Accept"];
+  if(st.screen==="cancelq")return["","","Send"];
+  if(st.screen==="coSend")return["","","Send"];
+  if(["menu","nature","coType","coCat","coAddr","coCh","vol","sql"].includes(st.screen))return["","",""];
+  const p=st.softPage%Math.ceil(SOFTS.length/3);const a=SOFTS.slice(p*3,p*3+3);while(a.length<3)a.push("");return a;
+}
+function render(){
+  const L=$("#lcd");
+  if(!st.on){L.className="lcd off";L.innerHTML="";$$(".sk").forEach(b=>b.textContent="");setNoise(false);return}
+  L.className="lcd"+(st.bl?" bl":"");
+  const top=`<div class="row"><span>${PW()==="HI"?"HI":"LOW"} · INT</span><span>GPS ${OWN.mmsi}</span><span>▮▮▮</span></div>`;
+  let mid="";const sc=st.screen;
+  if(sc==="boot"){mid=`<div class="alert"><div class="h">ICOM</div><div>IC-M94DE</div></div>`}
+  else if(sc==="main"){
+    mid=`<div class="mid"><div><div class="nm">${esc(chName())}${LOWONLY.includes(st.ch)?" · 1W":""}</div><div class="big">${st.ch}</div></div><div style="text-align:right;font-size:11px">${st.tx?'<b>TX</b>':noisy()?"BUSY":"STBY"}<br>${st.mobUntil>Date.now()?'<span class="blink">MOB</span>':""}</div></div>
+      <div class="row"><span>51°52.40'N 001°32.70'E</span><span>${new Date().toTimeString().slice(0,5)}</span></div>`}
+  else if(sc==="vol"||sc==="sql"){const v=sc==="vol"?st.vol:st.sql;mid=`<div class="alert"><div class="h">${sc==="vol"?"VOLUME":"SQUELCH"}</div><div class="bar"><i style="width:${v*10}%"></i></div><div>${v} / 10 · ▲▼ adjust · ENT</div>${sc==="sql"&&st.sql<2?'<div class="blink">~~ noise ~~</div>':""}</div>`}
+  else if(["menu","nature","coType","coCat","coAddr","coCh"].includes(sc)){const T={menu:"MENU",nature:"Nature of Distress",coType:"Message Type",coCat:"Category",coAddr:"Address",coCh:"Channel"}[sc];
+    const items=st.list;const start=Math.max(0,Math.min(st.sel-2,items.length-5));
+    mid=`<div class="ttl">${T}</div><div class="lst">${items.slice(start,start+5).map((x,i)=>`<div class="${start+i===st.sel?"sel":""}">${esc(x)}</div>`).join("")}</div>`}
+  else if(sc==="distready"){mid=`<div class="alert"><div class="h">Distress: ${esc(st.nature)}</div><div>Lift cover, hold [DISTRESS] 3 s</div></div>`}
+  else if(sc==="count"){mid=`<div class="alert"><div class="h blink">DISTRESS</div><div>Sending in ${st.count}…</div></div>`}
+  else if(sc==="distwait"){const s=Math.max(0,Math.round((st.dist.next-Date.now())/1000));mid=`<div class="alert"><div class="h">Waiting for ACK</div><div>${esc(st.dist.nature)}</div><div>Resend in ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}</div></div>`}
+  else if(sc==="distack"){mid=`<div class="alert"><div class="h blink">RCVD Distress ACK</div><div>${esc(st.dist.ackFrom)}</div><div>CH 16 selected · any key: silence</div></div>`}
+  else if(sc==="cancelq"){mid=`<div class="alert"><div class="h">Cancel Distress?</div><div>Send a Distress Cancel call</div></div>`}
+  else if(sc==="cancelled"){mid=`<div class="alert"><div class="h">Cancel call sent</div><div>CH 16 · Hold [PTT] and give the reason</div></div>`}
+  else if(sc==="coSend"){const c=st.co;mid=`<div class="alert"><div class="h">Ready to send</div><div>${esc(c.type)}${c.cat?" · "+esc(c.cat):""}</div><div>${c.to?esc(c.to)+" · ":""}CH ${esc(c.ch)}</div></div>`}
+  else if(sc==="coTx"){mid=`<div class="alert"><div class="h">Transmitting</div><div>${esc(st.co.type)} Call</div></div>`}
+  else if(sc==="coWait"){mid=`<div class="alert"><div class="h">Waiting for ACK</div><div>${esc(st.co.to)}</div></div>`}
+  else if(sc==="coAble"){mid=`<div class="alert"><div class="h blink">Able to comply</div><div>${esc(st.co.to)} · CH ${esc(st.co.ch)}</div><div>any key</div></div>`}
+  else if(sc==="rcvd"){const r=st.rcvd;mid=`<div class="alert"><div class="h blink">RCVD ${esc(r.kind)}</div><div>${esc(r.from)}</div><div>${esc(r.info||"")}</div></div>`}
+  else if(sc==="mobset"){mid=`<div class="alert"><div class="h blink">MAN OVERBOARD</div><div>MOB waypoint set</div><div>Nature = MOB (30 s)</div></div>`}
+  else if(sc==="aqua"){mid=`<div class="alert"><div class="h">AquaQuake</div><div>Clearing water…</div></div>`}
+  else if(sc==="msg"){mid=`<div class="alert"><div class="h">${esc(st.msg[0])}</div><div>${esc(st.msg[1]||"")}</div></div>`}
+  const sl=softLabels();
+  L.innerHTML=top+mid+`<div class="soft">${sl.map(x=>`<span>${esc(x)}</span>`).join("")}</div>`;
+  $$(".sk").forEach((b,i)=>{b.textContent="";b.setAttribute("aria-label","Soft key: "+(sl[i]||"none"))});
+  setNoise(noisy()&&st.screen==="main"||st.screen==="sql"&&st.sql<2);
+  $("#led").className="led"+(st.tx?" tx":"");
+}
+setInterval(()=>{if(st.on&&(st.screen==="distwait"||st.screen==="main"))render()},1000);
+
+/* ---------- events to the scenario ---------- */
+function emit(e){if(SC.active)SC.onEvent(e)}
+
+/* ---------- key handling ---------- */
+function openList(screen,items,sel=0){st.screen=screen;st.list=items;st.sel=sel;render()}
+function back(){st.screen="main";st.list=null;render()}
+function setCh(c){st.ch=c;render();emit({type:"ch",ch:c})}
+function key(k){
+  if(!st.on){return}
+  beep(2400,.03,.08);
+  st.bl=true;clearTimeout(key.t);key.t=setTimeout(()=>{st.bl=false;render()},5000);
+  const sc=st.screen;
+  if(sc==="distack"){alarm(false);st.screen="main";setCh("16");emit({type:"ack_silenced"});return}
+  if(sc==="coAble"){alarm(false);st.screen="main";setCh(st.co.ch);emit({type:"indv_ok",ch:st.co.ch});return}
+  if(sc==="rcvd"){
+    if(k==="s0"){alarm(false);emit({type:"rcvd_ignore",kind:st.rcvd.kind});back()}
+    else if(k==="s1"){alarm(false);back()}
+    else if(k==="s2"){alarm(false);const r=st.rcvd;st.screen="main";setCh(r.ch||"16");emit({type:"rcvd_accept",kind:r.kind})}
+    return}
+  if(sc==="distwait"){
+    if(k==="s0"){st.screen="cancelq";render()}else if(k==="s1"){logSys("Hold [DISTRESS] 3 s to resend.")}else if(k==="s2"){logSys("Resend countdown paused (simulated).")}
+    else if(k==="clr"){logSys("Distress is still active. Cancel it with the Cancel soft key, or wait for an ACK.")}
+    return}
+  if(sc==="cancelq"){if(k==="s2"||k==="ent"){st.dist=null;st.screen="cancelled";st.ch="16";render();beep(1500,.2);emit({type:"dsc_cancel"});setTimeout(()=>{if(st.screen==="cancelled")back()},4000)}else if(k==="clr"){st.screen="distwait";render()}return}
+  if(sc==="vol"||sc==="sql"){
+    if(k==="up"){if(sc==="vol")st.vol=Math.min(10,st.vol+1);else st.sql=Math.min(10,st.sql+1)}
+    else if(k==="down"){if(sc==="vol")st.vol=Math.max(0,st.vol-1);else st.sql=Math.max(0,st.sql-1)}
+    else if(k==="vol"){st.screen=sc==="vol"?"sql":"main"}
+    else if(k==="ent"||k==="clr"){if(sc==="sql")emit({type:"sql",v:st.sql});if(sc==="vol")emit({type:"vol",v:st.vol});st.screen="main"}
+    render();if(sc==="sql"&&(k==="up"||k==="down"))emit({type:"sqladj",v:st.sql});return}
+  if(["menu","nature","coType","coCat","coAddr","coCh"].includes(sc)){
+    if(k==="up"){st.sel=Math.max(0,st.sel-1);render();return}
+    if(k==="down"){st.sel=Math.min(st.list.length-1,st.sel+1);render();return}
+    if(k==="clr"||k==="menu"){back();return}
+    if(k==="ent"){const v=st.list[st.sel];
+      if(sc==="menu"){if(v==="Compose Distress")openNature();else if(v==="Compose Other")openCo();else if(v==="Dual/Tri-Watch")toggleDual();else if(v==="Channel Group")msg("Channel Group","INT (International) selected");else back()}
+      else if(sc==="nature"){st.nature=v;st.natureSet=true;st.screen="distready";render();emit({type:"nature",v})}
+      else if(sc==="coType"){st.co={type:v};if(v==="Individual")openList("coAddr",ADDR());else if(v==="All Ships")openList("coCat",["Safety","Urgency"]);else if(v==="Test")openList("coAddr",ADDR());else openList("coCh",["16","06","08","72","77"])}
+      else if(sc==="coCat"){st.co.cat=v;openList("coCh",["16","06","08","13","72","77"])}
+      else if(sc==="coAddr"){st.co.to=v;openList("coCh",["72","77","06","08","16"])}
+      else if(sc==="coCh"){st.co.ch=v;st.screen="coSend";render()}
+      return}
+    return}
+  if(sc==="coSend"){if(k==="s2"||k==="ent"){sendCo()}else if(k==="clr")back();return}
+  if(sc==="distready"){if(k==="clr"){st.natureSet=false;back()}return}
+  if(sc==="cancelled"||sc==="msg"||sc==="mobset"||sc==="aqua"||sc==="coTx"||sc==="coWait"){if(k==="clr"||k==="ent")back();return}
+  // main
+  if(k==="up"||k==="down"){if(st.dual){st.dual=false;emit({type:"dual",on:false})}const i=CHS.indexOf(st.ch);let j=i<0?CHS.indexOf("16"):i;j=(j+(k==="up"?1:-1)+CHS.length)%CHS.length;setCh(CHS[j]);return}
+  if(k==="c16"){st.dual=false;setCh("16");return}
+  if(k==="left"){st.softPage=(st.softPage+Math.ceil(SOFTS.length/3)-1)%Math.ceil(SOFTS.length/3);render();return}
+  if(k==="right"){st.softPage=(st.softPage+1)%Math.ceil(SOFTS.length/3);render();return}
+  if(k==="vol"){st.screen="vol";render();return}
+  if(k==="menu"){openList("menu",["Compose Distress","Compose Other","Dual/Tri-Watch","Channel Group","Back"]);return}
+  if(k==="clr")return;
+  if(k==="s0"||k==="s1"||k==="s2"){const f=softLabels()[+k[1]];soft(f)}
+}
+function soft(f){
+  if(f==="Hi/Lo"){if(LOWONLY.includes(st.ch)){msg("Low power only","on this channel");return}st.pwr=st.pwr==="HI"?"LOW":"HI";render();emit({type:"pwr",v:st.pwr})}
+  else if(f==="Dual")toggleDual();
+  else if(f==="Compose Distress")openNature();
+  else if(f==="Compose Other")openCo();
+  else if(f==="MOB"){st.mobUntil=Date.now()+30000;st.nature="Man Overboard";st.natureSet=true;st.screen="mobset";render();emit({type:"mob"});setTimeout(()=>{if(st.screen==="mobset")back()},2500)}
+  else if(f==="Scan")msg("Scan","Not used in these scenarios");
+  else if(f==="AquaQuake"){st.screen="aqua";render();beep(180,.6,.25);setTimeout(()=>{if(st.screen==="aqua")back()},1500)}
+  else if(f==="AIS")msg("AIS plotter","No targets nearby (simulated)");
+}
+function msg(a,b){st.msg=[a,b];st.screen="msg";render();setTimeout(()=>{if(st.screen==="msg")back()},2200)}
+function toggleDual(){st.dual=!st.dual;st.screen="main";render();emit({type:"dual",on:st.dual})}
+function openNature(){openList("nature",NATURES,Math.max(0,NATURES.indexOf(st.nature)))}
+function openCo(){openList("coType",["Individual","Group","All Ships","Test"])}
+function ADDR(){return (SC.cur&&SC.cur.book)||["Kestrel","Puffin","Coastguard"]}
+function sendCo(){const c=st.co;st.screen="coTx";render();beep(1200,.5,.1);
+  setTimeout(()=>{
+    if(c.type==="All Ships"){emit({type:"dsc_allships",cat:c.cat,ch:c.ch});st.screen="main";setCh(c.ch);logSys(`DSC All Ships ${c.cat} call sent. Radio on CH ${c.ch}: now give the voice message.`)}
+    else if(c.type==="Individual"||c.type==="Test"){st.screen="coWait";render();emit({type:"dsc_indv",to:c.to,ch:c.ch,test:c.type==="Test"});
+      const r=SC.active&&SC.cur.indvReply?SC.cur.indvReply(c):{ok:true};setTimeout(()=>{if(st.screen!=="coWait")return;if(r.ok){st.screen="coAble";render();alarm(true);setTimeout(()=>alarm(false),2500)}else{msg("Unable to comply",r.why||"")}},2500)}
+    else{st.screen="main";render()}
+  },1200)}
+
+/* pointer helpers for hold keys */
+function holdable(el,ms,onHold,onTap,onTick){let t=null,ticks=null,held=false;
+  const down=e=>{e.preventDefault();el.classList.add("down");held=false;if(onTick){let n=0;ticks=setInterval(()=>{n++;onTick(n)},1000)}t=setTimeout(()=>{held=true;clearInterval(ticks);onHold()},ms)};
+  const up=e=>{el.classList.remove("down");clearTimeout(t);clearInterval(ticks);if(!held&&onTap)onTap()};
+  el.addEventListener("pointerdown",down);el.addEventListener("pointerup",up);el.addEventListener("pointerleave",e=>{if(el.classList.contains("down"))up(e)});el.addEventListener("contextmenu",e=>e.preventDefault())}
+$$(".k[data-k]").forEach(b=>{const k=b.dataset.k;if(k==="pwr")return;
+  if(k==="up"||k==="down"){let t1=null,t2=null;const stop=()=>{clearTimeout(t1);clearInterval(t2);b.classList.remove("down")};
+    b.addEventListener("pointerdown",e=>{e.preventDefault();b.classList.add("down");key(k);t1=setTimeout(()=>{t2=setInterval(()=>key(k),140)},450)});
+    b.addEventListener("pointerup",stop);b.addEventListener("pointerleave",stop);b.addEventListener("pointercancel",stop);
+    b.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();key(k)}});b.addEventListener("contextmenu",e=>e.preventDefault());return}
+  b.addEventListener("click",()=>key(k))});
+holdable($('[data-k="pwr"]'),1000,()=>{if(st.on){st=Object.assign(fresh(),{});alarm(false);render();emit({type:"power",on:false})}else{st.on=true;st.screen="boot";render();beep(1600,.1);setTimeout(()=>{st.screen="main";render();emit({type:"power",on:true})},900)}},()=>{if(st.on)logSys("Hold POWER for 1 second to switch off.");else logSys("Hold POWER for 1 second to switch on.")});
+/* distress */
+$("#dcover").onclick=()=>{st.cover=true;$("#dwrap").classList.add("open");emit({type:"cover"})};
+holdable($("#dkey"),3000,()=>{if(!st.on)return;sendDistress()},()=>{if(st.on&&st.screen!=="count")logSys("Hold [DISTRESS] for 3 seconds.")},n=>{if(!st.on)return;st.screen="count";st.count=3-n;render();beep(2000,.12)});
+$("#dkey").addEventListener("pointerdown",()=>{if(st.on&&st.screen!=="distwait"){st.prev=st.screen;st.screen="count";st.count=3;render();beep(2000,.12)}});
+$("#dkey").addEventListener("pointerup",()=>{if(st.screen==="count"){st.screen="main";render()}});
+function sendDistress(){beep(1000,.8,.2);const nature=st.mobUntil>Date.now()?"Man Overboard":(st.natureSet?st.nature:"Undesignated");
+  st.dist={nature,next:Date.now()+(210+Math.random()*60)*1000};st.ch="16";st.dual=false;st.screen="distwait";st.cover=false;$("#dwrap").classList.remove("open");render();
+  emit({type:"dsc_distress",nature});
+  const delay=SC.active&&SC.cur.ackDelay!==undefined?SC.cur.ackDelay:null;
+  if(delay!==null)setTimeout(()=>{if(st.screen!=="distwait")return;st.dist.ackFrom=SC.cur.cg+" "+(SC.cur.cgMmsi||"002320017");st.screen="distack";render();alarm(true);emit({type:"dsc_ack"})},delay)}
+/* PTT */
+let txStart=0;
+const ptt=$("#ptt");
+ptt.addEventListener("pointerdown",e=>{e.preventDefault();if(!st.on)return;if(st.screen!=="main"&&st.screen!=="cancelled"){logSys("Finish or close the screen first (CLR), then transmit.");return}
+  if(st.dual){st.dual=false;logSys("Dualwatch switched off: you can't transmit in dual watch.");emit({type:"dual",on:false})}
+  st.tx=true;txStart=Date.now();ptt.classList.add("down");try{speechSynthesis.cancel()}catch(err){}render()});
+const pttUp=()=>{if(!st.tx)return;st.tx=false;ptt.classList.remove("down");if(st.screen==="cancelled")st.screen="main";render();const d=(Date.now()-txStart)/1000;
+  if(d<1){logSys("Transmission too short: hold PTT while you speak, then release.");return}
+  logMe(`(you transmitted ${Math.round(d)} s on CH ${st.ch}, ${PW()==="HI"?"high":"low"} power)`);emit({type:"tx",ch:st.ch,pwr:PW(),dur:d})};
+ptt.addEventListener("pointerup",pttUp);ptt.addEventListener("pointerleave",pttUp);ptt.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("keydown",e=>{if(e.code==="Space"&&!e.repeat&&!/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();ptt.dispatchEvent(new PointerEvent("pointerdown"))}});
+document.addEventListener("keyup",e=>{if(e.code==="Space"){e.preventDefault();pttUp()}});
+
+/* ---------- speaker log ---------- */
+function logRaw(cls,html){const d=document.createElement("div");d.className="m "+cls;d.innerHTML=html;$("#log").appendChild(d);$("#log").scrollTop=1e6;if(cls!=="me"){const L=$("#last");L.className="last"+(cls==="sys"?" sys":"");L.innerHTML=html}}
+function logSys(t){logRaw("sys",esc(t))}
+function logMe(t){logRaw("me",esc(t))}
+/* incoming voice: heard only on the right channel */
+function hears(ch){return st.on&&!st.tx&&(st.ch===ch||(st.dual&&ch==="16"))&&st.sql<9}
+function incoming(m){ // m:{ch,from,text,weak}
+  if(hears(m.ch)&&!(m.weak&&st.sql>=5)){logRaw("",`<b class="ch">CH ${m.ch}</b><b>${esc(m.from)}:</b> ${m.text}`);speak(m.text);st.rx=true;$("#led").className="led rx";setTimeout(()=>{$("#led").className="led"+(st.tx?" tx":"")},1500);return true}
+  if(SC.active)SC.missed.push(m);return false}
+function dscIn(r){ // incoming DSC call
+  if(!st.on)return;st.rcvd=r;st.screen="rcvd";render();alarm(true);setTimeout(()=>{if(st.screen!=="rcvd")alarm(false)},12000)}
+
+/* ---------- scenario engine ---------- */
+const SC={active:false,cur:null,idx:0,done:[],missed:[],timers:[],checks:{},
+  later(ms,f){this.timers.push(setTimeout(f,ms))},
+  clear(){this.timers.forEach(clearTimeout);this.timers=[]},
+  onEvent(e){const c=this.cur;if(!c)return;
+    // generic advice
+    if(e.type==="tx"&&e.ch==="70")feedback("Never use channel 70 for voice.",false);
+    for(let i=0;i<c.steps.length;i++){if(this.done[i])continue;const s=c.steps[i];
+      if(s.req&&!s.req.every(r=>this.done[r]))continue;
+      if(s.voice&&!this.done.slice(0,i).every(Boolean)){if(e.type==="tx")feedback("Do the earlier steps first (see Objectives).",false);break}
+      const r=s.test(e,st);
+      if(r===true||(r&&r.ok)){this.done[i]=true;drawSteps();if(r.note)feedback(r.note,!/but|Sent, but/.test(r.note));
+        if(s.voice){openCheck(s.voice,()=>{s.after&&s.after();checkEnd()});break}else{s.after&&s.after();checkEnd()}}
+      else if(r&&r.bad){feedback(r.bad,false);if(s.voice||e.type==="tx")break}
+    }},
+};
+function feedback(t,ok){const d=document.createElement("div");d.className="fb "+(ok?"ok":"bad");d.textContent=t;$("#fb").appendChild(d);while($("#fb").children.length>3)$("#fb").firstChild.remove()}
+function drawSteps(){const c=SC.cur;if(!c){$("#steps").innerHTML="";return}let curSet=false;
+  $("#steps").innerHTML=c.steps.map((s,i)=>{let cls=SC.done[i]?"done":"";if(!SC.done[i]&&!curSet&&SC.active){cls="cur";curSet=true}return `<li class="${cls}">${s.t}</li>`}).join("")}
+function checkEnd(){const c=SC.cur;if(c.steps.every((_,i)=>SC.done[i])){SC.later(c.endDelay||2500,finish)}}
+function finish(){if(!SC.active)return;SC.active=false;$("#ff").hidden=true;drawSteps();
+  const auto=SC.cur.steps.length;let v=0,vt=0;Object.values(SC.checks).forEach(x=>{v+=x.got;vt+=x.of});
+  const missed=SC.missed.filter(m=>!m.optional).length;
+  showDlg(`<h3>Scenario complete</h3><p class="score">${auto}/${auto} steps · ${v}/${vt} call items</p>
+   ${missed?`<p class="fb bad">You missed ${missed} radio message${missed>1?"s":""} because your radio wasn't on the right channel (or squelch too high).</p>`:""}
+   <p>${esc(SC.cur.debrief||"")}</p><div class="btnrow"><button class="btn" id="again">Try again</button><button class="btn ghost" id="next">Next scenario</button><button class="btn ghost" id="cls">Close</button></div>`);
+  $("#again").onclick=()=>{hideDlg();startSc()};$("#next").onclick=()=>{hideDlg();const s=$("#scsel");s.selectedIndex=(s.selectedIndex+1)%s.options.length;s.onchange();startSc()};$("#cls").onclick=hideDlg;
+  try{const r=JSON.parse(localStorage.getItem("vhf-sim")||"{}");r[SC.cur.id]=`${v}/${vt}`;localStorage.setItem("vhf-sim",JSON.stringify(r))}catch(e){}
+  fillSel();
+}
+function showDlg(h){$("#dlgbox").innerHTML=h;$("#dlg").hidden=false}
+function hideDlg(){$("#dlg").hidden=true}
+function openCheck(v,done){
+  showDlg(`<h3>${esc(v.title)}</h3><p style="margin:.2em 0 .6em">What did you say? Tick what you included.</p>
+   <div class="chk">${v.checks.map((c,i)=>`<label><input type="checkbox" data-i="${i}"> ${esc(c)}</label>`).join("")}</div>
+   <details><summary style="cursor:pointer;color:var(--accent);font-weight:700">Model answer</summary><div class="model">${v.model.map(l=>`<p>${l}</p>`).join("")}</div></details>
+   <div class="btnrow"><button class="btn" id="chkok">Done</button></div>`);
+  $("#chkok").onclick=()=>{const got=$$("#dlgbox .chk input:checked").length;SC.checks[v.title]={got,of:v.checks.length};hideDlg();feedback(`${v.title}: ${got}/${v.checks.length} items.`,got===v.checks.length);done&&done()}}
+
+/* ---------- scenario helpers ---------- */
+const CS="Mike Delta Echo Two Four",MM="8 2 4 4 1 2 3 4 5";
+const ON={t:"Switch the radio on (hold POWER 1 s)",test:e=>e.type==="power"&&e.on};
+const tx=(ch,pwr,voice,extra={})=>Object.assign({test:(e)=>{if(e.type!=="tx")return false;if(!ch.includes(e.ch))return{bad:`Wrong channel: you transmitted on ${e.ch}.`};if(pwr&&e.pwr!==pwr)return{ok:true,note:`Transmitted, but you used ${e.pwr==="HI"?"high":"low"} power; ${pwr==="HI"?"high":"low"} is right here.`};return true},voice},extra);
+const MAYDAY_VOICE=(nat,posTxt)=>({title:"Voice Mayday",checks:["Mayday ×3","'This is' + boat name ×3","Call sign (phonetic) and MMSI","Mayday + identity again at start of message","Position","Nature of distress","Assistance required","Number of people on board","Other information","Ended with 'Over'"],
+  model:["MAYDAY, MAYDAY, MAYDAY","this is Sea Otter, Sea Otter, Sea Otter, "+CS+", MMSI "+MM,"MAYDAY Sea Otter, "+CS+", MMSI "+MM,"My position "+posTxt,nat,"Require immediate assistance","Four persons on board","Ten metre white motor cruiser","OVER"]});
+
+const SCN=[
+{id:"setup",t:"1 · Switch on, set up and call a marina",kind:"Routine",
+ brief:"You're on the Sea Otter, about ten minutes from Riverside Marina, which works on channel 80. Your radio is off.",
+ steps:[ON,
+  {t:"Turn squelch fully down (you hear noise)",test:e=>e.type==="sqladj"&&e.v===0||(e.type==="sql"&&e.v===0)},
+  {t:"Set squelch so the noise just stops (level 2)",req:[1],test:e=>e.type==="sql"&&(e.v===2?true:e.v<2?{bad:"Still noisy: turn squelch up until the noise just stops."}:e.v>3?{bad:"Too high: you may miss weak signals. Turn it down until the noise just stops."}:true)},
+  {t:"Select channel 80",test:e=>e.type==="ch"&&e.ch==="80"},
+  {t:"Select LOW power",test:e=>e.type==="pwr"&&e.v==="LOW"},
+  Object.assign(tx(["80"],"LOW",{title:"Call to the marina",checks:["Marina's name (up to 3×)","'This is' + own name","Said which channel","Short description of the boat","Request (berth for tonight)","Ended with 'Over'"],
+   model:["Riverside Marina, Riverside Marina, this is Sea Otter, Sea Otter, on channel eight zero, Over","(after reply) Riverside Marina, this is Sea Otter, ten metre motor cruiser, about ten minutes away, request a berth for one night, Over"]}),{t:"Call Riverside Marina on 80 (hold PTT)",after:()=>SC.later(1500,()=>incoming({ch:"80",from:"Riverside Marina",text:"Sea Otter, Riverside Marina. Berth B twelve, port side to. Call us on this channel when you're at the entrance. Out."}))})],
+ debrief:"Order matters: squelch down, volume, squelch up until the noise just stops, channel, low power, listen, then call. Coast stations are called on their working channel, not on 16."},
+{id:"vessel",t:"2 · Call another vessel and move to 72",kind:"Routine",
+ brief:"You want to arrange to meet the yacht Kestrel in Harwich tonight. She's about two miles away, listening on 16.",
+ steps:[ON,{t:"Channel 16",test:e=>e.type==="ch"&&e.ch==="16"||e.type==="power"&&e.on&&st.ch==="16"},
+  {t:"LOW power (she's close)",test:e=>e.type==="pwr"&&e.v==="LOW"},
+  Object.assign(tx(["16"],"LOW",{title:"Initial call on 16",checks:["Kestrel's name (2–3×)","'This is' + Sea Otter","Proposed a working channel (72)","Ended with 'Over'"],model:["Kestrel, Kestrel, this is Sea Otter, Sea Otter, Over","(after reply) Kestrel, this is Sea Otter, channel seven two, please, seven two, Over"]}),{t:"Call Kestrel on 16 and propose 72",after:()=>SC.later(1500,()=>incoming({ch:"16",from:"Kestrel",text:"Sea Otter, this is Kestrel. Channel seven two. Over."}))}),
+  {t:"Switch to channel 72",test:e=>e.type==="ch"&&e.ch==="72"},
+  Object.assign(tx(["72"],"LOW",{title:"Conversation on 72",checks:["Called Kestrel again on 72","Kept it short","Ended with 'Out'"],model:["Kestrel, Kestrel, this is Sea Otter, Sea Otter, Over","Kestrel, this is Sea Otter. We're heading for Harwich tonight; would you like to meet up? Over","… Kestrel, this is Sea Otter, see you at nineteen hundred. Out"]}),{t:"Talk on 72",after:()=>SC.later(1500,()=>incoming({ch:"72",from:"Kestrel",text:"Sea Otter, this is Kestrel. Sounds good, see you in Harwich at nineteen hundred. Out."}))}),
+  {t:"Back to channel 16",test:e=>e.type==="ch"&&e.ch==="16"}],
+ debrief:"The calling vessel proposes the working channel; repeat it back. Use low power for short range. Return to 16 afterwards."},
+{id:"dscindv",t:"3 · DSC individual call to Kestrel",kind:"Routine",book:["Kestrel","Puffin"],
+ brief:"Same as before, but now use DSC: send an individual call to Kestrel with working channel 72, then talk by voice.",
+ indvReply:c=>c.to==="Kestrel"?{ok:true}:{ok:false,why:"No answer from "+c.to},
+ steps:[ON,{t:"Compose Other → Individual → Kestrel → CH 72 → Send",test:e=>e.type==="dsc_indv"&&(e.to==="Kestrel"&&e.ch==="72"?true:{bad:"Send it to Kestrel with channel 72."})},
+  {t:"'Able to comply' received: press a key (radio goes to 72)",test:e=>e.type==="indv_ok"&&e.ch==="72"},
+  {t:"LOW power",test:e=>e.type==="pwr"&&e.v==="LOW"||(e.type==="tx"&&e.pwr==="LOW")},
+  Object.assign(tx(["72"],"LOW",{title:"Voice on 72",checks:["Kestrel, this is Sea Otter","Message kept short","Ended with 'Out'"],model:["Kestrel, this is Sea Otter. Meet in Harwich at nineteen hundred? Over","… Out"]}),{t:"Talk on 72",after:()=>SC.later(1500,()=>incoming({ch:"72",from:"Kestrel",text:"Sea Otter, Kestrel. Yes, see you there. Out."}))})],
+ debrief:"DSC replaces the call on 16: the called station's radio rings, accepts, and both radios jump to the working channel."},
+{id:"check",t:"4 · Radio check",kind:"Routine",
+ brief:"You've fitted a new antenna. Your friend's boat Puffin listens on channel 77 in the marina.",
+ steps:[ON,{t:"Channel 77",test:e=>e.type==="ch"&&e.ch==="77"},{t:"LOW power",test:e=>e.type==="pwr"&&e.v==="LOW"},
+  Object.assign(tx(["77"],"LOW",{title:"Radio check",checks:["Puffin's name","'This is' Sea Otter","'Radio check, please'","Ended with 'Over'"],model:["Puffin, Puffin, this is Sea Otter, Sea Otter, radio check, please, Over"]}),{t:"Ask Puffin for a radio check",after:()=>SC.later(1500,()=>incoming({ch:"77",from:"Puffin",text:"Sea Otter, this is Puffin. You are loud and clear. Out."}))})],
+ debrief:"Do radio checks with a co-operating station on its channel, at low power when close."},
+{id:"fire",t:"5 · Fire on board: DSC alert + Mayday",kind:"Distress",cg:"Humber Coastguard",ackDelay:6000,
+ brief:"A fire in the engine room is out of control. Position 51°52.4'N 001°32.7'E. Four people on board. The skipper tells you to call for help.",
+ steps:[ON,{t:"Compose Distress → nature 'Fire/Explosion' (ENT)",test:e=>e.type==="nature"&&(e.v==="Fire/Explosion"?true:{bad:"Choose Fire/Explosion as nature of distress."})},
+  {t:"Lift the cover and hold [DISTRESS] 3 s",test:e=>e.type==="dsc_distress"&&(e.nature==="Fire/Explosion"?true:{ok:true,note:"Alert sent, but without the nature 'Fire'. Fine if there's no time."})},
+  {t:"ACK received: press a key to silence (CH 16)",test:e=>e.type==="ack_silenced"},
+  {t:"HIGH power",test:e=>e.type==="pwr"&&e.v==="HI"||(e.type==="tx"&&e.pwr==="HI")},
+  Object.assign(tx(["16"],"HI",MAYDAY_VOICE("On fire in the engine room","five one degrees five two decimal four minutes north, zero zero one degrees three two decimal seven minutes east")),{t:"Voice MAYDAY on 16",after:()=>SC.later(1800,()=>incoming({ch:"16",from:"Humber Coastguard",text:"Mayday Sea Otter, this is Humber Coastguard, Humber Coastguard, Humber Coastguard. Received Mayday. Lifeboat launching. Stand by on channel one six."}))})],
+ debrief:"A DSC alert carries only your MMSI, position and nature: always follow it with the full voice Mayday on 16, high power. Don't forget 'Mayday' and your identity at the start of the message."},
+{id:"mob",t:"6 · Man overboard",kind:"Distress",cg:"Humber Coastguard",ackDelay:6000,
+ brief:"A crew member has gone overboard in rough water; you're not sure you can recover them. You're 2 miles, 210° true, from Gull Rock lighthouse.",
+ steps:[ON,{t:"Press the MOB soft key (◄► to find it)",test:e=>e.type==="mob"},
+  {t:"Hold [DISTRESS] 3 s within 30 s (nature = MOB)",test:e=>e.type==="dsc_distress"&&(e.nature==="Man Overboard"?true:{ok:true,note:"Sent, but not as 'Man Overboard': press MOB first, then DISTRESS within 30 s."})},
+  {t:"Silence the ACK (CH 16)",test:e=>e.type==="ack_silenced"},
+  Object.assign(tx(["16"],"HI",MAYDAY_VOICE("Man overboard","two one zero degrees from Gull Rock lighthouse, two miles")),{t:"Voice MAYDAY on 16, high power",after:()=>SC.later(1800,()=>incoming({ch:"16",from:"Humber Coastguard",text:"Mayday Sea Otter, Humber Coastguard. Received Mayday. Helicopter tasked. Keep the casualty in sight."}))})],
+ debrief:"Position by landmark: bearing FROM the mark, in three figures, degrees true, then distance."},
+{id:"pan",t:"7 · Engine failure: Pan-pan",kind:"Urgency",
+ brief:"Engine failure, calm weather, drifting slowly 20 miles offshore. No immediate danger. Position 52°10.0'N 002°05.5'E. You want a tow.",
+ steps:[ON,{t:"DSC: Compose Other → All Ships → Urgency → CH 16 → Send",test:e=>e.type==="dsc_allships"&&(e.cat==="Urgency"?true:{bad:"Choose category Urgency (Pan-pan), not Safety."})},
+  {t:"HIGH power",test:e=>e.type==="pwr"&&e.v==="HI"||(e.type==="tx"&&e.pwr==="HI")},
+  Object.assign(tx(["16"],"HI",{title:"Voice Pan-pan",checks:["Pan-pan ×3","All stations ×3","'This is' + name ×3, call sign, MMSI","Position","Problem (engine failure, drifting)","Help needed (tow)","Persons on board","Ended with 'Over'"],model:["PAN-PAN, PAN-PAN, PAN-PAN","All stations, All stations, All stations","this is Sea Otter, Sea Otter, Sea Otter, "+CS+", MMSI "+MM,"My position five two degrees one zero decimal zero minutes north, zero zero two degrees zero five decimal five minutes east","Engine failure, drifting","Request a tow","Four persons on board, ten metre white motor cruiser","OVER"]}),{t:"Voice PAN-PAN on 16",after:()=>SC.later(1800,()=>incoming({ch:"16",from:"Humber Coastguard",text:"Pan-pan Sea Otter, Humber Coastguard. Channel six seven please, six seven."}))}),
+  {t:"Switch to the channel the Coastguard asks for",test:e=>e.type==="ch"&&e.ch==="67",after:()=>SC.later(1500,()=>incoming({ch:"67",from:"Humber Coastguard",text:"Sea Otter, Humber Coastguard. A commercial tow will be with you in about two hours. Report any change. Out."}))}],
+ debrief:"Pan-pan: urgent but not grave and imminent. The DSC announcement only carries your MMSI and channel; the voice message follows on 16, high power. The Coastguard chooses the working channel."},
+{id:"heard",t:"8 · You receive a DSC distress alert",kind:"Distress",
+ brief:"You're on passage, radio on 16, low power. Suddenly the alarm goes off. Treat it correctly: accept, listen, write it down, give the Coastguard time, and only acknowledge (by voice) if you can help. You are about 3 miles away and can be there in 12 minutes.",
+ start:()=>SC.later(4000,()=>dscIn({kind:"Distress",from:"Blue Heron 235078421",info:"Sinking · 51°55.1'N 001°40.2'E",ch:"16"})),
+ steps:[ON,{t:"Accept the RCVD Distress alert (radio goes to 16)",test:e=>e.type==="rcvd_accept"?(SC.later(2000,()=>incoming({ch:"16",from:"Blue Heron",text:"Mayday, Mayday, Mayday, this is Blue Heron, Blue Heron, Blue Heron. Mayday Blue Heron, position one mile east of Black Rock Buoy, sinking, two persons on board. Over."})),SC.later(5000,()=>{logSys("No reply from the Coastguard… (use 'Skip 5 minutes' to let time pass)");$("#ff").hidden=false}),true):e.type==="rcvd_ignore"?{bad:"Don't ignore a distress alert: accept it so your radio goes to 16 and you can hear the voice Mayday."}:false},
+  {t:"Wait ~5 minutes for a coast station (use 'Skip 5 minutes')",test:e=>e.type==="skip5"?true:e.type==="tx"?{bad:"Too early: give the Coastguard up to 5 minutes before you acknowledge."}:false},
+  Object.assign(tx(["16"],null,{title:"Acknowledge by voice",checks:["'Mayday' + casualty's name","'This is' Sea Otter ×3","'Received Mayday'","Ended with 'Out'"],model:["MAYDAY Blue Heron","this is Sea Otter, Sea Otter, Sea Otter","RECEIVED MAYDAY","OUT"]}),{t:"Acknowledge by voice on 16"}),
+  Object.assign(tx(["16"],null,{title:"Follow-up to casualty",checks:["Mayday + casualty name","This is Sea Otter","Your position","Your speed and ETA","Ended with 'Out'"],model:["MAYDAY Blue Heron, this is Sea Otter, Sea Otter, Sea Otter","My position three miles west of you","My speed one five knots, my ETA one two minutes","OUT"]}),{t:"Follow up: your position, speed and ETA"})],
+ debrief:"Class H/D radios can't acknowledge a DSC distress alert by DSC: use voice on 16. Allow the coast station 5 minutes; keep radio silence unless you're helping; write the message down. If nobody acknowledges, also send a Mayday Relay."},
+{id:"false",t:"9 · Accidental DSC alert: cancel it",kind:"Distress",cg:"Coastguard",
+ brief:"While cleaning the radio someone held the DISTRESS key. The alert has gone out and the radio is waiting for an ACK. Cancel it properly.",
+ start:()=>{if(!st.on){st.on=true}st.dist={nature:"Undesignated",next:Date.now()+230000};st.ch="16";st.screen="distwait";render()},
+ steps:[{t:"Press the Cancel soft key, then Send / ENT",test:e=>e.type==="dsc_cancel"?true:e.type==="power"&&!e.on?{bad:"On this Icom use the Cancel function. Switching off may not cancel the alert on sets that have a cancel function."}:false},
+  {t:"HIGH power",test:e=>e.type==="pwr"&&e.v==="HI"||(e.type==="tx"&&e.pwr==="HI")},
+  Object.assign(tx(["16"],"HI",{title:"Voice cancel",checks:["All stations ×3","'This is' name ×3 + call sign","MMSI, said twice ('I say again')","'Cancel my distress alert', said twice","Ended with 'Out'"],model:["All stations, All stations, All stations","this is Sea Otter, Sea Otter, Sea Otter, "+CS,"MMSI "+MM+", I say again, MMSI "+MM,"Cancel my distress alert, I say again, cancel my distress alert","OUT"]}),{t:"Voice cancel on 16"})],
+ debrief:"First rule: don't send it again. Cancel with the radio's cancel function, then explain by voice on 16 at high power."},
+{id:"sec",t:"10 · Floating container: Sécurité",kind:"Safety",
+ brief:"You pass a half-sunk container at 51°45.0'N 001°40.0'E, a danger to shipping. Warn other traffic: announce on 16, give the message on a working channel (use 72).",
+ steps:[ON,{t:"DSC: Compose Other → All Ships → Safety → CH 16 → Send",test:e=>e.type==="dsc_allships"&&(e.cat==="Safety"?true:{bad:"A navigational warning is Safety (Sécurité), not Urgency."})},
+  Object.assign(tx(["16"],null,{title:"Sécurité announcement on 16",checks:["Sécurité ×3","All ships ×3","'This is' Sea Otter ×3","'Listen channel seven two'","Ended with 'Out'"],model:["SÉCURITÉ, SÉCURITÉ, SÉCURITÉ","All ships, All ships, All ships","this is Sea Otter, Sea Otter, Sea Otter","For navigational warning listen channel seven two","OUT"]}),{t:"Voice announcement on 16"}),
+  {t:"Switch to 72",test:e=>e.type==="ch"&&e.ch==="72"},
+  Object.assign(tx(["72"],null,{title:"Sécurité message on 72",checks:["Sécurité ×3, All ships ×3, this is Sea Otter","The hazard","Its position","Ended with 'Out'"],model:["SÉCURITÉ ×3, All ships ×3, this is Sea Otter ×3","Half-sunk container in position five one degrees four five decimal zero minutes north, zero zero one degrees four zero decimal zero minutes east","OUT"]}),{t:"Give the warning on 72"})],
+ debrief:"Safety: announce on 16 (and DSC All Ships Safety), message on a working channel. Often the most useful thing is to tell the Coastguard."},
+{id:"garbled",t:"11 · A call you didn't fully hear",kind:"Routine",
+ brief:"Radio on 16. Someone calls you, but you miss their name. Reply correctly.",
+ start:()=>SC.later(3000,()=>incoming({ch:"16",from:"(unclear)",text:"Sea Otter, Sea Otter, this is … krrrsh … Over."})),
+ steps:[ON,Object.assign(tx(["16"],"LOW",{title:"Reply to garbled call",checks:["'Station calling Sea Otter'","'This is Sea Otter'","Ended with 'Over'"],model:["Station calling Sea Otter, this is Sea Otter, Over"]}),{t:"Reply on 16",after:()=>SC.later(1500,()=>incoming({ch:"16",from:"Kittiwake",text:"Sea Otter, this is Kittiwake. Channel seven seven please. Over."}))}),
+  {t:"Go to the channel they ask for",test:e=>e.type==="ch"&&e.ch==="77"}],
+ debrief:"Use 'Station calling' when you didn't catch the name. If you're not sure the call was for you, don't answer."},
+{id:"relay",t:"12 · Red flare seen: Mayday Relay",kind:"Distress",
+ brief:"You see a red parachute flare bearing 120° true from Blunt Point, about five miles. No radio traffic about it. Relay it to Falmouth Coastguard.",
+ steps:[ON,{t:"Channel 16, HIGH power",test:e=>(e.type==="pwr"&&e.v==="HI"&&st.ch==="16")||(e.type==="tx"&&e.ch==="16"&&e.pwr==="HI")||(e.type==="ch"&&e.ch==="16"&&st.pwr==="HI")},
+  Object.assign(tx(["16"],"HI",{title:"Mayday Relay",checks:["Mayday Relay ×3 (not Mayday)","Falmouth Coastguard ×3","'This is' Sea Otter ×3, call sign, MMSI","Mayday","What you saw (red flare)","Position FROM a landmark","Ended with 'Over'"],model:["MAYDAY RELAY, MAYDAY RELAY, MAYDAY RELAY","Falmouth Coastguard ×3","this is Sea Otter ×3, "+CS+", MMSI "+MM,"MAYDAY","Red parachute flare seen, position one two zero degrees from Blunt Point, five miles","Vessel and persons unknown. Require immediate assistance","OVER"]}),{t:"Voice MAYDAY RELAY on 16",after:()=>SC.later(1800,()=>incoming({ch:"16",from:"Falmouth Coastguard",text:"Sea Otter, Falmouth Coastguard. Received Mayday Relay. Lifeboat tasked. Please keep watch and report anything further. Out."}))})],
+ debrief:"Your own name goes after 'this is'. No answer from the Coastguard? Repeat with 'All stations'."},
+{id:"free",t:"Free practice (no scenario)",kind:"Free",brief:"Try all the keys. Nothing is checked.",steps:[]}
+];
+
+function fillSel(){let r={};try{r=JSON.parse(localStorage.getItem("vhf-sim")||"{}")}catch(e){}
+  const s=$("#scsel"),cur=s.value;s.innerHTML=SCN.map(x=>`<option value="${x.id}">${esc(x.t)}${r[x.id]?" ✓ "+r[x.id]:""}</option>`).join("");if(cur)s.value=cur}
+fillSel();
+$("#scsel").onchange=()=>{const c=SCN.find(x=>x.id===$("#scsel").value);$("#brief").innerHTML=`<b>${esc(c.kind)}.</b> ${esc(c.brief)}`;SC.cur=c;SC.active=false;SC.done=[];drawSteps();$("#fb").innerHTML=""};
+$("#scsel").onchange();
+function startSc(){SC.clear();alarm(false);const c=SCN.find(x=>x.id===$("#scsel").value);SC.cur=c;SC.done=c.steps.map(()=>false);SC.missed=[];SC.checks={};SC.active=c.steps.length>0;
+  st=fresh();$("#dwrap").classList.remove("open");$("#log").innerHTML="";$("#fb").innerHTML="";$("#ff").hidden=true;render();drawSteps();
+  logSys(c.steps.length?"Scenario started. Your radio is off.":"Free practice. Hold POWER to switch on.");if(c.start)c.start()}
+$("#start").onclick=startSc;
+$("#reset").onclick=()=>{SC.clear();alarm(false);st=fresh();$("#dwrap").classList.remove("open");render();if(SC.active){SC.active=false;drawSteps();logSys("Radio reset. Press Start scenario to begin again.")}};
+$("#ff").onclick=()=>{$("#ff").hidden=true;logSys("… five minutes pass. Still no reply from any coast station.");emit({type:"skip5"})};
+$("#dlg").addEventListener("click",e=>{if(e.target.id==="dlg")hideDlg()});
+render();
+})();
+</script>
+<script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}</script></body></html>

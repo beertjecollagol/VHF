@@ -184,6 +184,32 @@ nav.tabs .row{max-width:760px;margin:0 auto;display:grid;grid-template-columns:r
 .conv summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:14px;padding:4px 0}
 .conv input{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:10px;font-size:17px;width:100%;margin-top:6px}
 .conv-out{min-height:1em}
+
+/* waters */
+:root{--wland:var(--soft);--wwater:color-mix(in srgb,var(--accent) 38%,var(--surface));--wink:var(--ink)}
+.wfig{border:1px solid var(--line);border-radius:10px;overflow-x:auto;margin:8px 0;background:var(--wland);-webkit-overflow-scrolling:touch}
+.wfig svg{display:block;width:100%;min-width:600px;height:auto}
+.wfig.small svg{min-width:520px}
+.swipe{display:none;font-size:13px;color:var(--muted);margin:-2px 0 6px}
+@media (max-width:620px){.swipe{display:block}}
+.wfig .wl{font:600 13px var(--f-body);fill:var(--wink)}
+.wfig .wl.b{font-weight:700;font-size:14px}
+.wfig .wl.bank{font-style:italic;font-size:13px}
+.wfig .ws{font:700 9px var(--f-mono);fill:#111}
+.wfig .ws.b{font-size:12px}
+.wfig .boat circle{fill:#f2a400;stroke:var(--wink);stroke-width:2}
+.wfig .wp{font:700 14px var(--f-mono);fill:var(--wink)}
+.wpos{display:grid;gap:4px;padding-left:1.4em}
+.signs{display:grid;gap:10px;margin:6px 0}
+.sign{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:start}
+.vhf{width:58px;height:52px;display:grid;place-items:center;align-content:center;font-family:var(--f-mono);line-height:1.05;border-radius:2px}
+.vhf span{font-size:11px;font-weight:700}
+.vhf b{font-size:20px}
+.vhf.blue{background:#1f63b3;color:#fff}
+.vhf.red{background:#fff;color:#111;border:5px solid #d23a3a}
+details.trans{margin:4px 0 10px}
+details.trans summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:14px}
+details.trans p{font-size:15px;color:var(--muted)}
 /* country */
 .ctrybtn{flex:0 0 auto;border:1px solid var(--line);background:var(--bg);border-radius:999px;height:40px;padding:0 10px;cursor:pointer;font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px}
 .ctrybtn .mono{font-size:13px}
@@ -242,7 +268,7 @@ details.sc>summary::after{content:none}
 .checks label{display:flex;gap:8px;align-items:flex-start;font-size:15px}
 .checks input{margin-top:4px;width:18px;height:18px;flex:0 0 auto}
 .sc-score{color:var(--muted);font-size:14px}
-nav.tabs .row{grid-template-columns:repeat(5,1fr)!important}
+nav.tabs .row{grid-template-columns:repeat(6,1fr)!important}
 nav.tabs a{font-size:12px}
 
 nav.tabs button{border:0;background:transparent;padding:10px 4px 12px;cursor:pointer;display:grid;justify-items:center;gap:2px;color:var(--muted);font-size:13px;font-weight:700}
@@ -626,6 +652,154 @@ footer.src{font-size:13px;color:var(--muted);text-align:center}
       <li>You may hear beeps confirming your call is queued. When finished, call the station again on the same channel and end with "Thank you. Out."</li>
       <li>Shore-to-ship: the station broadcasts a <b>traffic list</b> at set times. If you hear your name, call them and say "you have traffic for me".</li>
     </ul>
+  </div>
+</section>
+
+<!-- ============ WATERS ============ -->
+<section class="view" id="v-waters" data-tab="waters">
+  <div><div class="eyebrow">On the water</div><h1 style="font-size:26px">Waters</h1>
+  <p class="lead">Sailing information per country, beyond the radio. Starting with Dutch inland waterways.</p></div>
+
+  <p class="cx cnote" data-c="uk"><b class="cflag">UK</b>No UK waterway section yet. The Netherlands section below is shown for reference.</p>
+  <p class="cx cnote" data-c="no"><b class="cflag">NO</b>No Norwegian waterway section yet. The Netherlands section below is shown for reference.</p>
+
+  <div class="panel sec" id="nl-position"><h2><span class="cflag">NL</span>Where are you on the water?</h2>
+    <p>On Dutch rivers and canals your position is described from the <b>source (bron)</b> of the water, following the current.</p>
+    <div class="wfig" role="img" aria-label="Schematic of a river flowing from the source to the sea, with left and right bank, harbour Z, bridge Y, canal A with lock X, and example positions of boats.">
+      <svg viewBox="0 0 640 430" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--wink)"/></marker>
+        </defs>
+        <rect x="0" y="0" width="640" height="430" fill="var(--wland)"/>
+        <!-- river -->
+        <path d="M20 130 H470 Q520 130 520 180 V430 H600 V180 Q600 60 470 60 H20 Z" fill="var(--wwater)"/>
+        <!-- harbour Z basin (left bank = top) -->
+        <rect x="150" y="18" width="70" height="44" rx="4" fill="var(--wwater)"/>
+        <text x="185" y="36" text-anchor="middle" class="wl b">Haven Z</text>
+        <!-- canal A going left from the bend, with lock X -->
+        <rect x="250" y="250" width="270" height="34" fill="var(--wwater)"/>
+        <text x="300" y="304" class="wl b">Kanaal A</text>
+        <!-- lock X -->
+        <rect x="330" y="246" width="44" height="42" fill="none" stroke="var(--wink)" stroke-width="2"/>
+        <path d="M330 250 L342 267 L330 284" fill="none" stroke="var(--wink)" stroke-width="3"/>
+        <path d="M374 250 L386 267 L374 284" fill="none" stroke="var(--wink)" stroke-width="3"/>
+        <text x="352" y="240" text-anchor="middle" class="wl b">Sluis X</text>
+        <!-- bridge Y across the river (lower part) -->
+        <rect x="514" y="352" width="92" height="10" fill="var(--wink)"/>
+        <text x="508" y="362" class="wl b" text-anchor="end">Brug Y</text>
+        <!-- source & sea -->
+        <text x="26" y="100" class="wl b">BRON</text>
+        <path d="M70 96 q8 -8 16 0 t16 0" fill="none" stroke="var(--wink)" stroke-width="2"/>
+        <text x="560" y="424" class="wl b" text-anchor="middle">ZEE ↓</text>
+        <!-- flow arrows -->
+        <path d="M60 105 H200" stroke="var(--wink)" stroke-width="2" marker-end="url(#ar)"/>
+        <text x="62" y="122" class="wl">afvaart (with the current)</text>
+        <path d="M440 80 H300" stroke="var(--wink)" stroke-width="2" marker-end="url(#ar)" stroke-dasharray="5 4"/>
+        <text x="300" y="100" class="wl">opvaart (against)</text>
+        <!-- banks -->
+        <text x="330" y="50" class="wl bank">Linkeroever (left bank)</text>
+        <text x="40" y="150" class="wl bank">Rechteroever (right bank)</text>
+        <!-- buoys: right bank red, left bank green -->
+        <rect x="120" y="122" width="9" height="9" fill="#d23a3a"/><rect x="250" y="122" width="9" height="9" fill="#d23a3a"/><rect x="524" y="200" width="9" height="9" fill="#d23a3a"/>
+        <circle cx="260" cy="68" r="5" fill="#2e9b57"/><circle cx="420" cy="68" r="5" fill="#2e9b57"/><circle cx="592" cy="210" r="5" fill="#2e9b57"/>
+        <!-- signs -->
+        <g transform="translate(410,140)"><rect width="34" height="30" fill="#fff" stroke="#d23a3a" stroke-width="4"/><text x="17" y="13" text-anchor="middle" class="ws">VHF</text><text x="17" y="25" text-anchor="middle" class="ws b">79</text></g>
+        <g transform="translate(395,300)"><rect width="34" height="30" fill="#1f63b3"/><text x="17" y="13" text-anchor="middle" class="ws" fill="#fff">VHF</text><text x="17" y="25" text-anchor="middle" class="ws b" fill="#fff">18</text></g>
+        <!-- boats with positions -->
+        <g class="boat"><circle cx="110" cy="80" r="6"/><text x="92" y="66" class="wp">1</text></g>
+        <g class="boat"><circle cx="250" cy="112" r="6"/><text x="236" y="104" class="wp">2</text></g>
+        <g class="boat"><circle cx="470" cy="100" r="6"/><text x="476" y="94" class="wp">3</text></g>
+        <g class="boat"><circle cx="530" cy="268" r="6"/><text x="508" y="262" class="wp">4</text></g>
+        <g class="boat"><circle cx="560" cy="330" r="6"/><text x="566" y="326" class="wp">5</text></g>
+        <g class="boat"><circle cx="534" cy="385" r="6"/><text x="544" y="401" class="wp">6</text></g>
+        <g class="boat"><circle cx="300" cy="267" r="6"/><text x="292" y="252" class="wp">7</text></g>
+        <g class="boat"><circle cx="420" cy="267" r="6"/><text x="420" y="252" class="wp">8</text></g>
+      </svg>
+    </div>
+    <p class="swipe">Swipe the picture sideways to see all of it.</p>
+    <ol class="wpos">
+      <li><b>Boven haven Z</b>: upstream of harbour Z (closer to the source).</li>
+      <li><b>Beneden haven Z, aan de rechteroever</b>: downstream of the harbour, on the right bank.</li>
+      <li><b>Afvarend boven kanaal A</b>: going downstream, just upstream of the junction with canal A.</li>
+      <li><b>In de monding van kanaal A</b>: in the mouth of canal A.</li>
+      <li><b>Opvarend beneden kanaal A</b>: going upstream, downstream of the junction.</li>
+      <li><b>Opvarend beneden brug Y, aan de rechteroever</b>: going upstream, below bridge Y, on the right bank.</li>
+      <li><b>Beneden sluis X</b>: on the low-water side of lock X.</li>
+      <li><b>Boven sluis X</b>: on the high-water side of lock X.</li>
+    </ol>
+    <dl class="dl">
+      <dt>Opvaart</dt><dd>Against the current (also <i>opvarend, bergvaart</i>).</dd>
+      <dt>Afvaart</dt><dd>With the current (also <i>afvarend, dalvaart</i>). Heading towards the sea you are <b>always</b> in the afvaart, even with the flood tide against you.</dd>
+      <dt>Linker- / rechteroever</dt><dd>Left and right bank, named looking <b>downstream</b> (with the current).</dd>
+      <dt>Betonning</dt><dd>You can see it in the buoyage: the starboard side (right bank, going downstream) is marked <b>red</b>, port (left bank) <b>green</b>.</dd>
+    </dl>
+    <p class="lead" style="font-size:14px">Schematic redrawn from the Marifoonkaart (Varen doe je Samen! / Waterrecreatie Nederland).</p>
+  </div>
+
+  <div class="panel sec" id="nl-lock"><h2><span class="cflag">NL</span>Positions at a lock</h2>
+    <div class="wfig small" role="img" aria-label="Lock with high water on one side and low water on the other; the gates point towards the higher water.">
+      <svg viewBox="0 0 640 170" xmlns="http://www.w3.org/2000/svg">
+        <rect width="640" height="170" fill="var(--wland)"/>
+        <rect x="20" y="70" width="290" height="80" fill="var(--wwater)"/>
+        <rect x="330" y="95" width="290" height="55" fill="var(--wwater)"/>
+        <rect x="300" y="40" width="40" height="120" fill="var(--wland)" stroke="var(--wink)" stroke-width="2"/>
+        <path d="M300 60 L280 95 L300 130" fill="none" stroke="var(--wink)" stroke-width="4"/>
+        <path d="M340 60 L320 95 L340 130" fill="none" stroke="var(--wink)" stroke-width="4"/>
+        <text x="165" y="60" text-anchor="middle" class="wl b">BOVEN / hoog</text>
+        <text x="165" y="115" text-anchor="middle" class="wl">higher water level</text>
+        <text x="475" y="85" text-anchor="middle" class="wl b">BENEDEN / laag</text>
+        <text x="475" y="130" text-anchor="middle" class="wl">lower water level</text>
+        <text x="320" y="28" text-anchor="middle" class="wl">the gates point towards the higher water</text>
+      </svg>
+    </div>
+    <ul>
+      <li><b>Beneden / laag</b> is the side with the lower water level; <b>boven / hoog</b> the higher side.</li>
+      <li>In tidal areas you say <b>binnenkant</b> (canal or harbour side) and <b>buitenkant</b> (tidal side) of the lock.</li>
+      <li>You can see the high side from the gates: the point of the lock doors always points towards the <b>highest</b> water level.</li>
+    </ul>
+  </div>
+
+  <div class="panel sec" id="nl-signs"><h2><span class="cflag">NL</span>VHF signs along the waterway</h2>
+    <div class="signs">
+      <div class="sign"><div class="vhf blue"><span>VHF</span><b>18</b></div><div><b>Information channel</b> (blue square). Listening is recommended. Only ask for information here: a berth, harbour dues, bridge opening times. Used on the waters in annex 9 of the BPR, mostly large canals and rivers.</div></div>
+      <div class="sign"><div class="vhf red"><span>VHF</span><b>79</b></div><div><b>Navigation channel</b> (square with red border). Listening on this (blok)channel is <b>compulsory</b>. Reporting in is for large ships only. <b>Klein schip: aanmelden mag, antwoorden verplicht</b>: small craft may report, but must answer when called. Almost everywhere this is channel 10, except in a sector with traffic control (VTS), where the sector channel applies.</div></div>
+    </div>
+    <p>The navigation channel is meant entirely for calls and questions about navigating. Find the channels on your route beforehand on <a href="https://www.vaarweginformatie.nl" target="_blank" rel="noopener">vaarweginformatie.nl</a>, on the water charts and in the latest Wateralmanak deel 1.</p>
+  </div>
+
+  <div class="panel sec" id="nl-dialogues"><h2><span class="cflag">NL</span>Example calls on Dutch inland waters</h2>
+    <p>Inland you normally speak Dutch with bridges, locks, traffic posts and harbours. Keep it short, businesslike and clear: wait 1 second after pressing the PTT, use the 4 W's (who, what, where, what you want / where you're going), end each turn with <i>over</i> and the conversation with <i>uit</i>.</p>
+    <h4>A bridge (or lock): opening times</h4>
+    <div class="script dlg-nl" style="--k:var(--accent);font-size:17px" lang="nl">
+      <p><b>Jij:</b> Zandslootbrug, hier zeiljacht Neeltje. Over.</p>
+      <p><b>Verkeerspost:</b> Neeltje, hier de Zandslootbrug. Over.</p>
+      <p><b>Jij:</b> Goedemiddag, ik ben een zeiljacht en vaar richting Akkrum. Hoe laat gaat u draaien? Over.</p>
+      <p><b>Verkeerspost:</b> Ik draai weer om 16.10. Over.</p>
+      <p><b>Jij:</b> Begrepen. Uit.</p>
+    </div>
+    <details class="trans"><summary>English</summary><p>You: Zandsloot bridge, this is sailing yacht Neeltje. Over. — Bridge: Neeltje, this is Zandsloot bridge. Over. — You: Good afternoon, I'm a sailing yacht heading for Akkrum. What time do you open? Over. — Bridge: I open again at 16:10. Over. — You: Understood. Out.</p></details>
+    <h4>A harbour: a berth for the night</h4>
+    <div class="script dlg-nl" style="--k:var(--accent);font-size:17px" lang="nl">
+      <p><b>Jij:</b> Sixhaven, hier zeiljacht Neeltje. Over.</p>
+      <p><b>Sixhaven:</b> Neeltje, hier de Sixhaven. Over.</p>
+      <p><b>Jij:</b> Goedendag. Ik ben een zeiljacht van 11,5 meter en nader de haven vanuit de richting Oranjesluis. Heeft u een ligplaats voor de nacht beschikbaar? Over.</p>
+      <p><b>Sixhaven:</b> Ja hoor, er is plaats beschikbaar. Houd bij het binnenvaren van de haven stuurboord aan. Bij passantensteiger drie is nog volop ruimte. Over.</p>
+      <p><b>Jij:</b> Hartelijk dank en tot straks. Uit.</p>
+    </div>
+    <details class="trans"><summary>English</summary><p>You: Sixhaven, this is sailing yacht Neeltje. Over. — Harbour: Neeltje, this is Sixhaven. Over. — You: Good day. I'm an 11.5 m sailing yacht approaching from the Oranjesluis. Do you have a berth for the night? Over. — Harbour: Yes, there's room. Keep to starboard as you enter; there's plenty of space at visitors' jetty three. Over. — You: Thank you, see you soon. Out.</p></details>
+    <h4>A traffic post at a junction of busy waterways</h4>
+    <p>Varen doe je Samen! works this out in a video: <a href="https://youtube.com/watch?v=9lJluF4-mYI" target="_blank" rel="noopener">watch on YouTube</a>.</p>
+  </div>
+
+  <div class="panel sec" id="nl-tips"><h2><span class="cflag">NL</span>General tips</h2>
+    <ul>
+      <li>VHF channels are shown on the water charts and in the <b>Wateralmanak deel 1</b>. Make sure you have the most recent edition.</li>
+      <li>Check before your trip which blokkanalen you'll meet, e.g. on <a href="https://www.vaarweginformatie.nl" target="_blank" rel="noopener">vaarweginformatie.nl</a>.</li>
+      <li>Sailing the coast? Besides a marifoon, the <b>KNRM Helpt</b> app is recommended.</li>
+      <li>Listening out on busy waterways is extra important: you know what shipping around you is doing.</li>
+      <li>More on VHF use: the <a href="https://youtube.com/live/i6pWdl4cR6k" target="_blank" rel="noopener">Varen doe je Samen! webinar on YouTube</a>.</li>
+    </ul>
+    <p class="srcs">Source: <a href="https://www.knrm.nl/images/downloads/marifoonkaart.pdf" target="_blank" rel="noopener">De Marifoonkaart</a>, Waterrecreatie Nederland / Varen doe je Samen! (via KNRM). Checked 26 Oct 2026. No rights can be derived from it; the BPR and signs on site apply.</p>
   </div>
 </section>
 
@@ -1275,6 +1449,7 @@ footer.src{font-size:13px;color:var(--muted);text-align:center}
 <nav class="tabs" aria-label="Sections"><div class="row">
   <a class="t-em" href="#v-emergency" data-tab="emergency" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/></svg>Emergency</a>
   <a href="#v-routine" data-tab="routine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15a8 8 0 0 1 8-8M4 15h4l2 4h4l2-4h4a8 8 0 0 0-8-8"/></svg>Routine</a>
+  <a href="#v-waters" data-tab="waters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 13c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 18c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/></svg>Waters</a>
   <a href="#v-reference" data-tab="reference"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Reference</a>
   <a href="#v-study" data-tab="study"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l9-3 9 3-9 3-9-3zM6 8v6c0 2 3 4 6 4s6-2 6-4V8"/></svg>Study</a>
   <a href="#v-exam" data-tab="exam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Exam</a>
@@ -1607,7 +1782,7 @@ $$("nav.tabs a").forEach(b=>b.addEventListener("click",e=>{e.preventDefault();sh
 function goTo(id){const el=document.getElementById(id);if(!el)return;const v=el.closest(".view");if(v)showTab(v.dataset.tab);if(el.tagName==="DETAILS")el.open=true;
   requestAnimationFrame(()=>{el.scrollIntoView({block:"start"});window.scrollBy(0,-70);el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")})}
 const h0=location.hash.slice(1);const h=h0.startsWith("v-")?h0.slice(2):h0.startsWith("s-")?"emergency":h0;
-if(h&&document.getElementById(h)){goTo(h)}else{showTab(["emergency","routine","reference","study","exam"].includes(h)?h:"emergency")}
+if(h&&document.getElementById(h)){goTo(h)}else{showTab(["emergency","routine","waters","reference","study","exam"].includes(h)?h:"emergency")}
 
 /* ---------- search ---------- */
 const idx=$$(".sec").map(el=>({id:el.id,title:(el.querySelector("h2,h3")||{}).textContent||el.id,text:el.textContent.replace(/\s+/g," ")}));

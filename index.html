@@ -291,6 +291,7 @@ nav.tabs button svg{width:22px;height:22px}
 nav.tabs button[aria-current="page"]{color:var(--accent)}
 nav.tabs button.t-em[aria-current="page"]{color:var(--mayday)}
 footer.src{font-size:13px;color:var(--muted);text-align:center}
+:root[data-country]:not([data-country="uk"]) .ukc,:root[data-country="uk"][data-area="inland"] .ukc,:root[data-country]:not([data-country="uk"]) tr.ukr,:root[data-country="uk"][data-area="inland"] tr.ukr{display:none}
 
 /* KVB courses */
 .seg.course{grid-template-columns:repeat(3,1fr)}
@@ -389,7 +390,7 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
       <a class="card k-sec" href="#s-seelonce" data-open="seelonce"><b>Seelonce</b><span>Radio silence during distress traffic</span></a>
     </div>
   </div>
-  <div class="ch-strip cx" data-c="uk" aria-label="Key channels">
+  <div class="ch-strip cx" data-c="uk" data-a="coast" aria-label="Key channels">
     <div class="ch"><b>16</b><span>Distress, safety, calling</span></div>
     <div class="ch"><b>70</b><span>DSC only, never voice</span></div>
     <div class="ch"><b>67</b><span>UK small craft safety</span></div>
@@ -609,7 +610,7 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
   <div><div class="eyebrow">Voice procedure</div><h1 style="font-size:26px">Routine calls</h1></div>
 
   <div class="panel sec" id="setup"><h2>Switch on and set up</h2>
-    <p class="lead">Example: calling a marina a couple of miles away on channel 80.</p>
+    <p class="lead">Example: calling a marina a couple of miles away on its working channel.</p>
     <ol class="steps">
       <li><span>Switch the power supply to the radio on</span></li>
       <li><span>Adjust the dimmer if necessary, to illuminate the display and controls</span></li>
@@ -669,14 +670,15 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
   </div>
 
   <div class="panel sec" id="call-cg"><h2>Calling the Coastguard</h2>
-    <p>Call on <b>ch 16</b>, as if calling a vessel. The <b>Coastguard chooses the working channel</b> (usually 67). Exception: Solent Coastguard is called on ch 67 for routine matters. <span class="tag">UK</span></p>
+    <p>Call on <b>ch 16</b> (or with a routine DSC call), as if calling a vessel. The <b>Coastguard chooses the working channel</b>.</p>
+    <p class="cx cnote" data-c="uk" data-a="coast"><b class="cflag">UK</b>HM Coastguard usually moves you to <b>ch 67</b>. Exception: Solent Coastguard is called directly on ch 67 for routine matters.</p>
     <p class="cx env cnote" data-c="nl" data-a="coast"><b class="cflag">NL</b>Call <b>"Netherlands Coastguard"</b> on ch 16 (or DSC). Weather, gale warnings and safety messages: announced on ch 16 / 70, broadcast on <b>ch 23 and 83</b>.</p>
     <p class="cx nbv cnote" lang="nl" data-c="nl" data-a="coast"><b class="cflag">NL</b>Roep <b>"Netherlands Coastguard"</b> op via kanaal 16 (of DSC). Weerberichten, stormwaarschuwingen en veiligheidsberichten: aangekondigd op kanaal 16 / 70, uitgezonden op <b>kanaal 23 en 83</b>.</p>
     <p class="cx env cnote" data-c="nl" data-a="inland"><b class="cflag">NL</b>Inland you normally call the <b>traffic post</b> on the blokkanaal, or a lock or bridge on the channel shown on its sign. Calling: name up to 3×, "hier is" / "this is", own name, "over"; end with "uit" / "out".</p>
     <p class="cx nbv cnote" lang="nl" data-c="nl" data-a="inland"><b class="cflag">NL</b>Op het binnenwater roep je meestal de <b>verkeerspost</b> op via het blokkanaal, of een sluis of brug op het kanaal dat op het bord staat. Oproepen: naam tot 3×, "hier is", eigen naam, "over"; afsluiten met "uit".</p>
     <p class="cx env cnote" data-c="no"><b class="cflag">NO</b>Call <b>Kystradio Sør</b> or <b>Kystradio Nord</b> on ch 16 (or a routine DSC call); they move you to a working channel. Weather and navigational warnings every 3 hours; you can ask for the latest forecast.</p>
     <p class="cx nbv cnote" lang="nb" data-c="no"><b class="cflag">NO</b>Kall opp <b>Kystradio Sør</b> eller <b>Kystradio Nord</b> på kanal 16 (eller med et rutine-DSC-anrop); de flytter deg til en arbeidskanal. Værmeldinger og navigasjonsvarsler hver 3. time; du kan be om siste værmelding.</p>
-    <div class="script" style="--k:var(--accent);font-size:18px">
+    <div class="script cx" data-c="uk" data-a="coast" style="--k:var(--accent);font-size:18px">
       <p>Clyde Coastguard, Clyde Coastguard, <span class="pw">this is</span> Gandalf, Gandalf, Gandalf, <span class="pw">Over.</span></p>
       <p><i>Gandalf, <span class="pw">this is</span> Clyde Coastguard. Channel six seven, please, six seven, and stand by. <span class="pw">Over.</span></i></p>
       <p>Clyde Coastguard, <span class="pw">this is</span> Gandalf. Channel six seven, standing by. <span class="pw">Over.</span></p>
@@ -687,7 +689,7 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
   </div>
 
   <div class="panel sec" id="radiocheck"><h2>Radio check</h2>
-    <p>Only when needed (e.g. after fitting a new antenna). With any station willing to co-operate, on a channel they listen to: a marina on its working channel, a friend on an agreed channel, or the Coastguard on ch 16 (ch 67 in the Solent).</p>
+    <p>Only when needed (e.g. after fitting a new antenna). With any station willing to co-operate, on a channel they listen to: a marina on its working channel, a friend on an agreed channel, or the Coastguard on ch 16<span class="cx" data-c="uk" data-a="coast"> (ch 67 in the Solent)</span>.</p>
     <div class="script" style="--k:var(--accent);font-size:18px">
       <p>Cardhu, Cardhu, <span class="pw">this is</span> Windrift, Windrift. <span class="pw">Radio check</span>, please. <span class="pw">Over.</span></p>
       <p><i>Windrift, <span class="pw">this is</span> Cardhu. You are loud and clear. <span class="pw">Out.</span></i></p>
@@ -1149,7 +1151,7 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
     <p>Which name and identity you give depends on the boat and on which radio you use. The rule: the <b>name</b> is the boat's (so rescuers know what to look for); the <b>radio identity</b> (MMSI, call sign) belongs to the transmitter you are using.</p>
     <div class="tbl"><table><thead><tr><th>Situation</th><th>Say as name</th><th>Identity (call sign / MMSI)</th></tr></thead><tbody>
       <tr><td>Boat has a fixed VHF: <b>use it</b> (more power, higher antenna)</td><td>Boat's name</td><td>The <b>boat's</b> call sign and MMSI</td></tr>
-      <tr><td>Boat has a name, you use <b>your handheld</b></td><td>Boat's name</td><td><b>Your handheld's</b> MMSI (and your own call sign if RDI gave you one). Not the boat's call sign</td></tr>
+      <tr><td>Boat has a name, you use <b>your handheld</b></td><td>Boat's name</td><td><b>Your handheld's</b> MMSI (and your own call sign, if you have one). Not the boat's call sign</td></tr>
       <tr><td>Boat has <b>no name and no VHF</b>, you use your handheld</td><td>A short description, e.g. "white rental motorboat"; add hull or registration number, or "rental boat from [company]"</td><td><b>Your handheld's</b> MMSI (and own call sign)</td></tr>
     </tbody></table></div>
     <p class="note">A DSC alert from your handheld always sends <b>your handheld's MMSI</b> plus its GPS position, whatever boat you are on.</p>
@@ -1159,7 +1161,7 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
       <li>Ask the hire company for the boat's <b>name, call sign and MMSI</b>, and whether the fixed VHF has DSC and a GPS connected.</li>
       <li>No name? Take a <b>photo</b> of the boat and note colour, length, type and any number on the hull.</li>
       <li>Enter it under <a href="#boat">Emergency → My boat</a> (description and persons on board), so the scripts are ready.</li>
-      <li>Check your handheld: charged, on the right channel group, ATIS code programmed for Dutch inland waters.</li>
+      <li>Check your handheld: charged and on the right channel group<span class="cx" data-c="nl" data-a="inland">, with your ATIS code programmed (mandatory on Dutch inland waters)</span>.</li>
       <li>Save the emergency numbers with country code in your phone (see the country rules below).</li>
     </ul>
 
@@ -1191,7 +1193,7 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
   </div>
 
   <div class="cx panel sec" id="country-uk" data-c="uk"><h2><span class="cflag">UK</span>Local rules</h2>
-    <p>The handbook is written for UK waters, so the rest of this app already reflects UK practice. Items marked <span class="tag">UK</span> are UK-only.</p></div>
+    <p>The SRC handbook is written for UK waters. UK-only items (ch 0, 62–64, 67, M, M2, HM Coastguard practice) appear only when you choose UK coast.</p></div>
 
   <div class="cx env panel sec" id="country-nl" data-c="nl"><h2><span class="cflag">NL</span>Netherlands: local rules</h2>
     <h4>Licence and certificate</h4>
@@ -1401,18 +1403,18 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
 
   <div class="panel sec" id="special-ch"><h2>Channels worth memorising</h2>
     <div class="tbl"><table><thead><tr><th>Ch</th><th>Use</th></tr></thead><tbody>
-      <tr><td class="n">0</td><td>Private channel, UK Search and Rescue organisations (Coastguard, RNLI) <span class="tag">UK</span></td></tr>
+      <tr class="cx" data-c="uk" data-a="coast"><td class="n">0</td><td>Private channel, UK Search and Rescue organisations (Coastguard, RNLI) <span class="tag">UK</span></td></tr>
       <tr><td class="n">6, 8</td><td>Inter-ship</td></tr>
       <tr><td class="n">11, 12, 14</td><td>Port operations</td></tr>
       <tr><td class="n">13</td><td>Bridge-to-bridge, navigational safety</td></tr>
       <tr class="hot"><td class="n">16</td><td><b>Distress, Safety and Calling</b></td></tr>
-      <tr><td class="n">62, 63, 64</td><td>Maritime Safety Information broadcasts <span class="tag">UK</span></td></tr>
-      <tr><td class="n">67</td><td>Small craft safety channel <span class="tag">UK</span></td></tr>
+      <tr class="cx" data-c="uk" data-a="coast"><td class="n">62, 63, 64</td><td>Maritime Safety Information broadcasts <span class="tag">UK</span></td></tr>
+      <tr class="cx" data-c="uk" data-a="coast"><td class="n">67</td><td>Small craft safety channel <span class="tag">UK</span></td></tr>
       <tr class="hot"><td class="n">70</td><td><b>DSC only, no voice</b></td></tr>
       <tr><td class="n">72, 77</td><td>Inter-ship</td></tr>
       <tr><td class="n">75, 76</td><td>Guard band either side of 16: port ops/on-board only, max 1 W</td></tr>
-      <tr><td class="n">80</td><td>Marinas (duplex) <span class="tag">UK</span></td></tr>
-      <tr><td class="n">M, M2</td><td>UK private channels for marinas, yacht clubs, recreational craft; M may show as 37 or P1 <span class="tag">UK</span></td></tr>
+      <tr class="cx" data-c="uk" data-a="coast"><td class="n">80</td><td>Marinas (duplex) <span class="tag">UK</span></td></tr>
+      <tr class="cx" data-c="uk" data-a="coast"><td class="n">M, M2</td><td>UK private channels for marinas, yacht clubs, recreational craft; M may show as 37 or P1 <span class="tag">UK</span></td></tr>
     </tbody></table></div>
   </div>
 
@@ -3029,13 +3031,13 @@ $("#pw").innerHTML=PW.map(([a,b])=>`<dt>${a}</dt><dd>${esc(b)}</dd>`).join("");
 
 /* ---------- channels ---------- */
 // [ch, ship, coast, intership, portSingle, portTwo, publicCorr, note]
-const CH=[["01","156.050","160.650",0,1,1,1,""],["02","156.100","160.700",0,1,1,1,""],["03","156.150","160.750",0,1,1,1,""],["04","156.200","160.800",0,1,1,1,""],["05","156.250","160.850",0,1,1,1,""],["06","156.300","",1,0,0,0,"Ship to ship"],["07","156.350","160.950",0,1,1,1,""],["08","156.400","",1,0,0,0,"Ship to ship"],["09","156.450","156.450",1,1,0,0,"Used by pilots"],["10","156.500","156.500",1,1,0,0,"Used by HM Coastguard"],["11","156.550","156.550",0,1,0,0,"Port operations"],["12","156.600","156.600",0,1,0,0,"Port operations"],["13","156.650","156.650",1,1,0,0,"Bridge-to-bridge working"],["14","156.700","156.700",0,1,0,0,"Port operations"],["15","156.750","156.750",1,1,0,0,"On-board working"],["16","156.800","156.800",0,0,0,0,"DISTRESS, SAFETY AND CALLING"],["17","156.850","156.850",1,1,0,0,"On-board working"],["18","156.900","161.500",0,1,1,1,""],["19","156.950","161.550",0,1,1,1,""],["20","157.000","161.600",0,1,1,1,""],["21","157.050","161.650",0,1,1,1,""],["22","157.100","161.700",0,1,1,1,""],["23","157.150","161.750",0,1,1,1,""],["24","157.200","161.800",0,1,1,1,"VDES: digital data since 2023, no analogue voice"],["25","157.250","161.850",0,1,1,1,"VDES: digital data since 2023, no analogue voice"],["26","157.300","161.900",0,1,1,1,"VDES satellite since 2023, no analogue voice"],["27","157.350","161.950",0,0,1,1,"Split: 1027 = analogue simplex voice, 2027 = data"],["28","157.400","162.000",0,0,1,1,"Split: 1028 = analogue simplex voice, 2028 = data"],["60","156.025","160.625",0,1,1,1,""],["61","156.075","160.675",0,1,1,1,""],["62","156.125","160.725",0,1,1,1,"HMCG MSI broadcasts (UK)"],["63","156.175","160.775",0,1,1,1,"HMCG MSI broadcasts (UK)"],["64","156.225","160.825",0,1,1,1,"HMCG MSI broadcasts (UK)"],["65","156.275","160.875",0,1,1,1,""],["66","156.325","160.925",0,1,1,1,""],["67","156.375","156.375",1,1,0,0,"UK small ship safety"],["68","156.425","156.425",0,1,0,0,""],["69","156.475","156.475",1,1,0,0,"Port operations"],["70","156.525","156.525",0,0,0,0,"DSC ONLY. NOT FOR VOICE"],["71","156.575","156.575",0,1,0,0,""],["72","156.625","",1,0,0,0,"Ship to ship"],["73","156.675","156.675",1,1,0,0,"Used by HM Coastguard"],["74","156.725","156.725",0,1,0,0,""],["75","156.775","156.775",0,1,0,0,"Guard band: navigation comms, 1 W"],["76","156.825","156.825",0,1,0,0,"Guard band: navigation comms, 1 W"],["77","156.875","",1,0,0,0,"Ship to ship"],["78","156.925","161.525",0,1,1,1,""],["79","156.975","161.575",0,1,1,1,""],["80","157.025","161.625",0,1,1,1,"Marinas (UK only)"],["81","157.075","161.675",0,1,1,1,""],["82","157.125","161.725",0,1,1,1,""],["83","157.175","161.775",0,1,1,1,""],["84","157.225","161.825",0,1,1,1,"VDES: digital data since 2023, no analogue voice"],["85","157.275","161.875",0,1,1,1,"VDES: digital data since 2023, no analogue voice"],["86","157.325","161.925",0,1,1,1,"VDES satellite since 2023, no analogue voice"],["87","157.375","157.375",0,1,0,0,""],["88","157.425","157.425",0,1,0,0,""],["AIS 1","161.975","161.975",0,0,0,0,"AIS"],["AIS 2","162.025","162.025",0,0,0,0,"AIS"],["M (37)","157.850","157.850",0,1,0,0,"UK private: marinas, clubs, recreational craft"],["M2","161.425","161.425",0,1,0,0,"UK private: marinas, clubs, recreational craft"]];
+const CH=[["01","156.050","160.650",0,1,1,1,""],["02","156.100","160.700",0,1,1,1,""],["03","156.150","160.750",0,1,1,1,""],["04","156.200","160.800",0,1,1,1,""],["05","156.250","160.850",0,1,1,1,""],["06","156.300","",1,0,0,0,"Ship to ship"],["07","156.350","160.950",0,1,1,1,""],["08","156.400","",1,0,0,0,"Ship to ship"],["09","156.450","156.450",1,1,0,0,"Used by pilots"],["10","156.500","156.500",1,1,0,0,"<span class=\"ukc\">Used by HM Coastguard</span>"],["11","156.550","156.550",0,1,0,0,"Port operations"],["12","156.600","156.600",0,1,0,0,"Port operations"],["13","156.650","156.650",1,1,0,0,"Bridge-to-bridge working"],["14","156.700","156.700",0,1,0,0,"Port operations"],["15","156.750","156.750",1,1,0,0,"On-board working"],["16","156.800","156.800",0,0,0,0,"DISTRESS, SAFETY AND CALLING"],["17","156.850","156.850",1,1,0,0,"On-board working"],["18","156.900","161.500",0,1,1,1,""],["19","156.950","161.550",0,1,1,1,""],["20","157.000","161.600",0,1,1,1,""],["21","157.050","161.650",0,1,1,1,""],["22","157.100","161.700",0,1,1,1,""],["23","157.150","161.750",0,1,1,1,""],["24","157.200","161.800",0,1,1,1,"VDES: digital data since 2023, no analogue voice"],["25","157.250","161.850",0,1,1,1,"VDES: digital data since 2023, no analogue voice"],["26","157.300","161.900",0,1,1,1,"VDES satellite since 2023, no analogue voice"],["27","157.350","161.950",0,0,1,1,"Split: 1027 = analogue simplex voice, 2027 = data"],["28","157.400","162.000",0,0,1,1,"Split: 1028 = analogue simplex voice, 2028 = data"],["60","156.025","160.625",0,1,1,1,""],["61","156.075","160.675",0,1,1,1,""],["62","156.125","160.725",0,1,1,1,"<span class=\"ukc\">HMCG MSI broadcasts (UK)</span>"],["63","156.175","160.775",0,1,1,1,"<span class=\"ukc\">HMCG MSI broadcasts (UK)</span>"],["64","156.225","160.825",0,1,1,1,"<span class=\"ukc\">HMCG MSI broadcasts (UK)</span>"],["65","156.275","160.875",0,1,1,1,""],["66","156.325","160.925",0,1,1,1,""],["67","156.375","156.375",1,1,0,0,"<span class=\"ukc\">UK small ship safety</span>"],["68","156.425","156.425",0,1,0,0,""],["69","156.475","156.475",1,1,0,0,"Port operations"],["70","156.525","156.525",0,0,0,0,"DSC ONLY. NOT FOR VOICE"],["71","156.575","156.575",0,1,0,0,""],["72","156.625","",1,0,0,0,"Ship to ship"],["73","156.675","156.675",1,1,0,0,"<span class=\"ukc\">Used by HM Coastguard</span>"],["74","156.725","156.725",0,1,0,0,""],["75","156.775","156.775",0,1,0,0,"Guard band: navigation comms, 1 W"],["76","156.825","156.825",0,1,0,0,"Guard band: navigation comms, 1 W"],["77","156.875","",1,0,0,0,"Ship to ship"],["78","156.925","161.525",0,1,1,1,""],["79","156.975","161.575",0,1,1,1,""],["80","157.025","161.625",0,1,1,1,"<span class=\"ukc\">Marinas (UK only)</span>"],["81","157.075","161.675",0,1,1,1,""],["82","157.125","161.725",0,1,1,1,""],["83","157.175","161.775",0,1,1,1,""],["84","157.225","161.825",0,1,1,1,"VDES: digital data since 2023, no analogue voice"],["85","157.275","161.875",0,1,1,1,"VDES: digital data since 2023, no analogue voice"],["86","157.325","161.925",0,1,1,1,"VDES satellite since 2023, no analogue voice"],["87","157.375","157.375",0,1,0,0,""],["88","157.425","157.425",0,1,0,0,""],["AIS 1","161.975","161.975",0,0,0,0,"AIS"],["AIS 2","162.025","162.025",0,0,0,0,"AIS"],["M (37)","157.850","157.850",0,1,0,0,"<span class=\"ukc\">UK private: marinas, clubs, recreational craft</span>"],["M2","161.425","161.425",0,1,0,0,"<span class=\"ukc\">UK private: marinas, clubs, recreational craft</span>"]];
 function drawCh(f){
   $("#chbody").innerHTML=CH.filter(r=>{const simplex=!r[2]||r[1]===r[2];
     return f==="all"||(f==="ship"&&r[3])||(f==="port"&&(r[4]||r[5]))||(f==="pc"&&r[6])||(f==="simplex"&&simplex);
   }).map(r=>{const use=[r[3]&&"Inter-ship",(r[4]||r[5])&&("Port ops"+(r[5]&&!r[4]?" (two freq.)":"")),r[6]&&"Public corr."].filter(Boolean).join(" · ");
     const hot=r[0]==="16"||r[0]==="70";
-    return `<tr class="${hot?"hot":""}"><td class="n"><b>${r[0]}</b></td><td class="n">${r[1]}</td><td class="n">${r[2]||"–"}</td><td>${use||"–"}</td><td>${hot?"<b>"+r[7]+"</b>":r[7]}</td></tr>`}).join("");
+    return `<tr class="${hot?"hot":""}${/^M/.test(r[0])?" ukr":""}"><td class="n"><b>${r[0]}</b></td><td class="n">${r[1]}</td><td class="n">${r[2]||"–"}</td><td>${use||"–"}</td><td>${hot?"<b>"+r[7]+"</b>":r[7]}</td></tr>`}).join("");
 }
 drawCh("all");
 $("#chfilter").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;$$("#chfilter button").forEach(x=>x.setAttribute("aria-pressed",x===b));drawCh(b.dataset.f)});
@@ -3171,7 +3173,7 @@ medico:{t:"MEDICAL ADVICE",k:"--pan",render(){return `
    <p>Request urgent medical advice</p>
    <p><span class="pw">OVER</span></p>
   </div>
-  <p class="lead">Expect to be moved to a duplex channel (UK: 62, 63 or 64) and linked to a doctor. Have your position and vessel details ready in case it escalates to a lifeboat or helicopter.</p>`}},
+  <p class="lead">Expect to be moved to a duplex channel${COUNTRY==="uk"?" (UK: 62, 63 or 64)":""} and linked to a doctor. Have your position and vessel details ready in case it escalates to a lifeboat or helicopter.</p>`}},
 heard:{t:"I HEAR A MAYDAY",k:"--mayday",render(){return `
   <ol class="steps">
    <li><span><b>Write it down</b>: name, callsign/MMSI, position, problem, people on board.</span></li>

@@ -269,7 +269,8 @@ details.sc>summary::after{content:none}
 .checks input{margin-top:4px;width:18px;height:18px;flex:0 0 auto}
 .sc-score{color:var(--muted);font-size:14px}
 nav.tabs .row{grid-template-columns:repeat(6,1fr)!important}
-nav.tabs a{font-size:12px}
+nav.tabs a{font-size:12px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:400px){nav.tabs a{font-size:11px}}
 
 nav.tabs button{border:0;background:transparent;padding:10px 4px 12px;cursor:pointer;display:grid;justify-items:center;gap:2px;color:var(--muted);font-size:13px;font-weight:700}
 nav.tabs button svg{width:22px;height:22px}

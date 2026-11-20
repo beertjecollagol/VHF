@@ -55,9 +55,10 @@
   "title": "Handboek radiocommunicatie binnenvaart — algemeen deel (CCR)",
   "regs": "bpr rpr",
   "src": "https://www.ccr-zkr.org/files/documents/reglementRP/rp41nl_pg_062017.pdf",
-  "file": null,
-  "bytes": 0,
-  "date": null
+  "file": "regs/marifoon-algemeen.pdf",
+  "bytes": 492183,
+  "date": "editie 2017 (CCR, Donau- en Moezelcommissie)",
+  "note": "Inland VHF: procedures, channels, standard phrases. Required on board with a VHF set (BPR art. 1.10, RPR art. 1.10)."
  },
  {
   "id": "marifoon-regionaal",

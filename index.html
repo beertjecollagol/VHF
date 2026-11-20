@@ -1129,6 +1129,19 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
     .pc-nm{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-family:var(--f-mono);font-size:12px}
     .pc-scale{background:rgba(255,255,255,.85);border:2px solid #0e2233;border-top:0;font:600 12px var(--f-mono);color:#0e2233;padding:0 4px;text-align:center}
     #pc-globe{background:#0b1a2a}
+    .pc-onmap{background:rgba(255,255,255,.93);border:1px solid rgba(0,0,0,.25);border-radius:8px;padding:5px 8px;font:600 15px/1.3 var(--f-mono);color:#0e2233;cursor:pointer;text-align:right}
+    .pc-onmap small{display:block;font:500 11px var(--f-mono);color:#555}
+    .pc-radio{font-size:14px;line-height:1.5;margin:4px 0 8px}
+    .pc-search{display:flex;gap:6px;margin:10px 0 4px}
+    .pc-search input{flex:1;min-width:0;font-size:16px;padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink)}
+    .pc-sres{display:flex;flex-direction:column;gap:4px;margin:4px 0 6px}
+    .pc-sres button{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:14px;color:var(--ink)}
+    .pc-mlist{list-style:none;padding:0;margin:6px 0;display:flex;flex-direction:column;gap:6px}
+    .pc-mlist li{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface)}
+    .pc-mlist .mpos{font-family:var(--f-mono);font-size:14px}
+    .pc-mlist .mact{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+    .pc-mlist .mact button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:13px;cursor:pointer;color:var(--ink)}
+    .pc-mk{width:14px;height:14px;border-radius:50% 50% 50% 0;background:#D85A30;border:2px solid #fff;transform:rotate(-45deg);box-shadow:0 1px 3px rgba(0,0,0,.4)}
     .pc-gl{font:600 11px var(--f-mono);color:#0e3c6e;background:rgba(255,255,255,.85);border-radius:4px;padding:0 4px;white-space:nowrap;pointer-events:none}
     .pc-pl{font:12px var(--f-body);color:#26215C;background:rgba(255,255,255,.88);border-radius:4px;padding:0 5px;white-space:nowrap;pointer-events:none;transform:translate(52%,0)}
     .pc-pl::before{content:'';position:absolute;left:-9px;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;background:#7F77DD;border:1.5px solid #fff}
@@ -1156,7 +1169,10 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
       <button class="ghost" id="pc-wake" aria-pressed="false">Keep screen on: off</button>
     </div>
     <p class="pc-read" id="pc-msg" style="font-family:var(--f-body);color:var(--muted);font-size:13px"></p>
+    <details id="pc-radiobox"><summary>Say it on the radio</summary><p class="pc-radio" id="pc-radio">Start GPS to get your position read-out.</p></details>
 
+    <form class="pc-search" id="pc-sform" role="search"><input id="pc-q" type="search" placeholder="Search a place, e.g. Sauda" autocomplete="off" enterkeyhint="search"><button class="ghost" type="submit">Search</button></form>
+    <div class="pc-sres" id="pc-sres"></div>
     <div class="pc-ctl"><span class="lbl">View</span><span class="chips" id="pc-view">
       <button data-v="flat" aria-pressed="true">Flat</button>
       <button data-v="globe" aria-pressed="false">Globe</button></span></div>
@@ -1177,6 +1193,10 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
       <button class="ghost" id="pc-clr" hidden>Clear measurement</button>
       <button class="ghost" id="pc-me">Centre on me</button>
     </div>
+    <h3 style="font-size:17px;margin:14px 0 2px">Markers</h3>
+    <p style="font-size:14px;color:var(--muted)">Tap the chart and choose <b>Save marker</b>, or mark where you are. Markers are kept on this phone.</p>
+    <div class="pc-btns"><button class="ghost" id="pc-markme">Mark my position</button><button class="ghost" id="pc-mcopy">Copy all markers</button></div>
+    <ol class="pc-mlist" id="pc-mlist"></ol>
 
     <details><summary><b>Offline charts</b> — store the Norwegian sea chart on this phone</summary>
       <p>Charts you have looked at are kept automatically. To be sure you have them at sea, store an area before you go (on Wi-Fi). The download covers Kartverket's Norwegian sea chart; OpenStreetMap does not allow bulk downloads, so it only works offline for areas you have viewed.</p>
@@ -4541,6 +4561,27 @@ const pad=(n,l)=>String(n).padStart(l,'0');
 function ddm(v,isLat,dec){dec=dec==null?3:dec;const a=Math.abs(v);let d=Math.floor(a),m=+((a-d)*60).toFixed(dec);if(m>=60){d++;m=0}const ms=m.toFixed(dec).padStart(dec?dec+3:2,'0');return pad(d,isLat?2:3)+'°'+ms+'′'+(isLat?(v>=0?'N':'S'):(v>=0?'E':'W'))}
 const R_NM=3440.065;
 window.pcUtil={ddm,pad,rhumb:(a,b)=>rhumb(a,b),dest:(p,b,n)=>dest(p,b,n)};
+const SAY={'0':'zero','1':'one','2':'two','3':'tree','4':'fower','5':'fife','6':'six','7':'seven','8':'eight','9':'niner'};
+function sayNum(str){return str.split('').map(c=>c==='.'?'decimal':SAY[c]||'').filter(Boolean).join(' ')}
+function radioText(lat,lon){const part=(v,isLat)=>{const a=Math.abs(v);let d=Math.floor(a),m=+((a-d)*60).toFixed(2);if(m>=60){d++;m=0}return sayNum(pad(d,isLat?2:3))+' degrees, '+sayNum(m.toFixed(2).padStart(5,'0'))+' minutes '+(isLat?(v>=0?'North':'South'):(v>=0?'East':'West'))};return part(lat,true)+' — '+part(lon,false)}
+function utcNow(t){const d=t?new Date(t):new Date();return pad(d.getUTCHours(),2)+pad(d.getUTCMinutes(),2)+' UTC'}
+function posText(lat,lon,extra){return 'Position '+ddm(lat,true)+' '+ddm(lon,false)+(extra||'')}
+/* markers store */
+const MK={all(){try{return JSON.parse(localStorage.getItem('pc-markers')||'[]')}catch(e){return[]}},save(a){try{localStorage.setItem('pc-markers',JSON.stringify(a))}catch(e){}MK.render()},add(lat,lon,name){const a=MK.all();const n=name||prompt('Name for this marker',`Marker ${a.length+1}`);if(n===null)return;a.push({id:Date.now(),n:(n||'Marker').slice(0,60),lat:+lat.toFixed(6),lon:+lon.toFixed(6),t:Date.now()});MK.save(a);msg('Saved marker “'+(n||'Marker')+'”.')},render(){
+  const ul=$('pc-mlist');const a=MK.all();ul.innerHTML='';
+  if(!a.length){ul.innerHTML='<li style="color:var(--muted);font-size:14px">No markers yet.</li>'}
+  a.forEach(m=>{const li=document.createElement('li');let fr='';if(last){const r=rhumb([last.lat,last.lon],[m.lat,m.lon]);fr=' · '+r.nm.toFixed(r.nm<10?2:1)+' nm / '+pad(Math.round(r.brg)%360,3)+'°T from you'}
+    li.innerHTML='<b></b><div class="mpos"></div><div class="mact"><button data-a="go">Show</button><button data-a="copy">Copy</button><button data-a="ren">Rename</button><button data-a="del">Delete</button></div>';
+    li.querySelector('b').textContent=m.n;li.querySelector('.mpos').textContent=ddm(m.lat,true)+'  '+ddm(m.lon,false)+fr;
+    li.querySelector('.mact').onclick=e=>{const act=e.target.dataset.a;if(!act)return;const all=MK.all(),i=all.findIndex(x=>x.id===m.id);if(i<0)return;
+      if(act==='go'){if(window.pcGoTo)pcGoTo(m.lat,m.lon,m.n)}
+      else if(act==='copy'){copyText(m.n+': '+ddm(m.lat,true)+' '+ddm(m.lon,false))}
+      else if(act==='ren'){const n=prompt('New name',m.n);if(n){all[i].n=n.slice(0,60);MK.save(all)}}
+      else if(act==='del'){if(confirm('Delete marker “'+m.n+'”?')){all.splice(i,1);MK.save(all)}}};
+    ul.appendChild(li)});
+  if(window.pcMarkLayer)pcMarkLayer();if(window.pcGlobeMarks)pcGlobeMarks()}};
+window.pcMK=MK;
+function copyText(t){(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg('Copied: '+t),()=>{msg(t)})}
 function rhumb(a,b){const r=Math.PI/180,f1=a[0]*r,f2=b[0]*r,df=f2-f1;let dl=(b[1]-a[1])*r;if(Math.abs(dl)>Math.PI)dl=dl>0?-(2*Math.PI-dl):2*Math.PI+dl;const dp=Math.log(Math.tan(Math.PI/4+f2/2)/Math.tan(Math.PI/4+f1/2));const q=Math.abs(dp)>1e-12?df/dp:Math.cos(f1);return{nm:Math.sqrt(df*df+q*q*dl*dl)*R_NM,brg:(Math.atan2(dl,dp)/r+360)%360}}
 function dest(p,brgDeg,nm){const r=Math.PI/180,d=nm/R_NM,b=brgDeg*r,f1=p[0]*r,l1=p[1]*r;const f2=Math.asin(Math.sin(f1)*Math.cos(d)+Math.cos(f1)*Math.sin(d)*Math.cos(b));const l2=l1+Math.atan2(Math.sin(b)*Math.sin(d)*Math.cos(f1),Math.cos(d)-Math.sin(f1)*Math.sin(f2));return[f2/r,l2/r]}
 
@@ -4557,19 +4598,28 @@ function showFix(p){
   $('pc-sog').textContent=last.sogKn==null?'– kn':last.sogKn.toFixed(1)+' kn';
   $('pc-cog').textContent=last.cog==null?'–°T':pad(Math.round(last.cog)%360,3)+'°T';
   $('pc-acc').textContent=Math.round(c.accuracy)+' m';
+  $('pc-radio').textContent=radioText(last.lat,last.lon)+'. Time '+sayNum(utcNow(last.t).slice(0,4))+' UTC.';
+  if(window.pcOnMap)pcOnMap(last);
+  if(!showFix.n||Date.now()-showFix.n>15000){showFix.n=Date.now();MK.render()}
   if(window.pcMap)pcMap.ownFix(last,follow);
   if(window.pcGlobe)pcGlobe.ownFix(last,follow);
 }
 function tick(){const n=new Date();$('pc-utc').textContent=pad(n.getUTCHours(),2)+':'+pad(n.getUTCMinutes(),2)+':'+pad(n.getUTCSeconds(),2);if(last){const s=Math.round((Date.now()-last.t)/1000);$('pc-age').textContent=s<60?s+' s ago':Math.round(s/60)+' min ago'}}
 setInterval(tick,1000);tick();
 $('pc-gps').onclick=()=>{
-  if(watch!=null){navigator.geolocation.clearWatch(watch);watch=null;$('pc-gps').textContent='Start GPS';msg('GPS stopped.');return}
+  if(watch!=null){navigator.geolocation.clearWatch(watch);watch=null;$('pc-gps').textContent='Start GPS';st.set('pc-gps','0');msg('GPS stopped.');return}
   if(!('geolocation' in navigator)){msg('This browser has no GPS access.');return}
   msg('Waiting for a GPS fix… the first fix can take a minute, also without internet.');
   watch=navigator.geolocation.watchPosition(p=>{msg('');showFix(p)},e=>{msg(e.code===1?'Location permission denied. Allow location for this site in your phone settings.':'No GPS fix yet ('+e.message+'). Keep the phone where it can see the sky.')},{enableHighAccuracy:true,maximumAge:0,timeout:60000});
-  $('pc-gps').textContent='Stop GPS';
+  $('pc-gps').textContent='Stop GPS';st.set('pc-gps','1');
 };
-$('pc-copy').onclick=()=>{if(!last){msg('No position yet. Start GPS first.');return}const t=ddm(last.lat,true)+' '+ddm(last.lon,false);(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg('Copied: '+t),()=>msg(t))};
+function autoGPS(){if(st.get('pc-gps')!=='1'||watch!=null)return;$('pc-gps').click()}
+new IntersectionObserver((es,o)=>{if(es.some(e=>e.isIntersecting)){autoGPS();o.disconnect()}}).observe($('poschart'));
+$('pc-copy').onclick=()=>{if(!last){msg('No position yet. Start GPS first.');return}copyText(posText(last.lat,last.lon,' (WGS84) at '+utcNow(last.t)+', accuracy '+Math.round(last.acc)+' m'+(last.sogKn!=null?', SOG '+last.sogKn.toFixed(1)+' kn':'')+(last.cog!=null?', COG '+pad(Math.round(last.cog)%360,3)+'°T':'')))};
+$('pc-markme').onclick=()=>{if(!last){msg('No position yet. Start GPS first.');return}MK.add(last.lat,last.lon)};
+$('pc-mcopy').onclick=()=>{const a=MK.all();if(!a.length){msg('No markers yet.');return}copyText(a.map(m=>m.n+': '+ddm(m.lat,true)+' '+ddm(m.lon,false)).join('\n'))};
+MK.render();
+$('pc-sform').onsubmit=e=>{e.preventDefault();$('pc-sres').textContent='Switch to the Flat view to search.'};
 function setFollow(v){follow=v;st.set('pc-follow',v?'1':'0');const b=$('pc-follow');b.setAttribute('aria-pressed',v);b.textContent='Follow: '+(v?'on':'off')}
 setFollow(follow);$('pc-follow').onclick=()=>{setFollow(!follow);if(follow&&last&&window.pcMap)pcMap.ownFix(last,true);if(follow&&last&&window.pcGlobe)pcGlobe.ownFix(last,true)};
 window.pcLast=()=>last;window.pcFollow=()=>follow;
@@ -4649,9 +4699,30 @@ function initMap(){
   let me=null,meAcc=null,meVec=null;
   window.pcMap={ownFix(f,fol){const ll=[f.lat,f.lon];if(!me){meAcc=L.circle(ll,{radius:f.acc,color:'#378ADD',weight:1,fillOpacity:.12,interactive:false}).addTo(map);me=L.circleMarker(ll,{radius:7,color:'#fff',weight:2,fillColor:'#185FA5',fillOpacity:1}).addTo(map);meVec=L.polyline([ll,ll],{color:'#185FA5',weight:3,dashArray:'6 5'}).addTo(map)}me.setLatLng(ll);meAcc.setLatLng(ll).setRadius(f.acc);meVec.setLatLngs(f.cog!=null&&f.sogKn?[ll,dest(ll,f.cog,f.sogKn*0.1)]:[ll,ll]);if(fol)map.panTo(ll,{animate:true})}};
   if(last)pcMap.ownFix(last,follow);
+  /* position box on the chart */
+  const OnMap=L.Control.extend({options:{position:'topright'},onAdd(){const d=L.DomUtil.create('div','pc-onmap');d.title='Tap to copy';d.innerHTML='Start GPS<small>for your position</small>';L.DomEvent.disableClickPropagation(d);d.onclick=()=>$('pc-copy').click();this.d=d;return d}});
+  const onm=new OnMap().addTo(map);
+  window.pcOnMap=f=>{onm.d.innerHTML=ddm(f.lat,true)+'<br>'+ddm(f.lon,false)+'<small>'+utcNow(f.t)+' · ±'+Math.round(f.acc)+' m'+(f.sogKn!=null?' · '+f.sogKn.toFixed(1)+' kn':'')+' · tap to copy</small>'};
+  if(last)pcOnMap(last);
+  /* popup with save */
+  function popAt(ll,latlng,title){const d=document.createElement('div');d.innerHTML=(title?'<b></b><br>':'')+'<span style="font-family:var(--f-mono)">'+ddm(ll[0],true)+'<br>'+ddm(ll[1],false)+'</span><br><button class="ghost" style="margin-top:6px;padding:5px 12px;font-size:13px">Save marker</button> <button class="ghost" style="margin-top:6px;padding:5px 12px;font-size:13px">Copy</button>';if(title)d.querySelector('b').textContent=title;const bs=d.querySelectorAll('button');bs[0].onclick=()=>{MK.add(ll[0],ll[1],title?prompt('Name for this marker',title):undefined);map.closePopup()};bs[1].onclick=()=>copyText((title?title+': ':'')+ddm(ll[0],true)+' '+ddm(ll[1],false));L.popup({closeButton:true,autoPan:true}).setLatLng(latlng||ll).setContent(d).openOn(map)}
+  /* saved markers layer */
+  const mkLayer=L.layerGroup().addTo(map);
+  window.pcMarkLayer=()=>{mkLayer.clearLayers();MK.all().forEach(m=>{L.marker([m.lat,m.lon],{icon:L.divIcon({className:'',html:'<div class="pc-mk"></div>',iconSize:[18,18],iconAnchor:[7,16]})}).bindTooltip(m.n,{permanent:true,direction:'top',offset:[0,-14]}).on('click',ev=>{L.DomEvent.stopPropagation(ev);popAt([m.lat,m.lon],null,m.n)}).addTo(mkLayer)})};
+  pcMarkLayer();
+  window.pcGoTo=(lat,lon,name)=>{if(mode()==='globe'&&window.pcGlobeGo){pcGlobeGo(lat,lon);return}setFollow(false);map.setView([lat,lon],Math.max(map.getZoom(),13));$('pc-map').scrollIntoView({block:'center',behavior:'smooth'})};
+  function mode(){return st.get('pc-mode')==='globe'?'globe':'flat'}
+  /* place search (OpenStreetMap Nominatim, online only) */
+  let srTemp=null;
+  $('pc-sform').onsubmit=async ev=>{ev.preventDefault();const q=$('pc-q').value.trim(),box=$('pc-sres');if(!q){box.innerHTML='<span style="color:var(--danger,#c00);font-size:13px">Type a place name first.</span>';return}
+    box.innerHTML='<span style="font-size:13px;color:var(--muted)">Searching…</span>';
+    try{const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=6&accept-language=en&q='+encodeURIComponent(q));const j=await r.json();box.innerHTML='';
+      if(!j.length){box.innerHTML='<span style="font-size:13px;color:var(--muted)">Nothing found.</span>';return}
+      j.forEach(x=>{const b=document.createElement('button');const la=+x.lat,lo=+x.lon;b.textContent=x.display_name+' — '+ddm(la,true,1)+' '+ddm(lo,false,1);b.onclick=()=>{box.innerHTML='';setFollow(false);if(st.get('pc-mode')==='globe'&&window.pcGlobeGo){pcGlobeGo(la,lo);return}map.setView([la,lo],x.boundingbox&&Math.abs(x.boundingbox[1]-x.boundingbox[0])>0.5?10:13);if(srTemp)map.removeLayer(srTemp);srTemp=L.circleMarker([la,lo],{radius:8,color:'#D85A30',weight:3,fill:false}).addTo(map);popAt([la,lo],null,x.name||q)};box.appendChild(b)})}
+    catch(e){box.innerHTML='<span style="font-size:13px;color:var(--muted)">Search needs internet. Saved markers and stored charts still work offline.</span>'}};
   $('pc-me').onclick=()=>{if(last)map.setView([last.lat,last.lon],Math.max(map.getZoom(),13));else msg('No position yet. Start GPS first.')};
   /* clicks */
-  map.on('click',e=>{const ll=[e.latlng.lat,L.Util.wrapNum(e.latlng.lng,[-180,180],true)];if(ovl.measure){meas.push(ll);drawMeas();return}let t=ddm(ll[0],true)+'  '+ddm(ll[1],false);if(last){const r=rhumb([last.lat,last.lon],ll);t+='  ·  from you '+r.nm.toFixed(r.nm<10?2:1)+' nm / '+pad(Math.round(r.brg)%360,3)+'°T'}if(ovl.tz&&tzData){const p=tzAt(ll[0],ll[1]);if(p)t+='  ·  '+tzName(p)+' '+tzTime(p)}$('pc-read').textContent=t;L.popup({closeButton:false,autoPan:false}).setLatLng(e.latlng).setContent('<span style="font-family:var(--f-mono)">'+ddm(ll[0],true)+'<br>'+ddm(ll[1],false)+'</span>').openOn(map)});
+  map.on('click',e=>{const ll=[e.latlng.lat,L.Util.wrapNum(e.latlng.lng,[-180,180],true)];if(ovl.measure){meas.push(ll);drawMeas();return}let t=ddm(ll[0],true)+'  '+ddm(ll[1],false);if(last){const r=rhumb([last.lat,last.lon],ll);t+='  ·  from you '+r.nm.toFixed(r.nm<10?2:1)+' nm / '+pad(Math.round(r.brg)%360,3)+'°T'}if(ovl.tz&&tzData){const p=tzAt(ll[0],ll[1]);if(p)t+='  ·  '+tzName(p)+' '+tzTime(p)}$('pc-read').textContent=t;popAt(ll,e.latlng)});
   function readCenter(){if(!ovl.tz||!tzData)return;const c=map.getCenter(),p=tzAt(c.lat,L.Util.wrapNum(c.lng,[-180,180],true));if(p&&!ovl.measure)$('pc-read').textContent='Chart centre: '+tzName(p)+' · '+tzTime(p)+(p.tz_name1st&&!/\/$/.test(p.tz_name1st)?' ('+p.tz_name1st+')':'')}
   /* apply overlays */
   function apply(){
@@ -4790,6 +4861,9 @@ function init(c,z){
   /* own position */
   function circle(ll,m){const c=[];for(let i=0;i<=48;i++){const d=U.dest(ll,i*7.5,m/1852);c.push([d[1],d[0]])}return c}
   window.pcGlobe={ownFix(f,fol){if(!gm||!gm.getSource('me'))return;const ll=[f.lat,f.lon],fs=[{type:'Feature',properties:{k:'acc'},geometry:{type:'Polygon',coordinates:[circle(ll,Math.max(5,f.acc))]}},{type:'Feature',properties:{k:'pos'},geometry:{type:'Point',coordinates:[f.lon,f.lat]}}];if(f.cog!=null&&f.sogKn){const d=U.dest(ll,f.cog,f.sogKn*0.1);fs.push({type:'Feature',properties:{k:'vec'},geometry:{type:'LineString',coordinates:[[f.lon,f.lat],[d[1],d[0]]]}})}gm.getSource('me').setData({type:'FeatureCollection',features:fs});if(fol&&mode==='globe')gm.easeTo({center:[f.lon,f.lat],duration:600})}};
+  window.pcGlobeGo=(lat,lon)=>{gm.easeTo({center:[lon,lat],zoom:Math.max(gm.getZoom(),11),duration:900});$('pc-globe').scrollIntoView({block:'center',behavior:'smooth'})};
+  let gmk=[];window.pcGlobeMarks=()=>{gmk.forEach(m=>m.remove());gmk=window.pcMK.all().map(m=>{const el=document.createElement('div');el.innerHTML='<div class="pc-mk"></div>';el.title=m.n;const pop=new maplibregl.Popup({offset:14,closeButton:false}).setHTML('<b></b><br><span style="font-family:var(--f-mono)">'+ddm(m.lat,true)+'<br>'+ddm(m.lon,false)+'</span>');pop.getElement&&0;const mk=new maplibregl.Marker({element:el,anchor:'bottom'}).setLngLat([m.lon,m.lat]).setPopup(pop).addTo(gm);pop.on('open',()=>{const b=pop.getElement().querySelector('b');if(b)b.textContent=m.n});return mk})};
+  pcGlobeMarks();
   $('pc-me').addEventListener('click',()=>{const l=window.pcLast&&pcLast();if(l&&gm&&mode==='globe')gm.easeTo({center:[l.lon,l.lat],zoom:Math.max(gm.getZoom(),12)})});
   /* sync with chips */
   function sync(){if(!gm||!gm.isStyleLoaded())return;const b=baseKey(),o=ovl();['osm','sjo','topo'].forEach(k=>gm.setLayoutProperty(k,'visibility',k===b?'visible':'none'));gm.setLayoutProperty('seamark','visibility',o.seamark?'visible':'none');tz(!!o.tz);plMk.forEach(m=>o.places?m.addTo(gm):m.remove());if(!o.measure&&meas.length){meas=[];drawMeas()}gm.getCanvas().style.cursor=o.measure?'crosshair':'';grid()}

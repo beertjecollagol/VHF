@@ -721,58 +721,10 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
 
 
 
-<!-- ============ REFERENCE ============ -->
-<section class="view" id="v-reference" data-tab="reference">
-  <div><div class="eyebrow">Look it up</div><h1 style="font-size:26px">Reference</h1></div>
-  <div class="seg rsub js-only" role="group" aria-label="Reference section">
-    <button data-r-pick="nav" aria-pressed="true">Navigation</button>
-    <button data-r-pick="vhf" aria-pressed="false">VHF</button>
-    <button data-r-pick="waters" aria-pressed="false">Waters</button>
-    <button data-r-pick="wx" aria-pressed="false">Weather</button>
-    <button data-r-pick="gen" aria-pressed="false">General</button>
-  </div>
-  <style>
-    .pc-pos{border:1px solid var(--line);border-radius:10px;background:var(--soft);padding:12px 14px;margin:8px 0}
-    .pc-ll{font-family:var(--f-mono);font-weight:600;font-size:clamp(24px,7vw,34px);line-height:1.25;letter-spacing:.01em}
-    .pc-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:6px 12px;margin-top:8px}
-    .pc-stats div{font-size:13px;color:var(--muted)}
-    .pc-stats b{display:block;font-family:var(--f-mono);font-size:18px;color:var(--ink)}
-    .pc-btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
-    .pc-btns button{font-size:15px}
-    .pc-map{height:62vh;min-height:340px;max-height:720px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--soft);position:relative;z-index:0}
-    .pc-map .leaflet-container{font-family:var(--f-body)}
-    .pc-grid{position:absolute;inset:0;pointer-events:none;z-index:450}
-    .pc-ctl{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px;align-items:center}
-    .pc-ctl .lbl{font-size:13px;color:var(--muted);margin-right:2px}
-    .pc-read{font-family:var(--f-mono);font-size:14px;margin:6px 0;min-height:1.4em}
-    .pc-prog{height:8px;border-radius:999px;background:var(--line);overflow:hidden;margin:8px 0}
-    .pc-prog i{display:block;height:100%;width:0;background:var(--accent)}
-    .pc-tzlbl{background:rgba(250,238,218,.92);color:#633806;border-radius:6px;padding:1px 6px;font-size:12px;white-space:nowrap;font-family:var(--f-mono);border:1px solid rgba(186,117,23,.5)}
-    .pc-nm{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-family:var(--f-mono);font-size:12px}
-    .pc-scale{background:rgba(255,255,255,.85);border:2px solid #0e2233;border-top:0;font:600 12px var(--f-mono);color:#0e2233;padding:0 4px;text-align:center}
-    #pc-globe{background:#0b1a2a}
-    .pc-onmap{background:rgba(255,255,255,.93);border:1px solid rgba(0,0,0,.25);border-radius:8px;padding:5px 8px;font:600 15px/1.3 var(--f-mono);color:#0e2233;cursor:pointer;text-align:right}
-    .pc-onmap small{display:block;font:500 11px var(--f-mono);color:#555}
-    .pc-radio{font-size:14px;line-height:1.5;margin:4px 0 8px}
-    .pc-search{display:flex;gap:6px;margin:10px 0 4px}
-    .pc-search input{flex:1;min-width:0;font-size:16px;padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink)}
-    .pc-sres{display:flex;flex-direction:column;gap:4px;margin:4px 0 6px}
-    .pc-sres button{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:14px;color:var(--ink)}
-    .pc-mlist{list-style:none;padding:0;margin:6px 0;display:flex;flex-direction:column;gap:6px}
-    .pc-mlist li{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface)}
-    .pc-mlist .mpos{font-family:var(--f-mono);font-size:14px}
-    .pc-mlist .mact{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-    .pc-mlist .mact button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:13px;cursor:pointer;color:var(--ink)}
-    .pc-mk{width:14px;height:14px;border-radius:50% 50% 50% 0;background:#D85A30;border:2px solid #fff;transform:rotate(-45deg);box-shadow:0 1px 3px rgba(0,0,0,.4)}
-    .pc-gl{font:600 11px var(--f-mono);color:#0e3c6e;background:rgba(255,255,255,.85);border-radius:4px;padding:0 4px;white-space:nowrap;pointer-events:none}
-    .pc-pl{font:12px var(--f-body);color:#26215C;background:rgba(255,255,255,.88);border-radius:4px;padding:0 5px;white-space:nowrap;pointer-events:none;transform:translate(52%,0)}
-    .pc-pl::before{content:'';position:absolute;left:-9px;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;background:#7F77DD;border:1.5px solid #fff}
-    .pc-gscale{position:absolute;left:8px;bottom:22px;z-index:2}
-    :root.night #pc-globe canvas{filter:grayscale(1) brightness(.55) sepia(1) hue-rotate(-50deg) saturate(6)}
-    :root.night .pc-map .leaflet-tile-pane{filter:grayscale(1) brightness(.55) sepia(1) hue-rotate(-50deg) saturate(6)}
-  </style>
-<div data-rsub="nav" id="navigation">
-  <div><div class="eyebrow">Navigation</div><h2 class="vkh">Position, chart and courses</h2></div>
+<!-- ============ NAVIGATION ============ -->
+<section class="view" id="v-navigation" data-tab="navigation" hidden>
+<div id="navigation">
+  <div><div class="eyebrow">Underway</div><h1 style="font-size:26px">Navigation</h1><p class="muted" style="margin:2px 0 0">Position, chart and courses</p></div>
   <div class="panel sec js-only" id="poschart"><h2>Position and chart <span class="cx nbv nlt" lang="nl" data-c="nl">(Positie en kaart)</span><span class="cx nbv nlt" lang="nb" data-c="no">(Posisjon og kart)</span></h2>
     <p class="lead" style="font-size:15px">Your phone's GPS position in chart notation, with charts that keep working offline.</p>
     <div class="pc-pos" aria-live="polite">
@@ -896,6 +848,57 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
     <p class="note">Example: 50.9174962, -4.7981849 → <b class="mono">50° 55.05' N, 004° 47.89' W</b>. On the radio, read the figures out digit by digit.</p>
   </div>
 </div>
+</section>
+<!-- ============ REFERENCE ============ -->
+<section class="view" id="v-reference" data-tab="reference">
+  <div><div class="eyebrow">Look it up</div><h1 style="font-size:26px">Reference</h1></div>
+  <div class="seg rsub js-only" role="group" aria-label="Reference section">
+    <button data-r-pick="vhf" aria-pressed="false">VHF</button>
+    <button data-r-pick="waters" aria-pressed="false">Waters</button>
+    <button data-r-pick="wx" aria-pressed="false">Weather</button>
+    <button data-r-pick="gen" aria-pressed="false">General</button>
+  </div>
+  <style>
+    .pc-pos{border:1px solid var(--line);border-radius:10px;background:var(--soft);padding:12px 14px;margin:8px 0}
+    .pc-ll{font-family:var(--f-mono);font-weight:600;font-size:clamp(24px,7vw,34px);line-height:1.25;letter-spacing:.01em}
+    .pc-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:6px 12px;margin-top:8px}
+    .pc-stats div{font-size:13px;color:var(--muted)}
+    .pc-stats b{display:block;font-family:var(--f-mono);font-size:18px;color:var(--ink)}
+    .pc-btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+    .pc-btns button{font-size:15px}
+    .pc-map{height:62vh;min-height:340px;max-height:720px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--soft);position:relative;z-index:0}
+    .pc-map .leaflet-container{font-family:var(--f-body)}
+    .pc-grid{position:absolute;inset:0;pointer-events:none;z-index:450}
+    .pc-ctl{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px;align-items:center}
+    .pc-ctl .lbl{font-size:13px;color:var(--muted);margin-right:2px}
+    .pc-read{font-family:var(--f-mono);font-size:14px;margin:6px 0;min-height:1.4em}
+    .pc-prog{height:8px;border-radius:999px;background:var(--line);overflow:hidden;margin:8px 0}
+    .pc-prog i{display:block;height:100%;width:0;background:var(--accent)}
+    .pc-tzlbl{background:rgba(250,238,218,.92);color:#633806;border-radius:6px;padding:1px 6px;font-size:12px;white-space:nowrap;font-family:var(--f-mono);border:1px solid rgba(186,117,23,.5)}
+    .pc-nm{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-family:var(--f-mono);font-size:12px}
+    .pc-scale{background:rgba(255,255,255,.85);border:2px solid #0e2233;border-top:0;font:600 12px var(--f-mono);color:#0e2233;padding:0 4px;text-align:center}
+    #pc-globe{background:#0b1a2a}
+    .pc-onmap{background:rgba(255,255,255,.93);border:1px solid rgba(0,0,0,.25);border-radius:8px;padding:5px 8px;font:600 15px/1.3 var(--f-mono);color:#0e2233;cursor:pointer;text-align:right}
+    .pc-onmap small{display:block;font:500 11px var(--f-mono);color:#555}
+    .pc-radio{font-size:14px;line-height:1.5;margin:4px 0 8px}
+    .pc-search{display:flex;gap:6px;margin:10px 0 4px}
+    .pc-search input{flex:1;min-width:0;font-size:16px;padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink)}
+    .pc-sres{display:flex;flex-direction:column;gap:4px;margin:4px 0 6px}
+    .pc-sres button{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:14px;color:var(--ink)}
+    .pc-mlist{list-style:none;padding:0;margin:6px 0;display:flex;flex-direction:column;gap:6px}
+    .pc-mlist li{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface)}
+    .pc-mlist .mpos{font-family:var(--f-mono);font-size:14px}
+    .pc-mlist .mact{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+    .pc-mlist .mact button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:13px;cursor:pointer;color:var(--ink)}
+    .pc-mk{width:14px;height:14px;border-radius:50% 50% 50% 0;background:#D85A30;border:2px solid #fff;transform:rotate(-45deg);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+    .pc-gl{font:600 11px var(--f-mono);color:#0e3c6e;background:rgba(255,255,255,.85);border-radius:4px;padding:0 4px;white-space:nowrap;pointer-events:none}
+    .pc-pl{font:12px var(--f-body);color:#26215C;background:rgba(255,255,255,.88);border-radius:4px;padding:0 5px;white-space:nowrap;pointer-events:none;transform:translate(52%,0)}
+    .pc-pl::before{content:'';position:absolute;left:-9px;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;background:#7F77DD;border:1.5px solid #fff}
+    .pc-gscale{position:absolute;left:8px;bottom:22px;z-index:2}
+    :root.night #pc-globe canvas{filter:grayscale(1) brightness(.55) sepia(1) hue-rotate(-50deg) saturate(6)}
+    :root.night .pc-map .leaflet-tile-pane{filter:grayscale(1) brightness(.55) sepia(1) hue-rotate(-50deg) saturate(6)}
+  </style>
+
 <div data-rsub="vhf" id="vhf-ref">
   <div><div class="eyebrow">VHF</div><h2 class="vkh">Radio reference</h2></div>
   <div class="panel sec" id="myradio"><h2>My radio: Icom IC-M94DE</h2>
@@ -3782,6 +3785,7 @@ Droogvalling <u>0</u><sub>5</sub> (bodem 0,5 m boven LAT), HW 2,1 m: werkelijke 
 <nav class="tabs" aria-label="Sections"><div class="row">
   <a class="t-em" href="#v-emergency" data-tab="emergency" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/></svg>Emergency</a>
   <a href="#v-routine" data-tab="routine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15a8 8 0 0 1 8-8M4 15h4l2 4h4l2-4h4a8 8 0 0 0-8-8"/></svg>Routine</a>
+  <a href="#v-navigation" data-tab="navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Navigation</a>
   <a href="#v-reference" data-tab="reference"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Reference</a>
   <a href="#v-study" data-tab="study"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l9-3 9 3-9 3-9-3zM6 8v6c0 2 3 4 6 4s6-2 6-4V8"/></svg>Study</a>
   <a href="#v-exam" data-tab="exam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Exam</a>
@@ -4139,7 +4143,7 @@ const pk=document.getElementById("reg-pick");if(pk)pk.addEventListener("click",e
 window.smRegSet=r=>{if(REG.includes(r)){cur=r;apply()}};
 window.smRegFor=list=>{const l=list.split(" ");if(l.includes("all")||l.includes(cur))return;cur=l[0];apply()};apply()})();
 /* ---------- reference sub-sections ---------- */
-(function(){const R=["nav","vhf","waters","wx","gen"];let cur=store.get("sm-rsub");if(!R.includes(cur))cur="nav";
+(function(){const R=["vhf","waters","wx","gen"];let cur=store.get("sm-rsub");if(!R.includes(cur))cur="vhf";
 function apply(){$$("[data-rsub]").forEach(el=>el.hidden=el.dataset.rsub!==cur);$$("[data-r-pick]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.rPick===cur));store.set("sm-rsub",cur);window.dispatchEvent(new Event("resize"))}
 $$(".rsub").forEach(seg=>seg.addEventListener("click",e=>{const b=e.target.closest("[data-r-pick]");if(!b)return;cur=b.dataset.rPick;apply();const v=document.getElementById("v-reference");if(v&&v.getBoundingClientRect().top<0)window.scrollTo(0,0)}));
 window.smSetRef=r=>{if(R.includes(r)){cur=r;apply()}};apply()})();
@@ -4149,7 +4153,7 @@ $$("nav.tabs a").forEach(b=>b.addEventListener("click",e=>{e.preventDefault();sh
 window.smGoTo=id=>goTo(id);function goTo(id){const el=document.getElementById(id);if(!el)return;const dc=el.closest("[data-course]");if(dc&&window.smSetCourse)window.smSetCourse(dc.dataset.course);const dr=el.closest("[data-rsub]");if(dr&&window.smSetRef)window.smSetRef(dr.dataset.rsub);const dg=el.closest("[data-reg]");if(dg&&window.smRegFor)window.smRegFor(dg.dataset.reg);const v=el.closest(".view");if(v)showTab(v.dataset.tab);if(el.tagName==="DETAILS")el.open=true;
   requestAnimationFrame(()=>{el.scrollIntoView({block:"start"});window.scrollBy(0,-70);el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")})}
 const h0=location.hash.slice(1);const h=h0.startsWith("v-")?h0.slice(2):h0.startsWith("s-")?"emergency":h0;
-if(h&&document.getElementById(h)){goTo(h)}else{showTab(["emergency","routine","waters","reference","study","exam"].includes(h)?h:"emergency")}
+if(h&&document.getElementById(h)){goTo(h)}else{showTab(["emergency","routine","navigation","waters","reference","study","exam"].includes(h)?h:"emergency")}
 
 /* ---------- search ---------- */
 const idx=$$(".sec").map(el=>({id:el.id,title:(el.querySelector("h2,h3")||{}).textContent||el.id,text:el.textContent.replace(/\s+/g," ")}));

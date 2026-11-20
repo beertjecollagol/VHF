@@ -4671,7 +4671,7 @@ function initMap(){
     else{const b=map.getBounds();bb=[b.getSouth(),b.getWest(),b.getNorth(),b.getEast()];z0=Math.max(5,Math.min(map.getZoom(),15));z1=15;label='this view'}
     const list=tiles(bb,z0,z1);
     if(list.length>40000){$('pc-dl').textContent='That is '+list.length.toLocaleString('en')+' tiles — too many at once. Zoom in further and try again.';return}
-    const estMB=Math.round(list.length*14/1024);
+    const estMB=Math.round(list.length*9/1024);
     if(!confirm('Download '+list.length.toLocaleString('en')+' chart tiles for '+label+' (about '+estMB+' MB)? Use Wi-Fi.'))return;
     try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
     busy=true;cancel=false;$('pc-cancel').disabled=false;

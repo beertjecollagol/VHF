@@ -316,7 +316,7 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
 .devt{display:flex;flex-wrap:wrap;gap:2px 12px;font:500 12px var(--f-mono);margin-top:12px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--soft);color:var(--ink)}
 .devt b{width:100%;font-family:var(--f-body)}
 .qtext-rv .devt{font-weight:500}
-#nl-sound .vkt,#int-sound .vkt,#srw-sound .vkt{width:100%;table-layout:auto}#nl-sound .vkt td+td,#int-sound .vkt td+td,#srw-sound .vkt td+td{white-space:normal}</style>
+#nl-sound .vkt,#int-sound .vkt,#srw-sound .vkt{width:100%;table-layout:auto}#nl-sound .vkt td+td,#int-sound .vkt td+td,#srw-sound .vkt td+td{white-space:normal}#regs-list .rg{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}#regs-list .rg a{font-weight:600}#regs-list .rg small{display:block;color:var(--muted);font-weight:400}#regs-list .rg button{white-space:nowrap}#pdfv{position:fixed;inset:0;z-index:9999;background:#525659;display:flex;flex-direction:column}#pdfv[hidden]{display:none}.pdfv-bar,.pdfv-bar2{display:flex;gap:8px;align-items:center;padding:8px 10px;background:var(--bg,#fff);color:var(--ink,#111)}.pdfv-bar{padding-top:calc(8px + env(safe-area-inset-top))}.pdfv-bar b{flex:1;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pdfv-bar button{font-size:20px;background:none;border:0;padding:4px 8px;color:inherit}.pdfv-bar2 input[type=search]{flex:1;min-width:0}#pdfv-pages{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:8px 0}#pdfv-pages .pp{margin:0 auto 8px;background:#fff;position:relative}#pdfv-pages canvas{display:block;width:100%;height:100%}#pdfv-pages .pp.hit{outline:3px solid #f5b400}</style>
 
 <header class="top">
   <div class="top-row">
@@ -1258,7 +1258,7 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
 <div data-rsub="waters" id="waters">
 <div><div class="eyebrow">On the water</div><h2 class="vkh">Waters: <span id="reg-title">rules</span></h2></div>
 <div class="pc-ctl" style="margin:6px 0 4px"><span class="lbl">Rules</span><span class="chips" id="reg-pick">
-  <button data-reg-pick="colreg">BVA/COLREG</button><button data-reg-pick="bpr">BPR</button><button data-reg-pick="rpr">RPR</button><button data-reg-pick="srt">SRT</button><button data-reg-pick="srw">SRW</button><button data-reg-pick="sre">SRE</button><button data-reg-pick="srkgt">SRKGT</button><button data-reg-pick="srgm">SRGM</button><button data-reg-pick="sjo">Sjøveisreglene</button></span></div>
+  <button data-reg-pick="colreg">BVA/COLREG</button><button data-reg-pick="bpr">BPR</button><button data-reg-pick="rpr">RPR</button><button data-reg-pick="srt">SRT</button><button data-reg-pick="srw">SRW</button><button data-reg-pick="sre">SRE</button><button data-reg-pick="srkgt">SRKGT</button><button data-reg-pick="srgm">SRGM</button><button data-reg-pick="sjo">Sjøveisreglene</button></span></div><p style="margin:4px 0 8px"><a href="#regs-lib" id="reg-doc" data-go="regs-lib">📄 Official text of this regulation</a></p>
 <p id="reg-auto" class="srcs" style="margin:2px 0 8px">Tap a regulation, or pick it on the map further down (“Where am I?”). With GPS on it is chosen from your position.</p>
 
 
@@ -1862,7 +1862,15 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
 </div>
 <div data-rsub="gen" id="general">
   <div><div class="eyebrow">General</div><h2 class="vkh">General</h2></div>
-  <div class="panel sec" id="hire"><h2>Hiring a boat <span class="lead" style="font-size:14px;font-weight:400">(boot huren)</span></h2>
+  <div class="panel sec" id="regs-lib"><h2>Regulations on board — official texts <span class="lx nbv nlt" lang="nl" data-l="nl">(reglementen aan boord)</span></h2>
+<p>The BPR (art. 1.10), SRW and RPR require the current regulation on board, printed or digital, and with a VHF set also the radiocommunication handbook. Tap a title to read it in the app; <b>Save offline</b> keeps it on this phone.</p>
+<div id="regs-list"><p class="muted">Loading…</p></div>
+<p><button class="btn" id="regs-all" type="button">Save all offline</button> <span id="regs-msg" class="muted"></span></p>
+<p class="srcs">Official texts: wetten.overheid.nl (geconsolideerde tekst), Centrale Commissie voor de Rijnvaart (ccr-zkr.org), lovdata.no. Check the date shown: an older copy is not the current text.</p></div>
+<div id="pdfv" hidden><div class="pdfv-bar"><button type="button" id="pdfv-x" aria-label="Close">✕</button><b id="pdfv-t"></b><span id="pdfv-pg"></span></div>
+<div class="pdfv-bar2"><input id="pdfv-q" type="search" placeholder="Find (e.g. artikel 6.16)" enterkeyhint="search"><button type="button" id="pdfv-go">Find</button><input id="pdfv-n" type="number" min="1" inputmode="numeric" placeholder="page" style="width:64px"><span id="pdfv-hits"></span></div>
+<div id="pdfv-pages"></div></div>
+<div class="panel sec" id="hire"><h2>Hiring a boat <span class="lead" style="font-size:14px;font-weight:400">(boot huren)</span></h2>
     <p>Which name and identity you give depends on the boat and on which radio you use. The rule: the <b>name</b> is the boat's (so rescuers know what to look for); the <b>radio identity</b> (MMSI, call sign) belongs to the transmitter you are using.</p>
     <div class="tbl"><table><thead><tr><th>Situation</th><th>Say as name</th><th>Identity (call sign / MMSI)</th></tr></thead><tbody>
       <tr><td>Boat has a fixed VHF: <b>use it</b> (more power, higher antenna)</td><td>Boat's name</td><td>The <b>boat's</b> call sign and MMSI</td></tr>
@@ -5182,4 +5190,54 @@ document.getElementById("regmap-gps").onclick=()=>{try{sessionStorage.removeItem
 })();
 </script>
 <script>document.addEventListener("click",e=>{const a=e.target.closest("a[data-go]");if(!a)return;e.preventDefault();if(window.smGoTo)window.smGoTo(a.dataset.go);else location.hash=a.dataset.go});</script>
+<script type="module">
+const list=document.getElementById("regs-list");if(list){
+const RC="sm-regs",base=new URL("./",location.href).href;
+const fmt=b=>b>1048576?(b/1048576).toFixed(1)+" MB":Math.round(b/1024)+" kB";
+let items=[];
+async function cached(u){try{return !!(await (await caches.open(RC)).match(new URL(u,base).href))}catch(e){return false}}
+async function render(){
+ try{items=await (await fetch("regs/index.json",{cache:"no-store"})).json()}catch(e){try{const c=await caches.open(RC);const r=await c.match(new URL("regs/index.json",base).href);if(r)items=await r.json()}catch(x){}}
+ let h="";for(const it of items){
+  if(it.file){const off=await cached(it.file);
+   h+=`<div class="rg"><div><a href="${it.file}" data-pdf="${it.file}" data-t="${it.title}">${it.title}</a><small>Text as of ${it.date||"?"} · ${fmt(it.bytes)} · ${off?"✓ saved offline":"online only"}</small></div>${off?"":`<button class="btn" data-save="${it.file}" type="button">Save offline</button>`}</div>`}
+  else h+=`<div class="rg"><div>${it.title}<small>Not yet in the app${it.optional?" (optional)":""} — official source: ${it.src.startsWith("http")&&!it.src.includes(" ")?`<a href="${it.src}" target="_blank" rel="noopener">link</a>`:it.src}</small></div></div>`}
+ list.innerHTML=h||"<p>No texts yet.</p>"}
+async function save(u){const c=await caches.open(RC);const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw new Error(r.status);await c.put(new URL(u,base).href,r);try{await c.put(new URL("regs/index.json",base).href,await fetch("regs/index.json",{cache:"no-store"}))}catch(e){}}
+list.addEventListener("click",async e=>{const b=e.target.closest("[data-save]");if(b){b.disabled=true;b.textContent="Saving…";try{await save(b.dataset.save)}catch(x){b.textContent="Failed"}render();return}
+ const a=e.target.closest("[data-pdf]");if(a){e.preventDefault();openPdf(a.dataset.pdf,a.dataset.t)}});
+document.getElementById("regs-all").addEventListener("click",async()=>{const m=document.getElementById("regs-msg");let n=0;for(const it of items)if(it.file&&!(await cached(it.file))){m.textContent="Saving "+it.title+"…";try{await save(it.file);n++}catch(x){}}m.textContent=n?"Saved "+n+".":"All saved.";render()});
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+render();
+/* ---- viewer ---- */
+const V=document.getElementById("pdfv"),PG=document.getElementById("pdfv-pages");let lib=null,doc=null,io=null,texts=[];
+async function openPdf(u,t){V.hidden=false;document.body.style.overflow="hidden";document.getElementById("pdfv-t").textContent=t;PG.innerHTML='<p style="color:#fff;padding:16px">Loading…</p>';texts=[];
+ history.pushState({pdfv:1},"");
+ if(!lib){lib=await import("./lib/pdfjs/pdf.min.mjs");lib.GlobalWorkerOptions.workerSrc=new URL("lib/pdfjs/pdf.worker.min.mjs",base).href}
+ let buf;const c=await caches.open(RC);let r=await c.match(new URL(u,base).href);
+ if(!r){r=await fetch(u);if(r.ok){try{await c.put(new URL(u,base).href,r.clone())}catch(e){}}}
+ buf=await r.arrayBuffer();doc=await lib.getDocument({data:buf}).promise;PG.innerHTML="";
+ const w=Math.min(PG.clientWidth-8,900),p1=await doc.getPage(1),vp1=p1.getViewport({scale:1}),ratio=vp1.height/vp1.width;
+ io=new IntersectionObserver(es=>{for(const en of es)if(en.isIntersecting&&!en.target.dataset.done){en.target.dataset.done=1;draw(en.target)}},{root:PG,rootMargin:"600px 0px"});
+ for(let i=1;i<=doc.numPages;i++){const d=document.createElement("div");d.className="pp";d.dataset.n=i;d.style.width=w+"px";d.style.height=Math.round(w*ratio)+"px";PG.appendChild(d);io.observe(d)}
+ document.getElementById("pdfv-pg").textContent=doc.numPages+" p.";render()}
+async function draw(d){const pg=await doc.getPage(+d.dataset.n),w=d.clientWidth,vp0=pg.getViewport({scale:1}),sc=w/vp0.width,dpr=Math.min(window.devicePixelRatio||1,2),vp=pg.getViewport({scale:sc*dpr});
+ d.style.height=Math.round(vp0.height*sc)+"px";const cv=document.createElement("canvas");cv.width=vp.width;cv.height=vp.height;d.appendChild(cv);await pg.render({canvasContext:cv.getContext("2d"),viewport:vp}).promise}
+function close(){V.hidden=true;document.body.style.overflow="";if(io)io.disconnect();PG.innerHTML="";if(doc){doc.destroy();doc=null}}
+document.getElementById("pdfv-x").addEventListener("click",()=>{if(history.state&&history.state.pdfv)history.back();else close()});
+addEventListener("popstate",()=>{if(!V.hidden)close()});
+function goPage(n){const d=PG.querySelector(`.pp[data-n="${n}"]`);if(d)PG.scrollTop=d.offsetTop-PG.offsetTop-8}
+document.getElementById("pdfv-n").addEventListener("change",e=>goPage(+e.target.value));
+let hits=[],hi=0;
+async function find(){const q=document.getElementById("pdfv-q").value.trim().toLowerCase();if(!q||!doc)return;const out=document.getElementById("pdfv-hits");
+ if(!texts.length){out.textContent="indexing…";for(let i=1;i<=doc.numPages;i++){const tc=await (await doc.getPage(i)).getTextContent();texts[i]=tc.items.map(x=>x.str).join(" ").replace(/\s+/g," ").toLowerCase()}}
+ const nh=[];for(let i=1;i<=doc.numPages;i++)if(texts[i]&&texts[i].includes(q))nh.push(i);
+ if(nh.join()!==hits.join()){hits=nh;hi=0}else hi=(hi+1)%Math.max(1,hits.length);
+ PG.querySelectorAll(".pp.hit").forEach(x=>x.classList.remove("hit"));
+ if(!hits.length){out.textContent="0";return}hits.forEach(n=>{const d=PG.querySelector(`.pp[data-n="${n}"]`);if(d)d.classList.add("hit")});out.textContent=`p.${hits[hi]} (${hi+1}/${hits.length})`;goPage(hits[hi])}
+document.getElementById("pdfv-go").addEventListener("click",find);document.getElementById("pdfv-q").addEventListener("keydown",e=>{if(e.key==="Enter")find()});
+document.getElementById("reg-doc")?.addEventListener("click",e=>{const cur=document.querySelector("[data-reg-pick][aria-pressed=true]")?.dataset.regPick;const id=({colreg:"bva",srt:"bva",bpr:"bpr",rpr:"rpr",srw:"srw",sre:"sre",srkgt:"srkgt",sjo:"sjo"})[cur];const it=items.find(x=>x.id===id);if(it&&it.file){e.preventDefault();e.stopImmediatePropagation();openPdf(it.file,it.title)}},true);
+window.smOpenReg=id=>{const it=items.find(x=>x.id===id);if(it&&it.file)openPdf(it.file,it.title);else if(window.smGoTo)smGoTo("regs-lib")};
+}
+</script>
 <script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}</script></body></html>

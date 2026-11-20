@@ -296,6 +296,7 @@ footer.src{font-size:13px;color:var(--muted);text-align:center}
 
 /* KVB courses */
 .seg.course{grid-template-columns:repeat(4,auto);justify-content:stretch}
+.seg.rsub{grid-template-columns:repeat(4,1fr);margin:6px 0 10px;position:sticky;top:64px;z-index:5}.seg.rsub button{padding:8px 4px;white-space:nowrap;font-size:14px}
 .seg.course button{padding:8px 6px;white-space:nowrap}
 figure.dsf{margin:10px 0}figure.dsf svg{width:100%;max-width:520px;height:auto;display:block}
 figure.dsf figcaption{font-size:13px;color:var(--muted);margin-top:4px;max-width:520px}
@@ -717,9 +718,539 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
   </div>
 </section>
 
-<!-- ============ WATERS ============ -->
-<section class="view" id="v-waters" data-tab="waters">
-  <div><div class="eyebrow">On the water</div><h1 style="font-size:26px">Waters</h1>
+
+
+<!-- ============ REFERENCE ============ -->
+<section class="view" id="v-reference" data-tab="reference">
+  <div><div class="eyebrow">Look it up</div><h1 style="font-size:26px">Reference</h1></div>
+  <div class="seg rsub js-only" role="group" aria-label="Reference section">
+    <button data-r-pick="nav" aria-pressed="true">Navigation</button>
+    <button data-r-pick="vhf" aria-pressed="false">VHF</button>
+    <button data-r-pick="waters" aria-pressed="false">Waters</button>
+    <button data-r-pick="gen" aria-pressed="false">General</button>
+  </div>
+  <style>
+    .pc-pos{border:1px solid var(--line);border-radius:10px;background:var(--soft);padding:12px 14px;margin:8px 0}
+    .pc-ll{font-family:var(--f-mono);font-weight:600;font-size:clamp(24px,7vw,34px);line-height:1.25;letter-spacing:.01em}
+    .pc-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:6px 12px;margin-top:8px}
+    .pc-stats div{font-size:13px;color:var(--muted)}
+    .pc-stats b{display:block;font-family:var(--f-mono);font-size:18px;color:var(--ink)}
+    .pc-btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+    .pc-btns button{font-size:15px}
+    .pc-map{height:62vh;min-height:340px;max-height:720px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--soft);position:relative;z-index:0}
+    .pc-map .leaflet-container{font-family:var(--f-body)}
+    .pc-grid{position:absolute;inset:0;pointer-events:none;z-index:450}
+    .pc-ctl{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px;align-items:center}
+    .pc-ctl .lbl{font-size:13px;color:var(--muted);margin-right:2px}
+    .pc-read{font-family:var(--f-mono);font-size:14px;margin:6px 0;min-height:1.4em}
+    .pc-prog{height:8px;border-radius:999px;background:var(--line);overflow:hidden;margin:8px 0}
+    .pc-prog i{display:block;height:100%;width:0;background:var(--accent)}
+    .pc-tzlbl{background:rgba(250,238,218,.92);color:#633806;border-radius:6px;padding:1px 6px;font-size:12px;white-space:nowrap;font-family:var(--f-mono);border:1px solid rgba(186,117,23,.5)}
+    .pc-nm{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-family:var(--f-mono);font-size:12px}
+    .pc-scale{background:rgba(255,255,255,.85);border:2px solid #0e2233;border-top:0;font:600 12px var(--f-mono);color:#0e2233;padding:0 4px;text-align:center}
+    #pc-globe{background:#0b1a2a}
+    .pc-onmap{background:rgba(255,255,255,.93);border:1px solid rgba(0,0,0,.25);border-radius:8px;padding:5px 8px;font:600 15px/1.3 var(--f-mono);color:#0e2233;cursor:pointer;text-align:right}
+    .pc-onmap small{display:block;font:500 11px var(--f-mono);color:#555}
+    .pc-radio{font-size:14px;line-height:1.5;margin:4px 0 8px}
+    .pc-search{display:flex;gap:6px;margin:10px 0 4px}
+    .pc-search input{flex:1;min-width:0;font-size:16px;padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink)}
+    .pc-sres{display:flex;flex-direction:column;gap:4px;margin:4px 0 6px}
+    .pc-sres button{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:14px;color:var(--ink)}
+    .pc-mlist{list-style:none;padding:0;margin:6px 0;display:flex;flex-direction:column;gap:6px}
+    .pc-mlist li{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface)}
+    .pc-mlist .mpos{font-family:var(--f-mono);font-size:14px}
+    .pc-mlist .mact{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+    .pc-mlist .mact button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:13px;cursor:pointer;color:var(--ink)}
+    .pc-mk{width:14px;height:14px;border-radius:50% 50% 50% 0;background:#D85A30;border:2px solid #fff;transform:rotate(-45deg);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+    .pc-gl{font:600 11px var(--f-mono);color:#0e3c6e;background:rgba(255,255,255,.85);border-radius:4px;padding:0 4px;white-space:nowrap;pointer-events:none}
+    .pc-pl{font:12px var(--f-body);color:#26215C;background:rgba(255,255,255,.88);border-radius:4px;padding:0 5px;white-space:nowrap;pointer-events:none;transform:translate(52%,0)}
+    .pc-pl::before{content:'';position:absolute;left:-9px;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;background:#7F77DD;border:1.5px solid #fff}
+    .pc-gscale{position:absolute;left:8px;bottom:22px;z-index:2}
+    :root.night #pc-globe canvas{filter:grayscale(1) brightness(.55) sepia(1) hue-rotate(-50deg) saturate(6)}
+    :root.night .pc-map .leaflet-tile-pane{filter:grayscale(1) brightness(.55) sepia(1) hue-rotate(-50deg) saturate(6)}
+  </style>
+<div data-rsub="nav" id="navigation">
+  <div><div class="eyebrow">Navigation</div><h2 class="vkh">Position, chart and courses</h2></div>
+  <div class="panel sec js-only" id="poschart"><h2>Position and chart <span class="cx nbv nlt" lang="nl" data-c="nl">(Positie en kaart)</span><span class="cx nbv nlt" lang="nb" data-c="no">(Posisjon og kart)</span></h2>
+    <p class="lead" style="font-size:15px">Your phone's GPS position in chart notation, with charts that keep working offline.</p>
+    <div class="pc-pos" aria-live="polite">
+      <div class="pc-ll" id="pc-lat">--°--.---′N</div>
+      <div class="pc-ll" id="pc-lon">---°--.---′E</div>
+      <div class="pc-stats">
+        <div>SOG<b id="pc-sog">– kn</b></div>
+        <div>COG<b id="pc-cog">–°T</b></div>
+        <div>Accuracy<b id="pc-acc">– m</b></div>
+        <div>UTC<b id="pc-utc">--:--:--</b></div>
+        <div>Fix<b id="pc-age">–</b></div>
+      </div>
+    </div>
+    <div class="pc-btns">
+      <button class="primary" id="pc-gps">Start GPS</button>
+      <button class="ghost" id="pc-copy">Copy position</button>
+      <button class="ghost" id="pc-follow" aria-pressed="true">Follow: on</button>
+      <button class="ghost" id="pc-wake" aria-pressed="false">Keep screen on: off</button>
+    </div>
+    <p class="pc-read" id="pc-msg" style="font-family:var(--f-body);color:var(--muted);font-size:13px"></p>
+    <details id="pc-radiobox"><summary>Say it on the radio</summary><p class="pc-radio" id="pc-radio">Start GPS to get your position read-out.</p></details>
+
+    <form class="pc-search" id="pc-sform" role="search"><input id="pc-q" type="search" placeholder="Search a place, e.g. Sauda" autocomplete="off" enterkeyhint="search"><button class="ghost" type="submit">Search</button></form>
+    <div class="pc-sres" id="pc-sres"></div>
+    <div class="pc-ctl"><span class="lbl">View</span><span class="chips" id="pc-view">
+      <button data-v="flat" aria-pressed="true">Flat</button>
+      <button data-v="globe" aria-pressed="false">Globe</button></span></div>
+    <div class="pc-ctl"><span class="lbl">Chart</span><span class="chips" id="pc-base">
+      <button data-b="osm" aria-pressed="true">OpenStreetMap</button>
+      <button data-b="sjo" aria-pressed="false">Sea chart Norway</button>
+      <button data-b="topo" aria-pressed="false">Topo Norway</button></span></div>
+    <div class="pc-ctl"><span class="lbl">Layers</span><span class="chips" id="pc-ovl">
+      <button data-o="seamark" aria-pressed="true">Seamarks</button>
+      <button data-o="grid" aria-pressed="true">Lat/long grid</button>
+      <button data-o="tz" aria-pressed="false">Time zones</button>
+      <button data-o="places" aria-pressed="false">Places on meridians</button>
+      <button data-o="measure" aria-pressed="false">Measure (nm)</button></span></div>
+    <div class="pc-map" id="pc-map" role="application" aria-label="Chart"></div>
+    <div class="pc-map" id="pc-globe" role="application" aria-label="Globe chart" hidden></div>
+    <div class="pc-read" id="pc-read">Tap the chart for a position.</div>
+    <div class="pc-btns" style="margin-top:0">
+      <button class="ghost" id="pc-clr" hidden>Clear measurement</button>
+      <button class="ghost" id="pc-me">Centre on me</button>
+    </div>
+    <h3 style="font-size:17px;margin:14px 0 2px">Markers</h3>
+    <p style="font-size:14px;color:var(--muted)">Tap the chart and choose <b>Save marker</b>, or mark where you are. Markers are kept on this phone.</p>
+    <div class="pc-btns"><button class="ghost" id="pc-markme">Mark my position</button><button class="ghost" id="pc-mcopy">Copy all markers</button></div>
+    <ol class="pc-mlist" id="pc-mlist"></ol>
+
+    <details><summary><b>Offline charts</b> — store the Norwegian sea chart on this phone</summary>
+      <p>Charts you have looked at are kept automatically. To be sure you have them at sea, store an area before you go (on Wi-Fi). The download covers Kartverket's Norwegian sea chart; OpenStreetMap does not allow bulk downloads, so it only works offline for areas you have viewed.</p>
+      <div class="pc-btns">
+        <button class="ghost" data-dl="ov">Norway 58–66°N, overview (zoom ≤ 11)</button>
+        <button class="ghost" data-dl="z12">Norway 58–66°N, extra detail (zoom 12)</button>
+        <button class="ghost" data-dl="view">This view, full detail (to zoom 15)</button>
+      </div>
+      <div class="pc-prog" aria-hidden="true"><i id="pc-bar"></i></div>
+      <p class="pc-read" id="pc-dl" style="font-family:var(--f-body);font-size:14px">Nothing downloading.</p>
+      <div class="pc-btns"><button class="ghost" id="pc-cancel" disabled>Cancel download</button><button class="ghost" id="pc-wipe">Delete stored charts</button></div>
+      <p class="srcs" id="pc-store"></p>
+    </details>
+
+    <p class="cnote"><b class="cflag">!</b>Phone GPS and these charts are an aid, not a replacement for your plotter and official charts. Kartverket's raster sea chart is not approved for navigation.</p>
+    <p class="cx nbv cnote" lang="nl" data-c="nl"><b class="cflag">NL</b>Telefoon-GPS en deze kaarten zijn een hulpmiddel, geen vervanging van je plotter en officiële kaarten.</p>
+    <p class="cx nbv cnote" lang="nb" data-c="no"><b class="cflag">NO</b>Kartverkets rasterkart er ikke godkjent for navigasjon. Bruk offisielle sjøkart og kartplotter.</p>
+    <p class="srcs">Charts: © OpenStreetMap contributors, OpenSeaMap, © Kartverket (CC BY 4.0). Time zones: Natural Earth. Distances are rhumb lines (the course you steer), 1 nm = 1852 m.</p>
+  </div>
+
+  <div class="panel sec" id="course-plot"><h2>Plotting courses: EP and course to steer <span class="cx nbv nlt" lang="nl" data-c="nl">(koers bepalen)</span></h2>
+    <p class="lead" style="font-size:15px">Two questions, two constructions: <b>“Where am I?”</b> puts the tidal stream at the <b>end</b>; <b>“What do I steer?”</b> puts it at the <b>start</b>.</p>
+    <h3>The terms</h3>
+    <div class="ktw"><table class="kt">
+      <tr><th>English</th><th>Abbr.</th><th>Dutch</th></tr>
+      <tr><td>Departure point</td><td></td><td>Vertrekpunt</td></tr>
+      <tr><td>Compass heading</td><td>C</td><td>Kompaskoers (KK)</td></tr>
+      <tr><td>Deviation</td><td>Dev</td><td>Deviatie</td></tr>
+      <tr><td>Magnetic heading</td><td>M</td><td>Magnetische koers (MK)</td></tr>
+      <tr><td>Variation</td><td>Var</td><td>Variatie (misweijzing)</td></tr>
+      <tr><td>True heading</td><td>T</td><td>Ware koers (WK)</td></tr>
+      <tr><td>Leeway (wind)</td><td></td><td>Drift</td></tr>
+      <tr><td>Water track</td><td></td><td>Behouden ware koers (BWK)</td></tr>
+      <tr><td>Tidal stream: set (direction) and rate/drift (speed)</td><td></td><td>Stroom</td></tr>
+      <tr><td>Ground track / course over ground</td><td>COG</td><td>Grondkoers</td></tr>
+      <tr><td>Speed through the water (log)</td><td>STW</td><td>Snelheid door het water</td></tr>
+      <tr><td>Speed over ground</td><td>SOG</td><td>Snelheid over de grond</td></tr>
+      <tr><td>Estimated position</td><td>EP</td><td>Gegiste positie</td></tr>
+      <tr><td>Course to steer</td><td>CTS</td><td>Te sturen koers</td></tr>
+    </table></div>
+    <p><b>Watch the word “drift”.</b> In English <i>drift</i> is the speed of the tidal stream. What Dutch calls <i>drift</i> (the wind pushing you sideways) is <b>leeway</b> in English.</p>
+    <h3>The chain of courses</h3>
+    <p style="font-family:var(--f-mono);font-size:14px">Compass → +deviation → Magnetic → +variation → True → +leeway → Water track → +tidal stream → Ground track</p>
+    <p>Memory aid: <b>“Can Dead Men Vote Twice”</b> = Compass, Deviation, Magnetic, Variation, True.</p>
+    <h3>1 · “Where am I?” — estimated position (EP): stream at the <u>end</u></h3>
+    <ol>
+      <li>Start at the <b>departure point</b>.</li>
+      <li>Draw the <b>water track</b>, length = STW × time.</li>
+      <li>At its <b>end</b>, draw the <b>tidal stream</b> for the same time.</li>
+      <li>Where you end up is the <b>EP</b>. The line from the departure point to the EP is your <b>ground track</b> (COG); its length ÷ time is your <b>SOG</b>.</li>
+    </ol>
+    <p>You work forwards: from what you steered to where you are. With a real fix (bearings or GPS), the line from your EP <i>without</i> stream to the fix is the stream you actually had.</p>
+    <h3>2 · “What do I steer?” — course to steer (CTS): stream at the <u>start</u></h3>
+    <ol>
+      <li>Draw the <b>ground track</b> from the departure point to the destination.</li>
+      <li>From the <b>departure point</b>, draw the <b>tidal stream</b> for 1 hour.</li>
+      <li>From the end of that stream vector, swing an arc with your <b>STW</b> (1 hour) until it cuts the ground track.</li>
+      <li>The line to that point is your <b>water track</b>; the distance along the ground track to the cut is your <b>SOG</b>.</li>
+      <li>Work back: remove leeway → <b>true heading</b>, remove variation → <b>magnetic heading</b>, remove deviation → <b>compass heading</b>. That is what you steer.</li>
+    </ol>
+    <p>You work backwards: from where you want to go to what you steer.</p>
+    <p class="cnote"><b class="cflag">!</b>All vectors must cover the <b>same time</b>, usually 1 hour. For an EP the order of the vectors gives the same end point, but exams expect water track first, then stream. For a course to steer the construction only works with the stream at the start.</p>
+    <p class="cx nbv cnote" lang="nl" data-c="nl"><b class="cflag">NL</b>Ezelsbruggetje: <b>Waar ben ik?</b> → eerst het water, de stroom achteraan (gegiste positie). <b>Waar moet ik op sturen?</b> → eerst de stroom vanaf het vertrekpunt, dan de passer met je eigen vaart (te sturen koers). Terugrekenen: BWK − drift = WK, WK − variatie = MK, MK − deviatie = KK.</p>
+  </div>
+
+  <div class="panel sec" id="posconv"><h2>Position converter</h2>
+    <p>Google Maps and phones show <b>decimal degrees</b> (50.9174962, -4.7981849). At sea you give <b>degrees and decimal minutes</b>: multiply the decimals by 60. Plus = N / E, minus = S / W. Longitude has three digits for the degrees.</p>
+    <div class="quick js-only"><input id="rc-in" placeholder="paste e.g. 50.9174962, -4.7981849" aria-label="Decimal coordinates"><div id="rc-out" class="conv-out"><p class="lead" style="font-size:14px;margin:.4em 0">Paste latitude, longitude as decimals, e.g. 50.9174962, -4.7981849</p></div></div>
+    <p class="note">Example: 50.9174962, -4.7981849 → <b class="mono">50° 55.05' N, 004° 47.89' W</b>. On the radio, read the figures out digit by digit.</p>
+  </div>
+</div>
+<div data-rsub="vhf" id="vhf-ref">
+  <div><div class="eyebrow">VHF</div><h2 class="vkh">Radio reference</h2></div>
+  <div class="panel sec" id="myradio"><h2>My radio: Icom IC-M94DE</h2>
+    <p class="lead" style="font-size:15px">Handheld marine VHF with DSC, GPS and AIS receiver.</p>
+    <dl class="dl">
+      <dt>Power</dt><dd>6 W high; Low via the High/Low soft key ("HI"/"LOW" on screen). Some channels are low-power only.</dd>
+      <dt>DSC</dt><dd>Class H. Distress key on the back, under a cover.</dd>
+      <dt>GPS</dt><dd>Built in: position goes into DSC alerts automatically. Navigation to up to 50 waypoints.</dd>
+      <dt>AIS</dt><dd>Receive only: shows ships around you on a plotter (AIS soft key or [MENU] → AIS → Plotter), with a CPA/TCPA alarm. It does not transmit AIS.</dd>
+      <dt>Floats</dt><dd>Float'n Flash: screen, keys and distress key flash when it's in the water. IPX7 (1 m for 30 min).</dd>
+      <dt>Battery</dt><dd>BP-306 Li-ion, ~2400 mAh, about 10 h normal use. Weight 358 g.</dd>
+      <dt>Audio</dt><dd>1500 mW, noise cancelling, AquaQuake to clear water from the speaker.</dd>
+      <dt>Watch</dt><dd>Dualwatch (with ch 16) and Tri-watch (16 + call channel).</dd>
+    </dl>
+    <p><a href="sim.html">Practise on the virtual IC-M94DE simulator →</a></p>
+    <h4>Keys you need</h4>
+    <ul>
+      <li><b>[16/C]</b>: channel 16. Hold 1 s: call channel.</li>
+      <li><b>[VOL/SQL]</b>: once = volume, twice = squelch; adjust with the arrows, then [ENT]. Hold = open squelch to listen.</li>
+      <li><b>[DISTRESS]</b> (under the cover): hold 3 s to send a distress alert.</li>
+      <li><b>Man Overboard</b> soft key: starts MOB mode (press again to stop). With MOB Auto Set on, the nature of distress becomes "Man Overboard" for 30 s after an MOB waypoint or water detection. Pressing [DISTRESS] while Float'n Flash is active sends an MOB distress alert.</li>
+      <li><b>Individual DSC call:</b> Compose Other → Message Type → Individual → Address (or Manual Input) → Channel → send.</li>
+    </ul>
+    <h4>Set up once</h4>
+    <ul>
+      <li><b>MMSI</b>: entered once at the first power-on (hold power, then [ENT]). Skip it and DSC calls are blocked. Get it right: you can't change it yourself.</li>
+      <li><b>ATIS ID</b>: [MENU] → ATIS ID Input, 10 digits, once. The manual says this is available on the <b>HOL and FRG versions only</b>.</li>
+      <li><b>Channel group</b>: [MENU] → Settings → Radio → Channel Group (International, ATIS, … depending on version).</li>
+    </ul>
+    <p class="cx env cnote" data-c="nl"><b class="cflag">NL</b><b>Check before you buy:</b> on Dutch inland waters ATIS is mandatory and power max 1 W, and DSC is not allowed. The Dutch dealer <a href="https://www.georgekniest.nl/artikel/317713/icom-ic-m94de-handmarifoon-dsc-gps-ais-ontvanger.html" target="_blank" rel="noopener">George Kniest</a> lists the IC-M94DE with ATIS and can program your ATIS code and MMSI with the order. A UK-bought unit may be a version without ATIS input. Check that LOW is 1 W or less. Register it with RDI first and give the dealer the ATIS code and MMSI you receive.</p>
+    <p class="cx nbv cnote" lang="nl" data-c="nl"><b class="cflag">NL</b><b>Controleer vóór aankoop:</b> op de Nederlandse binnenwateren is ATIS verplicht, maximaal 1 W, en is DSC niet toegestaan. De Nederlandse dealer <a href="https://www.georgekniest.nl/artikel/317713/icom-ic-m94de-handmarifoon-dsc-gps-ais-ontvanger.html" target="_blank" rel="noopener">George Kniest</a> levert de IC-M94DE met ATIS en kan je ATIS-code en MMSI bij de bestelling programmeren. Een in de UK gekocht exemplaar kan een versie zonder ATIS-invoer zijn. Controleer dat LOW 1 W of minder is. Registreer eerst bij de RDI en geef de dealer de ATIS-code en het MMSI die je krijgt.</p>
+    <p class="cx env cnote" data-c="no"><b class="cflag">NO</b>Program the MMSI from your Norwegian VHF licence, or the DISTRESS key won't work.</p>
+    <p class="cx nbv cnote" lang="nb" data-c="no"><b class="cflag">NO</b>Programmer MMSI-nummeret fra den norske VHF-lisensen din, ellers virker ikke DISTRESS-knappen (nødknappen).</p>
+    <h4>Battery care</h4>
+    <ul><li>Switch the radio off before charging; charge at 15–40 °C; about 4 h. Don't transmit while charging; don't charge a wet pack.</li>
+      <li>Replace the pack about every 5 years or after 300–500 charges. In extreme temperatures the radio forces Low power.</li></ul>
+    <h4>Documents</h4>
+    <ul>
+      <li><a href="https://icomuk.co.uk/IC-M94DE/Handheld-VHF-Marine-Radio" target="_blank" rel="noopener">Product page (Icom UK)</a> · <a href="https://icomuk.co.uk/files/icom/PDF/productManual/IC-M94D_M94DE_ENG_IM_5.pdf" target="_blank" rel="noopener">Instruction manual (PDF)</a> · <a href="https://icomuk.co.uk/files/icom/PDF/productLeaflet/IC-M94DE.pdf" target="_blank" rel="noopener">Leaflet (PDF)</a></li>
+      <li><a href="https://icomuk.co.uk/files/icom/PDF/radioGuide/DSC_Handheld_Facts_18.pdf" target="_blank" rel="noopener">Handheld DSC VHF radios</a> · <a href="https://icomuk.co.uk/files/icom/PDF/radioGuide/GUIDE_TO_MARINE_RADIO_18.pdf" target="_blank" rel="noopener">Icom guide to marine radio</a> · <a href="https://icomuk.co.uk/files/icom/PDF/radioGuide/ATIS-UPGRADE_2018.pdf" target="_blank" rel="noopener">ATIS upgrade</a> · <a href="https://icomuk.co.uk/files/icom/PDF/radioGuide/INLAND_WATERWAYS_2018.pdf" target="_blank" rel="noopener">VHF on inland waterways</a> · <a href="https://icomuk.co.uk/files/icom/PDF/radioGuide/DAY_TO_DAY_VHF_CARE_FM37.pdf" target="_blank" rel="noopener">Day-to-day VHF care</a> · <a href="https://icomuk.co.uk/Radio-Guides" target="_blank" rel="noopener">All Icom radio guides</a></li>
+    </ul>
+    <p class="srcs">From the Icom UK product page and the IC-M94D/M94DE manual. Checked 24 Oct 2026. Some details depend on the radio's version: check your own manual.</p>
+  </div>
+
+  <div class="panel sec" id="phonetic"><h2>Phonetic alphabet</h2>
+    <div class="phon" id="phon"><div><b>A</b><span>Alpha</span></div><div><b>B</b><span>Bravo</span></div><div><b>C</b><span>Charlie</span></div><div><b>D</b><span>Delta</span></div><div><b>E</b><span>Echo</span></div><div><b>F</b><span>Foxtrot</span></div><div><b>G</b><span>Golf</span></div><div><b>H</b><span>Hotel</span></div><div><b>I</b><span>India</span></div><div><b>J</b><span>Juliet</span></div><div><b>K</b><span>Kilo</span></div><div><b>L</b><span>Lima</span></div><div><b>M</b><span>Mike</span></div><div><b>N</b><span>November</span></div><div><b>O</b><span>Oscar</span></div><div><b>P</b><span>Papa</span></div><div><b>Q</b><span>Quebec</span></div><div><b>R</b><span>Romeo</span></div><div><b>S</b><span>Sierra</span></div><div><b>T</b><span>Tango</span></div><div><b>U</b><span>Uniform</span></div><div><b>V</b><span>Victor</span></div><div><b>W</b><span>Whiskey</span></div><div><b>X</b><span>X-Ray</span></div><div><b>Y</b><span>Yankee</span></div><div><b>Z</b><span>Zulu</span></div><div><b>1</b><span>One</span></div><div><b>2</b><span>Two</span></div><div><b>3</b><span>Three</span></div><div><b>4</b><span>Four</span></div><div><b>5</b><span>Five</span></div><div><b>6</b><span>Six</span></div><div><b>7</b><span>Seven</span></div><div><b>8</b><span>Eight</span></div><div><b>9</b><span>Niner</span></div><div><b>0</b><span>Zero</span></div></div>
+    <p class="lead js-only" style="font-size:14px;margin-top:10px">Spell your callsign: </p>
+    <div class="quick js-only"><input id="speller" placeholder="Type anything, e.g. MVYQ7" aria-label="Text to spell phonetically"><div id="spelled" class="script" style="font-size:18px;--k:var(--accent)"><span class="empty">The phonetic spelling appears here.</span></div></div>
+  </div>
+
+  <div class="panel sec" id="prowords"><h2>Prowords</h2>
+    <dl class="dl" id="pw"><dt>All after / All before</dt><dd>Asking for part of a message to be repeated: "say again all after a pound of sausages"</dd><dt>Correct / Wrong</dt><dd>"Correct" confirms a read-back. "Wrong" (not "incorrect") sounds completely different</dd><dt>Correction</dt><dd>Putting a mistake right: "a hundred and sixteen carrots, correction, one pound of carrots"</dd><dt>In figures / In letters</dt><dd>Distinguishing numbers and words: "Five Ashes Lane" vs "5, Ashes Lane"</dd><dt>I say again</dt><dd>I am going to repeat what I just said</dd><dt>I spell</dt><dd>I am going to spell the last word, using the phonetic alphabet</dd><dt>Out</dt><dd>End of transmission, no reply expected</dd><dt>Over</dt><dd>End of transmission, reply expected</dd><dt>Radio check</dt><dd>Please comment on the strength and quality of my transmission</dd><dt>Read back</dt><dd>Please read back the message I just passed</dd><dt>Received</dt><dd>I have received your message (not "roger")</dd><dt>Say again</dt><dd>Please repeat what you just said</dd><dt>Station calling</dt><dd>Instead of a name when you didn't hear who called you</dd><dt>Text</dt><dd>Start of a message to be written down and relayed verbatim</dd><dt>Traffic</dt><dd>General term for radio communications</dd><dt>This is</dt><dd>Identifying yourself at the start of a call</dd><dt>Wait</dt><dd>Wait, ideally with a time: "Wait five minutes"</dd><dt>Word after / Word before</dt><dd>Asking for a single word to be repeated or spelt</dd></dl>
+    <h4 style="margin-top:14px">Distress, urgency and safety prowords</h4>
+    <dl class="dl">
+      <dt>Mayday</dt><dd>Distress (from French <i>m'aidez</i>). Grave and imminent danger.</dd>
+      <dt>Mayday Relay</dt><dd>Passing on a distress message for another vessel.</dd>
+      <dt>Received Mayday</dt><dd>Acknowledging a distress message.</dd>
+      <dt>Seelonce Mayday</dt><dd>Radio silence: distress traffic in progress. Used by the casualty or the station controlling distress traffic.</dd>
+      <dt>Seelonce Feenee</dt><dd>Radio silence lifted; normal working may resume.</dd>
+      <dt>Pan-pan</dt><dd>Urgency (from French <i>panne</i>, breakdown). Very urgent message about the safety of a vessel or person.</dd>
+      <dt>Sécurité</dt><dd>Safety (pronounced "Securitay"). Navigational or meteorological warning.</dd>
+    </dl>
+    <p class="lead" style="font-size:14px">"Panpan Medico" is no longer used. "Medevac" only refers to medical transports in war.</p>
+  </div>
+
+  <div class="panel sec" id="special-ch"><h2>Channels worth memorising</h2>
+    <div class="tbl"><table><thead><tr><th>Ch</th><th>Use</th></tr></thead><tbody>
+      <tr class="cx" data-c="uk" data-a="coast"><td class="n">0</td><td>Private channel, UK Search and Rescue organisations (Coastguard, RNLI) <span class="tag">UK</span></td></tr>
+      <tr><td class="n">6, 8</td><td>Inter-ship</td></tr>
+      <tr><td class="n">11, 12, 14</td><td>Port operations</td></tr>
+      <tr><td class="n">13</td><td>Bridge-to-bridge, navigational safety</td></tr>
+      <tr class="hot"><td class="n">16</td><td><b>Distress, Safety and Calling</b></td></tr>
+      <tr class="cx" data-c="uk" data-a="coast"><td class="n">62, 63, 64</td><td>Maritime Safety Information broadcasts <span class="tag">UK</span></td></tr>
+      <tr class="cx" data-c="uk" data-a="coast"><td class="n">67</td><td>Small craft safety channel <span class="tag">UK</span></td></tr>
+      <tr class="hot"><td class="n">70</td><td><b>DSC only, no voice</b></td></tr>
+      <tr><td class="n">72, 77</td><td>Inter-ship</td></tr>
+      <tr><td class="n">75, 76</td><td>Guard band either side of 16: port ops/on-board only, max 1 W</td></tr>
+      <tr class="cx" data-c="uk" data-a="coast"><td class="n">80</td><td>Marinas (duplex) <span class="tag">UK</span></td></tr>
+      <tr class="cx" data-c="uk" data-a="coast"><td class="n">M, M2</td><td>UK private channels for marinas, yacht clubs, recreational craft; M may show as 37 or P1 <span class="tag">UK</span></td></tr>
+    </tbody></table></div>
+  </div>
+
+  <div class="panel sec" id="channels"><h2>Channel selection chart</h2>
+    <p class="note warn"><b>Changed since the handbook:</b> from 1 Jan 2023 (fully in use across Europe from 2024) channels <b>24, 25, 26, 84, 85, 86</b> are used for VDES data and can no longer be used for analogue voice duplex. Channels <b>27 and 28</b> are split into <b>1027/1028</b> (analogue simplex voice) and 2027/2028 (data). Locks and bridges that used these channels moved to others; follow the signs. Source: <a href="https://www.varendoejesamen.nl/nieuws/agentschap-telecom-wijziging-marifoonkanalen-1-januari-2023" target="_blank" rel="noopener">RDI via Varen doe je samen</a>.</p>
+    <p class="lead" style="font-size:15px">Frequencies in MHz. Duplex channels: ship transmits on the lower frequency. With semi-duplex equipment, two vessels cannot talk on a duplex channel.</p>
+    <div class="filter js-only" id="chfilter">
+      <button data-f="all" aria-pressed="true">All</button>
+      <button data-f="ship">Inter-ship</button>
+      <button data-f="port">Port ops</button>
+      <button data-f="pc">Public corr.</button>
+      <button data-f="simplex">Simplex</button>
+    </div>
+    <p class="cx env cnote" data-c="nl" data-a="inland"><b class="cflag">NL</b>Inland the uses differ from this international table: <b>10</b> = ship to ship and calling, <b>13</b> = fallback for 10, blokkanalen and lock/bridge channels vary by area (see the signs; often <b>18, 20, 22</b>), <b>31</b> often marinas, <b>72/77</b> private, <b>15/17</b> on board. DSC (70) not permitted. Cross-check: <a href="https://www.frequentieland.nl/maritiem/marifoonkanalen.htm" target="_blank" rel="noopener">Frequentieland</a>.</p>
+    <p class="cx nbv cnote" lang="nl" data-c="nl" data-a="inland"><b class="cflag">NL</b>Op het binnenwater wijkt het gebruik af van deze internationale tabel: <b>10</b> = schip–schip en aanroep, <b>13</b> = uitwijkkanaal voor 10, blokkanalen en brug- en sluiskanalen verschillen per gebied (zie de borden; vaak <b>18, 20, 22</b>), <b>31</b> vaak havens, <b>72/77</b> privé, <b>15/17</b> aan boord. DSC (70) niet toegestaan. Controle: <a href="https://www.frequentieland.nl/maritiem/marifoonkanalen.htm" target="_blank" rel="noopener">Frequentieland</a>.</p>
+    <p class="cx env cnote" data-c="nl" data-a="coast"><b class="cflag">NL</b>Kustwacht safety broadcasts on <b>23</b> and <b>83</b>. Cross-check: <a href="https://www.frequentieland.nl/maritiem/marifoonkanalen.htm" target="_blank" rel="noopener">Frequentieland</a>.</p>
+    <p class="cx nbv cnote" lang="nl" data-c="nl" data-a="coast"><b class="cflag">NL</b>Veiligheidsberichten van de Kustwacht op <b>23</b> en <b>83</b>. Controle: <a href="https://www.frequentieland.nl/maritiem/marifoonkanalen.htm" target="_blank" rel="noopener">Frequentieland</a>.</p>
+    <p class="cx env cnote" data-c="no"><b class="cflag">NO</b>VTS: <b>18, 19, 71, 80</b> (by area). Kystradio working channels vary by location; Kystradio tells you which.</p>
+    <p class="cx nbv cnote" lang="nb" data-c="no"><b class="cflag">NO</b>Sjøtrafikksentraler (VTS): <b>18, 19, 71, 80</b> (etter område). Kystradios arbeidskanaler varierer etter sted; Kystradio sier hvilken du skal bruke.</p>
+    <div class="tbl" style="max-height:70vh"><table><thead><tr><th>Ch</th><th>Ship TX</th><th>Coast TX</th><th>Use</th><th>Notes</th></tr></thead><tbody id="chbody"><tr class=""><td class="n"><b>01</b></td><td class="n">156.050</td><td class="n">160.650</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>02</b></td><td class="n">156.100</td><td class="n">160.700</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>03</b></td><td class="n">156.150</td><td class="n">160.750</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>04</b></td><td class="n">156.200</td><td class="n">160.800</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>05</b></td><td class="n">156.250</td><td class="n">160.850</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>06</b></td><td class="n">156.300</td><td class="n">–</td><td>Inter-ship</td><td>Ship to ship</td></tr><tr class=""><td class="n"><b>07</b></td><td class="n">156.350</td><td class="n">160.950</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>08</b></td><td class="n">156.400</td><td class="n">–</td><td>Inter-ship</td><td>Ship to ship</td></tr><tr class=""><td class="n"><b>09</b></td><td class="n">156.450</td><td class="n">156.450</td><td>Inter-ship · Port ops</td><td>Used by pilots</td></tr><tr class=""><td class="n"><b>10</b></td><td class="n">156.500</td><td class="n">156.500</td><td>Inter-ship · Port ops</td><td>Used by HM Coastguard</td></tr><tr class=""><td class="n"><b>11</b></td><td class="n">156.550</td><td class="n">156.550</td><td>Port ops</td><td>Port operations</td></tr><tr class=""><td class="n"><b>12</b></td><td class="n">156.600</td><td class="n">156.600</td><td>Port ops</td><td>Port operations</td></tr><tr class=""><td class="n"><b>13</b></td><td class="n">156.650</td><td class="n">156.650</td><td>Inter-ship · Port ops</td><td>Bridge-to-bridge working</td></tr><tr class=""><td class="n"><b>14</b></td><td class="n">156.700</td><td class="n">156.700</td><td>Port ops</td><td>Port operations</td></tr><tr class=""><td class="n"><b>15</b></td><td class="n">156.750</td><td class="n">156.750</td><td>Inter-ship · Port ops</td><td>On-board working</td></tr><tr class="hot"><td class="n"><b>16</b></td><td class="n">156.800</td><td class="n">156.800</td><td>–</td><td><b>DISTRESS, SAFETY AND CALLING</b></td></tr><tr class=""><td class="n"><b>17</b></td><td class="n">156.850</td><td class="n">156.850</td><td>Inter-ship · Port ops</td><td>On-board working</td></tr><tr class=""><td class="n"><b>18</b></td><td class="n">156.900</td><td class="n">161.500</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>19</b></td><td class="n">156.950</td><td class="n">161.550</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>20</b></td><td class="n">157.000</td><td class="n">161.600</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>21</b></td><td class="n">157.050</td><td class="n">161.650</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>22</b></td><td class="n">157.100</td><td class="n">161.700</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>23</b></td><td class="n">157.150</td><td class="n">161.750</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>24</b></td><td class="n">157.200</td><td class="n">161.800</td><td>Port ops · Public corr.</td><td>VDES: digital data since 2023, no analogue voice</td></tr><tr class=""><td class="n"><b>25</b></td><td class="n">157.250</td><td class="n">161.850</td><td>Port ops · Public corr.</td><td>VDES: digital data since 2023, no analogue voice</td></tr><tr class=""><td class="n"><b>26</b></td><td class="n">157.300</td><td class="n">161.900</td><td>Port ops · Public corr.</td><td>VDES satellite since 2023, no analogue voice</td></tr><tr class=""><td class="n"><b>27</b></td><td class="n">157.350</td><td class="n">161.950</td><td>Port ops (two freq.) · Public corr.</td><td>Split: 1027 = analogue simplex voice, 2027 = data</td></tr><tr class=""><td class="n"><b>28</b></td><td class="n">157.400</td><td class="n">162.000</td><td>Port ops (two freq.) · Public corr.</td><td>Split: 1028 = analogue simplex voice, 2028 = data</td></tr><tr class=""><td class="n"><b>60</b></td><td class="n">156.025</td><td class="n">160.625</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>61</b></td><td class="n">156.075</td><td class="n">160.675</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>62</b></td><td class="n">156.125</td><td class="n">160.725</td><td>Port ops · Public corr.</td><td>HMCG MSI broadcasts (UK)</td></tr><tr class=""><td class="n"><b>63</b></td><td class="n">156.175</td><td class="n">160.775</td><td>Port ops · Public corr.</td><td>HMCG MSI broadcasts (UK)</td></tr><tr class=""><td class="n"><b>64</b></td><td class="n">156.225</td><td class="n">160.825</td><td>Port ops · Public corr.</td><td>HMCG MSI broadcasts (UK)</td></tr><tr class=""><td class="n"><b>65</b></td><td class="n">156.275</td><td class="n">160.875</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>66</b></td><td class="n">156.325</td><td class="n">160.925</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>67</b></td><td class="n">156.375</td><td class="n">156.375</td><td>Inter-ship · Port ops</td><td>UK small ship safety</td></tr><tr class=""><td class="n"><b>68</b></td><td class="n">156.425</td><td class="n">156.425</td><td>Port ops</td><td></td></tr><tr class=""><td class="n"><b>69</b></td><td class="n">156.475</td><td class="n">156.475</td><td>Inter-ship · Port ops</td><td>Port operations</td></tr><tr class="hot"><td class="n"><b>70</b></td><td class="n">156.525</td><td class="n">156.525</td><td>–</td><td><b>DSC ONLY. NOT FOR VOICE</b></td></tr><tr class=""><td class="n"><b>71</b></td><td class="n">156.575</td><td class="n">156.575</td><td>Port ops</td><td></td></tr><tr class=""><td class="n"><b>72</b></td><td class="n">156.625</td><td class="n">–</td><td>Inter-ship</td><td>Ship to ship</td></tr><tr class=""><td class="n"><b>73</b></td><td class="n">156.675</td><td class="n">156.675</td><td>Inter-ship · Port ops</td><td>Used by HM Coastguard</td></tr><tr class=""><td class="n"><b>74</b></td><td class="n">156.725</td><td class="n">156.725</td><td>Port ops</td><td></td></tr><tr class=""><td class="n"><b>75</b></td><td class="n">156.775</td><td class="n">156.775</td><td>Port ops</td><td>Guard band: navigation comms, 1 W</td></tr><tr class=""><td class="n"><b>76</b></td><td class="n">156.825</td><td class="n">156.825</td><td>Port ops</td><td>Guard band: navigation comms, 1 W</td></tr><tr class=""><td class="n"><b>77</b></td><td class="n">156.875</td><td class="n">–</td><td>Inter-ship</td><td>Ship to ship</td></tr><tr class=""><td class="n"><b>78</b></td><td class="n">156.925</td><td class="n">161.525</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>79</b></td><td class="n">156.975</td><td class="n">161.575</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>80</b></td><td class="n">157.025</td><td class="n">161.625</td><td>Port ops · Public corr.</td><td>Marinas (UK only)</td></tr><tr class=""><td class="n"><b>81</b></td><td class="n">157.075</td><td class="n">161.675</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>82</b></td><td class="n">157.125</td><td class="n">161.725</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>83</b></td><td class="n">157.175</td><td class="n">161.775</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>84</b></td><td class="n">157.225</td><td class="n">161.825</td><td>Port ops · Public corr.</td><td>VDES: digital data since 2023, no analogue voice</td></tr><tr class=""><td class="n"><b>85</b></td><td class="n">157.275</td><td class="n">161.875</td><td>Port ops · Public corr.</td><td>VDES: digital data since 2023, no analogue voice</td></tr><tr class=""><td class="n"><b>86</b></td><td class="n">157.325</td><td class="n">161.925</td><td>Port ops · Public corr.</td><td>VDES satellite since 2023, no analogue voice</td></tr><tr class=""><td class="n"><b>87</b></td><td class="n">157.375</td><td class="n">157.375</td><td>Port ops</td><td></td></tr><tr class=""><td class="n"><b>88</b></td><td class="n">157.425</td><td class="n">157.425</td><td>Port ops</td><td></td></tr><tr class=""><td class="n"><b>AIS 1</b></td><td class="n">161.975</td><td class="n">161.975</td><td>–</td><td>AIS</td></tr><tr class=""><td class="n"><b>AIS 2</b></td><td class="n">162.025</td><td class="n">162.025</td><td>–</td><td>AIS</td></tr><tr class=""><td class="n"><b>M (37)</b></td><td class="n">157.850</td><td class="n">157.850</td><td>Port ops</td><td>UK private: marinas, clubs, recreational craft</td></tr><tr class=""><td class="n"><b>M2</b></td><td class="n">161.425</td><td class="n">161.425</td><td>Port ops</td><td>UK private: marinas, clubs, recreational craft</td></tr></tbody></table></div>
+  </div>
+
+  <div class="panel sec" id="range"><h2>VHF range</h2>
+    <p>Radio horizon (nautical miles) ≈ <b>3 × √(antenna height in metres)</b>. Two stations can talk when their horizons overlap: add them up.</p>
+    <div class="tbl"><table><thead><tr><th></th><th>Dinghy 1 m</th><th>Motor 4 m</th><th>Yacht 16 m</th><th>Ship 36 m</th><th>Coast 100 m</th></tr></thead><tbody>
+      <tr><td><b>Own horizon</b></td><td class="n">3</td><td class="n">6</td><td class="n">12</td><td class="n">18</td><td class="n">30</td></tr>
+      <tr><td>Dinghy</td><td class="n">6</td><td class="n">9</td><td class="n">15</td><td class="n">21</td><td class="n">33</td></tr>
+      <tr><td>Motor boat</td><td class="n">9</td><td class="n">12</td><td class="n">18</td><td class="n">24</td><td class="n">36</td></tr>
+      <tr><td>Sailing yacht</td><td class="n">15</td><td class="n">18</td><td class="n">24</td><td class="n">30</td><td class="n">42</td></tr>
+      <tr><td>Ship</td><td class="n">21</td><td class="n">24</td><td class="n">30</td><td class="n">36</td><td class="n">48</td></tr>
+      <tr><td>Coast station</td><td class="n">33</td><td class="n">36</td><td class="n">42</td><td class="n">48</td><td class="n">–</td></tr>
+    </tbody></table></div>
+  </div>
+
+  <div class="panel sec" id="mmsi"><h2>MMSI formats</h2>
+    <dl class="dl">
+      <dt>Ship</dt><dd><span class="mono">MID + 6 digits</span>. 9 digits; first three = Maritime Identification Digits (country). UK: 232, 233, 234, 235. e.g. <span class="mono">232089001</span></dd>
+      <dt>Coast station</dt><dd><span class="mono">00 + MID + 4 digits</span>. e.g. Milford Haven Coastguard <span class="mono">002320017</span></dd>
+      <dt>Group</dt><dd><span class="mono">0 + MID + 5 digits</span>. e.g. <span class="mono">023208591</span>. Can be stored and deleted freely.</dd>
+      <dt>AIS EPIRB</dt><dd>Manufacturer's 9-digit code beginning <span class="mono">974</span></dd>
+      <dt>EPIRB / PLB</dt><dd>15-character <b>Hex ID</b></dd>
+    </dl>
+    <p class="note"><b>Look up a ship or station:</b> <a href="https://mmsapp.itu.int/mmsapp/shipstation/list" target="_blank" rel="noopener">ITU MARS Ship Station List</a>. Search by ship name, MMSI, call sign, EPIRB Hex ID or vessel ID number, and filter by country. Needs internet.</p>
+    <p class="note">Your own MMSI can usually be entered into a Class D controller only <b>once</b>. A mistake means returning it to the supplier.</p>
+  </div>
+
+  <div class="panel sec" id="smcp"><h2>Standard Marine Communication Phrases</h2>
+    <p class="lead" style="font-size:15px">IMO's "standard English" for the sea. Not compulsory.</p>
+    <h4>Message markers</h4>
+    <dl class="dl">
+      <dt>QUESTION</dt><dd>The following message is a question</dd>
+      <dt>ANSWER</dt><dd>Reply to a previous question</dd>
+      <dt>REQUEST</dt><dd>Asking for action from others</dd>
+      <dt>INFORMATION</dt><dd>Observed facts only</dd>
+      <dt>INTENTION</dt><dd>Immediate navigational actions you intend to take</dd>
+      <dt>WARNING</dt><dd>Dangers to other traffic</dd>
+      <dt>ADVICE</dt><dd>A recommendation to influence the recipient</dd>
+      <dt>INSTRUCTION</dt><dd>A regulation-based instruction</dd>
+    </dl>
+    <h4>Standard responses</h4>
+    <ul>
+      <li>Affirmative: "Yes, …" + the phrase in full. Negative: "No, …" + the phrase in full.</li>
+      <li>Information coming soon: "Stand by". Can't be obtained: "No information".</li>
+      <li>Not properly heard: "Say again". Not understood: "Message not understood".</li>
+    </ul>
+    <h4>Readability and signal strength</h4>
+    <div class="tbl"><table><thead><tr><th>#</th><th>"I read you…"</th><th>Signal strength</th></tr></thead><tbody>
+      <tr><td class="n">1</td><td>bad</td><td>barely perceptible</td></tr>
+      <tr><td class="n">2</td><td>poor</td><td>weak</td></tr>
+      <tr><td class="n">3</td><td>fair</td><td>fairly good</td></tr>
+      <tr><td class="n">4</td><td>good</td><td>good</td></tr>
+      <tr><td class="n">5</td><td>excellent</td><td>very good</td></tr>
+    </tbody></table></div>
+    <h4>Useful phrases</h4>
+    <ul>
+      <li>What is your name (and call sign)? · How do you read me?</li>
+      <li>Stand by on channel … · Change to channel …</li>
+      <li>I cannot read you. · I cannot understand you.</li>
+      <li>I am passing a message for vessel … · Correction …</li>
+      <li>I am (not) ready to receive your message.</li>
+      <li>I do not have channel … Please use channel …</li>
+    </ul>
+    <h4>Conventions</h4>
+    <ul>
+      <li><b>Repetition:</b> "repeat" for vital parts: "You will load 163 repeat 163 tons bunkers", "Do not repeat not overtake".</li>
+      <li><b>Position:</b> degrees and minutes (decimals if needed) N/S, E/W; or bearing <b>FROM</b> a well-defined charted mark, 360° true, plus distance.</li>
+      <li><b>Courses and bearings:</b> 360° notation from true north unless stated. Relative bearings from the bow, e.g. "030° on your port bow".</li>
+      <li><b>Speed:</b> through the water unless "ground speed" is said.</li>
+      <li><b>Numbers:</b> digit by digit: "one-five-zero" for 150; "two point five" for 2.5.</li>
+      <li><b>Names:</b> as on the chart or Sailing Directions; else give lat/long.</li>
+      <li><b>Time:</b> 24-hour notation, stating UTC, zone time or local time.</li>
+    </ul>
+  </div>
+  <div class="cx panel sec" id="country-uk" data-c="uk"><h2><span class="cflag">UK</span>Local rules</h2>
+    <p>The SRC handbook is written for UK waters. UK-only items (ch 0, 62–64, 67, M, M2, HM Coastguard practice) appear only when you choose UK coast.</p></div>
+
+  <div class="cx env panel sec" id="country-nl" data-c="nl"><h2><span class="cflag">NL</span>Netherlands: local rules</h2>
+    <h4>Licence and certificate</h4>
+    <ul>
+      <li>Register every marifoon (fixed and handheld) with <b>RDI</b>. You get a callsign, an <b>ATIS code</b> and (if needed) an <b>MMSI</b>; you must program them correctly. No registration = no maritime transmitter on board.</li>
+      <li>Exams (theory at the <b>CBR</b>, practical at CBR-recognised trainers) and certificate applications go via the CBR; radio registration via RDI.</li>
+      <li><b>Basiscertificaat Marifonie</b>: inland waters only. <b>Marcom-B</b>: inland and coastal waters; needed for sea mode with DSC. <b>Marcom-A</b>: inland, coast and sea. A foreign certificate such as an SRC can be used for registration.</li>
+      <li>Fixed marifoon compulsory on vessels of <b>20 m or more</b>. Up to 20 m a handheld is allowed on inland waters.</li>
+      <li>Dutch MMSIs start with <span class="mono">244, 245, 246</span>.</li>
+    </ul>
+    <h4 class="cx" data-c="nl" data-a="inland">Inland waters (rivers, canals, lakes; also IJsselmeer and Wadden for listening)</h4>
+    <ul class="cx" data-c="nl" data-a="inland">
+      <li><b>Listen on ch 10</b> (ship to ship, calling, safety). Fallback channel: 13.</li>
+      <li><b>Blokgebied</b>: a VHF sign with a <b>red</b> border means you must listen on that blokkanaal; a <b>blue</b> sign is an information channel (optional). Go back to ch 10 when you leave.</li>
+      <li>Bridges and locks: use the channel on the sign, then return to 10 or the blokkanaal.</li>
+      <li>Private conversations only on <b>72 and 77</b>. On-board handhelds: <b>15 and 17</b>.</li>
+      <li><b>ATIS is mandatory</b>: your code goes out automatically when you release the PTT.</li>
+      <li><b>DSC is not permitted</b> in inland navigation, except voluntarily on certain large Dutch waters. A DSC alert would hardly be received anyway (traffic posts and most inland ships have no DSC).</li>
+      <li>Max transmitter power <b>1 W</b>; the set reduces power automatically on ship-to-ship channels.</li>
+      <li><b>Dual watch is not allowed</b> on inland waters.</li>
+      <li>IJsselmeer: ch 1 is the information channel of the Centrale Meldpost (broadcasts about 15 min past the hour). Don't stay on it; go back to 10.</li>
+      <li>Distress, urgency and safety use the same prowords (MAYDAY, PAN PAN, SECURITE), on ch 10 / the blokkanaal; on IJsselmeer, Markermeer, Wadden and Zeeland waters on ch 16. Non-participating ships keep radio silence.</li>
+      <li>Small vessels with a marifoon on board must listen out (BPR art. 4.05). <b>"Klein schip: aanmelden mag, antwoorden verplicht"</b>: reporting in is optional, answering when called is compulsory.</li>
+      <li>Blue square sign = <b>informatiekanaal</b> (listening recommended; only ask for information such as berths, harbour dues, bridge times). Square sign with red border = <b>navigatiekanaal</b> (usually ch 10 or a VTS sector channel): listening compulsory.</li>
+      <li>Common channels: <b>18, 20, 22</b> bridges and locks · <b>31</b> often used by marinas · <b>77</b> social. Check blokkanalen for your route beforehand at <a href="https://www.vaarweginformatie.nl" target="_blank" rel="noopener">vaarweginformatie.nl</a> or in the Wateralmanak deel 1.</li>
+      <li>Calling: press the PTT, wait about 1 second, then speak. Use the 4 W's: who you are, what you are, where you are, where you're going / what you want.</li>
+      <li>Position words: <i>afvaart</i> (downstream, towards the sea) / <i>opvaart</i> (upstream); <i>boven</i> / <i>beneden</i> a lock or bridge (boven = higher water); <i>ter hoogte van</i> a landmark; left/right bank; kilometre post.</li>
+      <li>Rijkswaterstaat: <span class="phone">0800-8002</span>.</li>
+    </ul>
+    <h4 class="cx" data-c="nl" data-a="coast">Coast and sea</h4>
+    <ul class="cx" data-c="nl" data-a="coast">
+      <li>Listen on <b>ch 16</b>. Power up to 25 W; DSC allowed (needs Marcom-B or higher).</li>
+      <li><b>Kustwacht</b> watches ch 16, DSC ch 70 and MF DSC 2187.5 kHz. Voice name "Netherlands Coastguard", in SAR "Den Helder Rescue", MMSI <span class="mono">002442000</span>.</li>
+      <li>Gale warnings, forecasts and safety messages: announced on 16/70, broadcast on <b>ch 23 and 83</b>, and Navtex 518 kHz.</li>
+      <li>Medical advice (Radio Medische Dienst): call the Kustwacht on ch 16; you are connected to a doctor on a working channel.</li>
+      <li>Phone: <span class="phone">0900-0111</span> · <span class="phone">+31 88 958 4000</span> · <span class="phone">112</span>. Not urgent: KNRM Helpt <span class="phone">+31 88 999 61 00</span>.</li>
+    </ul>
+    <p class="srcs">Sources (Checked 24 Oct 2026): <a href="https://www.ccr-zkr.org/files/documents/reglementRP/rp41nl_pg_062017.pdf" target="_blank" rel="noopener">CCR inland radio handbook (RAINWAT)</a> · <a href="https://www.rdi.nl/onderwerpen/vergunningen-en-registraties/marifoons-en-overige-maritieme-communicatieapparatuur/marifoon-en-maritieme-zendapparatuur-instellen" target="_blank" rel="noopener">RDI</a> · <a href="https://ondernemersplein.overheid.nl/wetten-en-regels/regels-voor-marifoongebruik/" target="_blank" rel="noopener">Ondernemersplein</a> · <a href="https://www.kustwacht.nl/hulp/" target="_blank" rel="noopener">Kustwacht</a> · <a href="https://itu.int/mms/mars/coast/notes/HOL.pdf" target="_blank" rel="noopener">ITU coast station notes</a> · <a href="https://www.varendoejesamen.nl/kennis/marifoon-gebruiken-ja-natuurlijk" target="_blank" rel="noopener">Varen doe je samen</a> · <a href="https://www.vaarbewijzen.nl/dsc-gebruik-binnenwateren/" target="_blank" rel="noopener">Vaarbewijzen.nl</a> · <a href="https://cdn.prod.website-files.com/67d9891f29c33ea2bccf274a/685e5e3268dea7887bfe1cec_De%20Marifoonkaart.pdf" target="_blank" rel="noopener">VDJS Marifoonkaart (2025)</a> · <a href="https://rootsteps-s3.ams3.cdn.digitaloceanspaces.com/VarenDoeJeSamen/downloads/communicatie-op-het-water.pdf" target="_blank" rel="noopener">VDJS: Communicatie op het water</a> · <a href="https://varendoejesamen.nl/kenniscentrum/artikel/examens-marifonie-vanaf-1-juli-2023-het-cbr" target="_blank" rel="noopener">VDJS: exams via CBR</a></p>
+    <p class="note"><b>Cross-check channels:</b> <a href="https://www.frequentieland.nl/maritiem/marifoonkanalen.htm" target="_blank" rel="noopener">Frequentieland: marifoonkanalen</a>. Every channel with ship and shore frequency and its Dutch use (bridges and locks, port operations, traffic guidance, Kustwacht). Not an official source and no update date shown; blokkanalen per area are not listed.</p>
+  </div>
+  <div class="cx nbv panel sec" lang="nl" id="country-nl-nl" data-c="nl"><h2><span class="cflag">NL</span>Nederland: lokale regels</h2>
+    <h4>Registratie en certificaat</h4>
+    <ul>
+      <li>Registreer elke marifoon (vast en handheld) bij de <b>RDI</b>. Je krijgt een roepnaam, een <b>ATIS-code</b> en (indien nodig) een <b>MMSI</b>, en moet die correct programmeren. Zonder registratie geen maritieme zender aan boord.</li>
+      <li>Examens (theorie bij het <b>CBR</b>, praktijk bij door het CBR erkende opleiders) en certificaataanvragen gaan via het CBR; registratie van de marifoon via de RDI.</li>
+      <li><b>Basiscertificaat Marifonie</b>: alleen binnenwateren. <b>Marcom-B</b>: binnen- en kustwateren; nodig voor de zee-stand met DSC. <b>Marcom-A</b>: binnenwateren, kust en zee. Een buitenlands certificaat zoals SRC kan gebruikt worden voor de registratie.</li>
+      <li>Een vaste marifoon is verplicht op schepen van <b>20 m of langer</b>. Tot 20 m mag op de binnenwateren een handheld (portofoon).</li>
+      <li>Nederlandse MMSI's beginnen met <span class="mono">244, 245, 246</span>.</li>
+    </ul>
+    <h4 class="cx" data-c="nl" data-a="inland">Binnenwateren (rivieren, kanalen, meren; voor het uitluisteren ook IJsselmeer en Wadden)</h4>
+    <ul class="cx" data-c="nl" data-a="inland">
+      <li><b>Luister uit op kanaal 10</b> (schip–schip, aanroep, veiligheid). Uitwijkkanaal: 13.</li>
+      <li><b>Blokgebied</b>: een VHF-bord met <b>rode</b> rand betekent verplicht uitluisteren op dat blokkanaal; een <b>blauw</b> bord is een informatiekanaal (aanbevolen). Ga terug naar kanaal 10 als je het gebied verlaat.</li>
+      <li>Bruggen en sluizen: gebruik het kanaal op het bord en ga daarna terug naar 10 of het blokkanaal.</li>
+      <li>Privégesprekken alleen op <b>72 en 77</b>. Portofoons aan boord: <b>15 en 17</b>.</li>
+      <li><b>ATIS is verplicht</b>: je code wordt automatisch uitgezonden als je de spreekknop loslaat.</li>
+      <li><b>DSC is niet toegestaan</b> in de binnenvaart, behalve vrijwillig op bepaalde grote Nederlandse wateren. Een DSC-alarm zou ook nauwelijks ontvangen worden (verkeersposten en de meeste binnenvaartschepen hebben geen DSC).</li>
+      <li>Maximaal zendvermogen <b>1 W</b>; de marifoon schakelt op schip–schipkanalen automatisch terug.</li>
+      <li><b>Dual watch is niet toegestaan</b> op de binnenwateren.</li>
+      <li>IJsselmeer: kanaal 1 is het informatiekanaal van de Centrale Meldpost (uitzendingen rond kwart over het hele uur). Blijf er niet op staan; ga terug naar 10.</li>
+      <li>Nood, spoed en veiligheid gebruiken dezelfde procedurewoorden (MAYDAY, PAN PAN, SECURITE), op kanaal 10 / het blokkanaal; op IJsselmeer, Markermeer, Wadden en de Zeeuwse wateren op kanaal 16. Schepen die niet deelnemen bewaren radiostilte.</li>
+      <li>Heb je een marifoon aan boord, dan ben je verplicht uit te luisteren (artikel 4.05 BPR). <b>Klein schip: aanmelden mag, antwoorden verplicht.</b></li>
+      <li>Blauw vierkant bord = <b>informatiekanaal</b> (aanbeveling om uit te luisteren; vraag hier alleen informatie op, zoals ligplaats, havengeld, brugopeningstijden). Vierkant bord met rode rand = <b>navigatiekanaal</b> (meestal kanaal 10 of een sectorkanaal bij verkeersbegeleiding): verplicht uitluisteren.</li>
+      <li>Veelgebruikte kanalen: <b>18, 20, 22</b> brug- en sluisbediening · <b>31</b> vaak door havens · <b>77</b> sociaal kanaal. Check vooraf de blokkanalen op je route via <a href="https://www.vaarweginformatie.nl" target="_blank" rel="noopener">vaarweginformatie.nl</a> of in de Wateralmanak deel 1.</li>
+      <li>Oproepen: druk de spreekknop in, wacht ongeveer 1 seconde en spreek dan. Gebruik de 4 W's: wie ben je, wat ben je, waar ben je, wat wil je of waarheen ga je.</li>
+      <li>Positiewoorden: <i>afvaart</i> (stroomafwaarts, richting zee) / <i>opvaart</i> (stroomopwaarts); <i>boven</i> / <i>beneden</i> een sluis of brug (boven = hoger water); <i>ter hoogte van</i> een herkenningspunt; linker- of rechteroever; kilometerraaipaal. Zie Waters.</li>
+      <li>Rijkswaterstaat: <span class="phone">0800-8002</span>.</li>
+    </ul>
+    <h4 class="cx" data-c="nl" data-a="coast">Kust en zee</h4>
+    <ul class="cx" data-c="nl" data-a="coast">
+      <li>Luister uit op <b>kanaal 16</b>. Vermogen tot 25 W; DSC toegestaan (vanaf Marcom-B).</li>
+      <li>De <b>Kustwacht</b> luistert uit op kanaal 16, DSC kanaal 70 en MF DSC 2187,5 kHz. Roepnaam "Netherlands Coastguard", bij een redding "Den Helder Rescue", MMSI <span class="mono">002442000</span>.</li>
+      <li>Stormwaarschuwingen, weerberichten en veiligheidsberichten: aangekondigd op 16/70, uitgezonden op <b>kanaal 23 en 83</b> en via Navtex 518 kHz.</li>
+      <li>Medisch advies (Radio Medische Dienst): roep de Kustwacht op via kanaal 16; je wordt op een werkkanaal doorverbonden met een arts.</li>
+      <li>Telefoon: <span class="phone">0900-0111</span> · <span class="phone">+31 88 958 4000</span> · <span class="phone">112</span>. Geen spoed: KNRM Helpt <span class="phone">+31 88 999 61 00</span>.</li>
+    </ul>
+    <p class="note"><b>Kanalen controleren:</b> <a href="https://www.frequentieland.nl/maritiem/marifoonkanalen.htm" target="_blank" rel="noopener">Frequentieland: marifoonkanalen</a>. Geen officiële bron en zonder datum; blokkanalen per gebied staan er niet in.</p>
+    <p class="srcs">Bronnen: zie de Engelse versie (English) van dit overzicht. Gecontroleerd 24 okt 2026.</p>
+  </div>
+
+  <div class="cx env panel sec" id="country-no" data-c="no"><h2><span class="cflag">NO</span>Norway: local rules</h2>
+    <h4>Licence and certificate</h4>
+    <ul>
+      <li><b>SRC</b> required, from an approved exam with Sjøfartsdirektoratet (the Norwegian Maritime Authority).</li>
+      <li><b>VHF licence</b> from Sjøfartsdirektoratet (since 1 Jan 2026, previously Telenor): gives callsign and MMSI; renews automatically each year. Program the MMSI into the radio, or the DISTRESS button won't work. Keep the licence on board.</li>
+      <li>DSC radio strongly recommended. ATIS is not required on Norwegian coastal waters.</li>
+      <li>Norwegian MMSIs start with <span class="mono">257, 258, 259</span>.</li>
+    </ul>
+    <h4>Coast radio</h4>
+    <ul>
+      <li><b>Who covers where:</b> <b>Kystradio Sør</b> (Stavanger) from the Swedish border to Rørvik in Trøndelag, about 65° N, so including Bergen, Sognefjord, Ålesund and Trondheim. <b>Kystradio Nord</b> (Bodø) from Rørvik to the Russian border. The rescue centres split the same way at 65° N: Hovedredningssentralen Sør-Norge and Nord-Norge.</li>
+      <li><b>Kystradio Sør</b> (<span class="phone">+47 51 69 00 44</span>) and <b>Kystradio Nord</b> (<span class="phone">+47 75 52 89 25</span>); phone <span class="phone">120</span> from a Norwegian mobile. With a foreign phone use the +47 numbers (save them in your contacts); 120 may not work from a foreign SIM, 112 always does. Since 1 Jan 2026 run by Hovedredningssentralen (JRCC); Kystverket runs the technical network.</li>
+      <li>Continuous watch on <b>ch 16</b> and their working channels; they receive DSC distress alerts and link you to the rescue centre.</li>
+      <li><b>Medico</b>: direct contact with a doctor for serious acute injury or illness, via Kystradio.</li>
+      <li>Weather and navigational warnings every 3 hours; you can ask for the latest.</li>
+      <li>Keep your listening watch on ch 16. Use the radio regularly and do a radio check.</li>
+    </ul>
+    <h4>VTS (sjøtrafikksentraler)</h4>
+    <div class="tbl"><table><thead><tr><th>VTS</th><th>Ch</th><th>Phone</th></tr></thead><tbody>
+      <tr><td>Horten (Oslofjord)</td><td class="n">19 inner · 18 outer</td><td class="n">+47 33 03 49 60</td></tr>
+      <tr><td>Brevik</td><td class="n">80</td><td class="n">+47 35 57 26 20</td></tr>
+      <tr><td>Kvitsøy</td><td class="n">19 N · 18 S</td><td class="n">+47 51 73 60 33</td></tr>
+      <tr><td>Fedje</td><td class="n">80 N · 71 S</td><td class="n">+47 56 16 44 32</td></tr>
+      <tr><td>Kinn</td><td class="n">18</td><td class="n">+47 70 23 11 23</td></tr>
+      <tr><td>Melkøya ("Nor VTS")</td><td class="n">71</td><td class="n">+47 78 98 98 98</td></tr>
+      <tr><td>NOR VTS (Barents)</td><td class="n">16</td><td class="n">+47 78 98 98 98</td></tr>
+    </tbody></table></div>
+    <p class="lead" style="font-size:14px">Useful to listen to in a VTS area, especially near shipping lanes. The source does not say whether leisure craft must report.</p>
+    <h4>Phone numbers</h4>
+    <p><span class="phone">120</span> Kystradio · <span class="phone">112</span> police · <span class="phone">113</span> medical · <span class="phone">110</span> fire · <span class="phone">02016</span> Redningsselskapet assistance (or RS SafeTrx app) · <span class="phone">02800</span> police, non-urgent</p>
+    <p class="note"><b>With a Dutch / foreign SIM:</b> 112 always works. 113 and 110 usually work but aren't guaranteed. 120, 02016 and 02800 are Norwegian service numbers and probably won't work. Use the radio (ch 16), 112, or Kystradio on <span class="phone">+47 51 69 00 44</span> (Sør) / <span class="phone">+47 75 52 89 25</span> (Nord). A Norwegian prepaid SIM solves this.</p>
+    <p class="srcs">Sources (Checked 24 Oct 2026): <a href="https://kystradio.no/" target="_blank" rel="noopener">Kystradio</a> · <a href="https://www.kystverket.no/navigasjonstjenester/kystradio---infrastruktur-for-nod--og-sikkerhetskommunikasjon/" target="_blank" rel="noopener">Kystverket</a> · <a href="https://www.sdir.no/fritidsbat/maritim-radio-for-fritidsbatbrukere/hva-kan-kystradiostasjonene-gjore-for-deg/" target="_blank" rel="noopener">Sjøfartsdirektoratet</a> · <a href="https://www.sdir.no/en/Leisure-boat/maritim-radio-for-fritidsbatbrukere/dette-trenger-du-vhf-pa-1-2-3/" target="_blank" rel="noopener">SDIR: VHF 1-2-3</a> · <a href="https://kystverket.no/en/contact/vts-service" target="_blank" rel="noopener">Kystverket VTS</a> · <a href="https://batforerskolen.no/batforerproven/spesielt-viktige-emner/nodsituasjoner-vhf-mobil/" target="_blank" rel="noopener">Båtførerskolen</a></p>
+  </div>
+  <div class="cx nbv panel sec" lang="nb" id="country-no-nb" data-c="no"><h2><span class="cflag">NO</span>Norge: lokale regler</h2>
+    <h4>Lisens og sertifikat</h4>
+    <ul>
+      <li><b>SRC</b> kreves, etter godkjent eksamen hos Sjøfartsdirektoratet.</li>
+      <li><b>VHF-lisens</b> fra Sjøfartsdirektoratet (siden 1. januar 2026, tidligere Telenor): gir kallesignal og MMSI, og fornyes automatisk hvert år. MMSI-nummeret må programmeres i radioen, ellers virker ikke nødknappen (DISTRESS). Lisensen skal oppbevares om bord.</li>
+      <li>VHF med DSC anbefales sterkt. ATIS kreves ikke i norske kystfarvann.</li>
+      <li>Norske MMSI-numre begynner med <span class="mono">257, 258, 259</span>.</li>
+    </ul>
+    <h4>Kystradio</h4>
+    <ul>
+      <li><b>Hvem dekker hvor:</b> <b>Kystradio Sør</b> (Stavanger) fra svenskegrensen til Rørvik i Trøndelag, ca. 65° N, altså også Bergen, Sognefjorden, Ålesund og Trondheim. <b>Kystradio Nord</b> (Bodø) fra Rørvik til grensen mot Russland. Hovedredningssentralen er delt på samme måte ved 65° N: Sør-Norge og Nord-Norge.</li>
+      <li><b>Kystradio Sør</b> (<span class="phone">+47 51 69 00 44</span>) og <b>Kystradio Nord</b> (<span class="phone">+47 75 52 89 25</span>); telefon <span class="phone">120</span> fra norsk mobil. Med utenlandsk telefon: bruk +47-numrene (lagre dem i kontaktene); 120 virker kanskje ikke med utenlandsk SIM, 112 virker alltid. Siden 1. januar 2026 drevet av Hovedredningssentralen; Kystverket drifter det tekniske nettet.</li>
+      <li>Kontinuerlig lyttevakt på <b>kanal 16</b> og arbeidskanalene; de mottar DSC-nødalarmer og setter deg i kontakt med redningssentralen.</li>
+      <li><b>Medico</b>: direkte kontakt med lege ved alvorlig akutt skade eller sykdom, via Kystradio.</li>
+      <li>Værmeldinger og navigasjonsvarsler hver 3. time; du kan be om siste værmelding.</li>
+      <li>Hold lyttevakt på kanal 16. Bruk radioen jevnlig og ta en radiosjekk.</li>
+    </ul>
+    <h4>Sjøtrafikksentraler (VTS)</h4>
+    <div class="tbl"><table><thead><tr><th>Sentral</th><th>Kanal</th><th>Telefon</th></tr></thead><tbody>
+      <tr><td>Horten (Oslofjorden)</td><td class="n">19 indre · 18 ytre</td><td class="n">+47 33 03 49 60</td></tr>
+      <tr><td>Brevik</td><td class="n">80</td><td class="n">+47 35 57 26 20</td></tr>
+      <tr><td>Kvitsøy</td><td class="n">19 N · 18 S</td><td class="n">+47 51 73 60 33</td></tr>
+      <tr><td>Fedje</td><td class="n">80 N · 71 S</td><td class="n">+47 56 16 44 32</td></tr>
+      <tr><td>Kinn</td><td class="n">18</td><td class="n">+47 70 23 11 23</td></tr>
+      <tr><td>Melkøya («Nor VTS»)</td><td class="n">71</td><td class="n">+47 78 98 98 98</td></tr>
+      <tr><td>NOR VTS (Barentshavet)</td><td class="n">16</td><td class="n">+47 78 98 98 98</td></tr>
+    </tbody></table></div>
+    <p class="lead" style="font-size:14px">Nyttig å lytte på i et VTS-område, særlig nær skipsleder. Kilden sier ikke om fritidsbåter må melde seg.</p>
+    <h4>Telefonnumre</h4>
+    <p><span class="phone">120</span> Kystradio · <span class="phone">112</span> politi · <span class="phone">113</span> medisinsk nødhjelp · <span class="phone">110</span> brann · <span class="phone">02016</span> Redningsselskapets assistanse (eller appen RS SafeTrx) · <span class="phone">02800</span> politi, ikke akutt</p>
+    <p class="note"><b>Med nederlandsk / utenlandsk SIM:</b> 112 virker alltid. 113 og 110 virker som regel, men ikke garantert. 120, 02016 og 02800 er norske tjenestenumre og virker trolig ikke. Bruk radioen (kanal 16), 112 eller Kystradio på <span class="phone">+47 51 69 00 44</span> (Sør) / <span class="phone">+47 75 52 89 25</span> (Nord). Et norsk kontantkort løser dette.</p>
+    <h4>Nødprosedyren på norsk</h4>
+    <p class="lead" style="font-size:14px">Rekkefølgen slik den står på nødprosedyrekortet fra Telenor Maritim Radio. Selve sambandet gjøres på engelsk (MAYDAY, «this is»), men slik heter delene på norsk:</p>
+    <div class="tbl"><table><thead><tr><th>Norsk</th><th>English</th></tr></thead><tbody>
+      <tr><td><b>Nødalarmering</b>: trykk inn den røde DSC-knappen (nødknappen)</td><td>DSC distress alert</td></tr>
+      <tr><td><b>Nødkalling</b>: MAYDAY ×3, «Dette er», fartøyets navn ×3, kallesignal, MMSI</td><td>Distress call</td></tr>
+      <tr><td><b>Nødmelding</b>: MAYDAY, navn, kallesignal, MMSI</td><td>Distress message</td></tr>
+      <tr><td>fartøyets posisjon</td><td>position</td></tr>
+      <tr><td>type nød (hvilken nød det er)</td><td>nature of distress</td></tr>
+      <tr><td>hvilken hjelp som trengs</td><td>assistance required</td></tr>
+      <tr><td>antall personer om bord</td><td>number of persons on board</td></tr>
+      <tr><td>andre viktige opplysninger</td><td>other information</td></tr>
+    </tbody></table></div>
+    <h4>Nyttige ord i en nødsituasjon</h4>
+    <div class="tbl"><table><thead><tr><th>Norsk</th><th>English</th><th>Kilde</th></tr></thead><tbody>
+      <tr><td>nødanrop · nødmelding</td><td>distress call · distress message</td><td>B, T</td></tr>
+      <tr><td>hastemelding (Pan-Pan)</td><td>urgency message</td><td>K</td></tr>
+      <tr><td>sikkerhetsmelding (Sécurité)</td><td>safety message</td><td>B</td></tr>
+      <tr><td>lyttevakt</td><td>listening watch</td><td>B</td></tr>
+      <tr><td>kallekanal · arbeidskanal</td><td>calling channel · working channel</td><td>B</td></tr>
+      <tr><td>kallesignal</td><td>call sign</td><td>B</td></tr>
+      <tr><td>nødknapp</td><td>distress button</td><td>B</td></tr>
+      <tr><td>radiosjekk</td><td>radio check</td><td>B</td></tr>
+      <tr><td>brann</td><td>fire</td><td>T</td></tr>
+      <tr><td>grunnstøting · grunnstøtt</td><td>grounding · aground</td><td>T, B, O</td></tr>
+      <tr><td>kantring · kantret</td><td>capsizing · capsized</td><td>T, O</td></tr>
+      <tr><td>synker</td><td>sinking</td><td>T</td></tr>
+      <tr><td>mann over bord</td><td>man overboard</td><td>T</td></tr>
+      <tr><td>lekkasje · tar inn vann</td><td>leak · taking on water</td><td>O</td></tr>
+      <tr><td>motorstopp · i drift</td><td>engine failure · adrift</td><td>O</td></tr>
+      <tr><td>slep</td><td>tow</td><td>O</td></tr>
+      <tr><td>skadet · syk · lege</td><td>injured · ill · doctor</td><td>O</td></tr>
+      <tr><td>redningsskøyte</td><td>rescue boat</td><td>O</td></tr>
+      <tr><td>nødbluss</td><td>distress flare</td><td>O</td></tr>
+      <tr><td>redningsvest · redningsflåte</td><td>life jacket · liferaft</td><td>O</td></tr>
+      <tr><td>kuling · storm · værmelding</td><td>gale · storm · weather forecast</td><td>O</td></tr>
+      <tr><td>mottatt · vent</td><td>received · wait</td><td>–</td></tr>
+    </tbody></table></div>
+    <p class="srcs">Kilder for ordene: <b>T</b> = <a href="https://favnforsikring.no/wp-content/uploads/2016/03/nodprosedyre_vhf.pdf" target="_blank" rel="noopener">Telenor Maritim Radio, Nødprosedyre for maritim VHF</a> · <b>B</b> = <a href="https://eteo.no/teori/batforerproven/kommunikasjon-og-nodssignaler/vhf-radio-prosedyrer/" target="_blank" rel="noopener">Båtførerprøven: VHF-prosedyrer (eteo.no)</a> · <b>K</b> = <a href="https://bukt.no/articles/kommunikasjon" target="_blank" rel="noopener">bukt.no: Kommunikasjon på sjøen</a> · <b>O</b> = <a href="https://ordbokene.no" target="_blank" rel="noopener">Bokmålsordboka (Språkrådet / UiB)</a>. «Mottatt» og «vent» fant jeg ikke i en offisiell norsk prosedyrekilde; prosedyreordene sies uansett på engelsk (RECEIVED, WAIT).</p>
+    <p class="srcs">Norsk tekst er oversatt av Claude fra kildene nedenfor, ikke en offisiell oversettelse. Ved tvil gjelder de offisielle kildene.</p>
+  </div>
+</div>
+<div data-rsub="waters" id="waters">
+  <div><div class="eyebrow">On the water</div><h2 class="vkh">Waters</h2>
   <p class="lead">Sailing information per country, beyond the radio. Choose the country at the top right.</p></div>
 
   <p class="cx cnote" data-c="uk"><b class="cflag">UK</b>No UK-specific waterway section yet. The international rules further down apply. Choose Netherlands at the top right for Dutch waterway information.</p>
@@ -1103,162 +1634,10 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
       <li>Large ships in a narrow channel or traffic separation scheme: small craft must not impede them.</li>
     </ul>
     <p><b>Above all: good seamanship</b> <span class="cx nbv nlt" lang="nl" data-c="nl">(goed zeemanschap)</span>. Always try to prevent a collision, even if you have right of way.</p><p class="srcs">Based on the <a href="https://www.vaarbewaarkaart.nl" target="_blank" rel="noopener">Vaarbewaarkaart</a> (Varen doe je Samen!, edition 2024), checked against the COLREGs (IRPCS) and the IALA buoyage system. At sea the COLREGs apply, on Dutch inland waters the BPR, in Norway Sjøveisreglene.</p></div>
-</section>
 
-<!-- ============ REFERENCE ============ -->
-<section class="view" id="v-reference" data-tab="reference">
-  <div><div class="eyebrow">Look it up</div><h1 style="font-size:26px">Reference</h1></div>
-
-  <style>
-    .pc-pos{border:1px solid var(--line);border-radius:10px;background:var(--soft);padding:12px 14px;margin:8px 0}
-    .pc-ll{font-family:var(--f-mono);font-weight:600;font-size:clamp(24px,7vw,34px);line-height:1.25;letter-spacing:.01em}
-    .pc-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:6px 12px;margin-top:8px}
-    .pc-stats div{font-size:13px;color:var(--muted)}
-    .pc-stats b{display:block;font-family:var(--f-mono);font-size:18px;color:var(--ink)}
-    .pc-btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
-    .pc-btns button{font-size:15px}
-    .pc-map{height:62vh;min-height:340px;max-height:720px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--soft);position:relative;z-index:0}
-    .pc-map .leaflet-container{font-family:var(--f-body)}
-    .pc-grid{position:absolute;inset:0;pointer-events:none;z-index:450}
-    .pc-ctl{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px;align-items:center}
-    .pc-ctl .lbl{font-size:13px;color:var(--muted);margin-right:2px}
-    .pc-read{font-family:var(--f-mono);font-size:14px;margin:6px 0;min-height:1.4em}
-    .pc-prog{height:8px;border-radius:999px;background:var(--line);overflow:hidden;margin:8px 0}
-    .pc-prog i{display:block;height:100%;width:0;background:var(--accent)}
-    .pc-tzlbl{background:rgba(250,238,218,.92);color:#633806;border-radius:6px;padding:1px 6px;font-size:12px;white-space:nowrap;font-family:var(--f-mono);border:1px solid rgba(186,117,23,.5)}
-    .pc-nm{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-family:var(--f-mono);font-size:12px}
-    .pc-scale{background:rgba(255,255,255,.85);border:2px solid #0e2233;border-top:0;font:600 12px var(--f-mono);color:#0e2233;padding:0 4px;text-align:center}
-    #pc-globe{background:#0b1a2a}
-    .pc-onmap{background:rgba(255,255,255,.93);border:1px solid rgba(0,0,0,.25);border-radius:8px;padding:5px 8px;font:600 15px/1.3 var(--f-mono);color:#0e2233;cursor:pointer;text-align:right}
-    .pc-onmap small{display:block;font:500 11px var(--f-mono);color:#555}
-    .pc-radio{font-size:14px;line-height:1.5;margin:4px 0 8px}
-    .pc-search{display:flex;gap:6px;margin:10px 0 4px}
-    .pc-search input{flex:1;min-width:0;font-size:16px;padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink)}
-    .pc-sres{display:flex;flex-direction:column;gap:4px;margin:4px 0 6px}
-    .pc-sres button{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 10px;cursor:pointer;font-size:14px;color:var(--ink)}
-    .pc-mlist{list-style:none;padding:0;margin:6px 0;display:flex;flex-direction:column;gap:6px}
-    .pc-mlist li{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface)}
-    .pc-mlist .mpos{font-family:var(--f-mono);font-size:14px}
-    .pc-mlist .mact{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-    .pc-mlist .mact button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:13px;cursor:pointer;color:var(--ink)}
-    .pc-mk{width:14px;height:14px;border-radius:50% 50% 50% 0;background:#D85A30;border:2px solid #fff;transform:rotate(-45deg);box-shadow:0 1px 3px rgba(0,0,0,.4)}
-    .pc-gl{font:600 11px var(--f-mono);color:#0e3c6e;background:rgba(255,255,255,.85);border-radius:4px;padding:0 4px;white-space:nowrap;pointer-events:none}
-    .pc-pl{font:12px var(--f-body);color:#26215C;background:rgba(255,255,255,.88);border-radius:4px;padding:0 5px;white-space:nowrap;pointer-events:none;transform:translate(52%,0)}
-    .pc-pl::before{content:'';position:absolute;left:-9px;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;background:#7F77DD;border:1.5px solid #fff}
-    .pc-gscale{position:absolute;left:8px;bottom:22px;z-index:2}
-    :root.night #pc-globe canvas{filter:grayscale(1) brightness(.55) sepia(1) hue-rotate(-50deg) saturate(6)}
-    :root.night .pc-map .leaflet-tile-pane{filter:grayscale(1) brightness(.55) sepia(1) hue-rotate(-50deg) saturate(6)}
-  </style>
-  <div class="panel sec js-only" id="poschart"><h2>Position and chart <span class="cx nbv nlt" lang="nl" data-c="nl">(Positie en kaart)</span><span class="cx nbv nlt" lang="nb" data-c="no">(Posisjon og kart)</span></h2>
-    <p class="lead" style="font-size:15px">Your phone's GPS position in chart notation, with charts that keep working offline.</p>
-    <div class="pc-pos" aria-live="polite">
-      <div class="pc-ll" id="pc-lat">--°--.---′N</div>
-      <div class="pc-ll" id="pc-lon">---°--.---′E</div>
-      <div class="pc-stats">
-        <div>SOG<b id="pc-sog">– kn</b></div>
-        <div>COG<b id="pc-cog">–°T</b></div>
-        <div>Accuracy<b id="pc-acc">– m</b></div>
-        <div>UTC<b id="pc-utc">--:--:--</b></div>
-        <div>Fix<b id="pc-age">–</b></div>
-      </div>
-    </div>
-    <div class="pc-btns">
-      <button class="primary" id="pc-gps">Start GPS</button>
-      <button class="ghost" id="pc-copy">Copy position</button>
-      <button class="ghost" id="pc-follow" aria-pressed="true">Follow: on</button>
-      <button class="ghost" id="pc-wake" aria-pressed="false">Keep screen on: off</button>
-    </div>
-    <p class="pc-read" id="pc-msg" style="font-family:var(--f-body);color:var(--muted);font-size:13px"></p>
-    <details id="pc-radiobox"><summary>Say it on the radio</summary><p class="pc-radio" id="pc-radio">Start GPS to get your position read-out.</p></details>
-
-    <form class="pc-search" id="pc-sform" role="search"><input id="pc-q" type="search" placeholder="Search a place, e.g. Sauda" autocomplete="off" enterkeyhint="search"><button class="ghost" type="submit">Search</button></form>
-    <div class="pc-sres" id="pc-sres"></div>
-    <div class="pc-ctl"><span class="lbl">View</span><span class="chips" id="pc-view">
-      <button data-v="flat" aria-pressed="true">Flat</button>
-      <button data-v="globe" aria-pressed="false">Globe</button></span></div>
-    <div class="pc-ctl"><span class="lbl">Chart</span><span class="chips" id="pc-base">
-      <button data-b="osm" aria-pressed="true">OpenStreetMap</button>
-      <button data-b="sjo" aria-pressed="false">Sea chart Norway</button>
-      <button data-b="topo" aria-pressed="false">Topo Norway</button></span></div>
-    <div class="pc-ctl"><span class="lbl">Layers</span><span class="chips" id="pc-ovl">
-      <button data-o="seamark" aria-pressed="true">Seamarks</button>
-      <button data-o="grid" aria-pressed="true">Lat/long grid</button>
-      <button data-o="tz" aria-pressed="false">Time zones</button>
-      <button data-o="places" aria-pressed="false">Places on meridians</button>
-      <button data-o="measure" aria-pressed="false">Measure (nm)</button></span></div>
-    <div class="pc-map" id="pc-map" role="application" aria-label="Chart"></div>
-    <div class="pc-map" id="pc-globe" role="application" aria-label="Globe chart" hidden></div>
-    <div class="pc-read" id="pc-read">Tap the chart for a position.</div>
-    <div class="pc-btns" style="margin-top:0">
-      <button class="ghost" id="pc-clr" hidden>Clear measurement</button>
-      <button class="ghost" id="pc-me">Centre on me</button>
-    </div>
-    <h3 style="font-size:17px;margin:14px 0 2px">Markers</h3>
-    <p style="font-size:14px;color:var(--muted)">Tap the chart and choose <b>Save marker</b>, or mark where you are. Markers are kept on this phone.</p>
-    <div class="pc-btns"><button class="ghost" id="pc-markme">Mark my position</button><button class="ghost" id="pc-mcopy">Copy all markers</button></div>
-    <ol class="pc-mlist" id="pc-mlist"></ol>
-
-    <details><summary><b>Offline charts</b> — store the Norwegian sea chart on this phone</summary>
-      <p>Charts you have looked at are kept automatically. To be sure you have them at sea, store an area before you go (on Wi-Fi). The download covers Kartverket's Norwegian sea chart; OpenStreetMap does not allow bulk downloads, so it only works offline for areas you have viewed.</p>
-      <div class="pc-btns">
-        <button class="ghost" data-dl="ov">Norway 58–66°N, overview (zoom ≤ 11)</button>
-        <button class="ghost" data-dl="z12">Norway 58–66°N, extra detail (zoom 12)</button>
-        <button class="ghost" data-dl="view">This view, full detail (to zoom 15)</button>
-      </div>
-      <div class="pc-prog" aria-hidden="true"><i id="pc-bar"></i></div>
-      <p class="pc-read" id="pc-dl" style="font-family:var(--f-body);font-size:14px">Nothing downloading.</p>
-      <div class="pc-btns"><button class="ghost" id="pc-cancel" disabled>Cancel download</button><button class="ghost" id="pc-wipe">Delete stored charts</button></div>
-      <p class="srcs" id="pc-store"></p>
-    </details>
-
-    <p class="cnote"><b class="cflag">!</b>Phone GPS and these charts are an aid, not a replacement for your plotter and official charts. Kartverket's raster sea chart is not approved for navigation.</p>
-    <p class="cx nbv cnote" lang="nl" data-c="nl"><b class="cflag">NL</b>Telefoon-GPS en deze kaarten zijn een hulpmiddel, geen vervanging van je plotter en officiële kaarten.</p>
-    <p class="cx nbv cnote" lang="nb" data-c="no"><b class="cflag">NO</b>Kartverkets rasterkart er ikke godkjent for navigasjon. Bruk offisielle sjøkart og kartplotter.</p>
-    <p class="srcs">Charts: © OpenStreetMap contributors, OpenSeaMap, © Kartverket (CC BY 4.0). Time zones: Natural Earth. Distances are rhumb lines (the course you steer), 1 nm = 1852 m.</p>
-  </div>
-
-  <div class="panel sec" id="myradio"><h2>My radio: Icom IC-M94DE</h2>
-    <p class="lead" style="font-size:15px">Handheld marine VHF with DSC, GPS and AIS receiver.</p>
-    <dl class="dl">
-      <dt>Power</dt><dd>6 W high; Low via the High/Low soft key ("HI"/"LOW" on screen). Some channels are low-power only.</dd>
-      <dt>DSC</dt><dd>Class H. Distress key on the back, under a cover.</dd>
-      <dt>GPS</dt><dd>Built in: position goes into DSC alerts automatically. Navigation to up to 50 waypoints.</dd>
-      <dt>AIS</dt><dd>Receive only: shows ships around you on a plotter (AIS soft key or [MENU] → AIS → Plotter), with a CPA/TCPA alarm. It does not transmit AIS.</dd>
-      <dt>Floats</dt><dd>Float'n Flash: screen, keys and distress key flash when it's in the water. IPX7 (1 m for 30 min).</dd>
-      <dt>Battery</dt><dd>BP-306 Li-ion, ~2400 mAh, about 10 h normal use. Weight 358 g.</dd>
-      <dt>Audio</dt><dd>1500 mW, noise cancelling, AquaQuake to clear water from the speaker.</dd>
-      <dt>Watch</dt><dd>Dualwatch (with ch 16) and Tri-watch (16 + call channel).</dd>
-    </dl>
-    <p><a href="sim.html">Practise on the virtual IC-M94DE simulator →</a></p>
-    <h4>Keys you need</h4>
-    <ul>
-      <li><b>[16/C]</b>: channel 16. Hold 1 s: call channel.</li>
-      <li><b>[VOL/SQL]</b>: once = volume, twice = squelch; adjust with the arrows, then [ENT]. Hold = open squelch to listen.</li>
-      <li><b>[DISTRESS]</b> (under the cover): hold 3 s to send a distress alert.</li>
-      <li><b>Man Overboard</b> soft key: starts MOB mode (press again to stop). With MOB Auto Set on, the nature of distress becomes "Man Overboard" for 30 s after an MOB waypoint or water detection. Pressing [DISTRESS] while Float'n Flash is active sends an MOB distress alert.</li>
-      <li><b>Individual DSC call:</b> Compose Other → Message Type → Individual → Address (or Manual Input) → Channel → send.</li>
-    </ul>
-    <h4>Set up once</h4>
-    <ul>
-      <li><b>MMSI</b>: entered once at the first power-on (hold power, then [ENT]). Skip it and DSC calls are blocked. Get it right: you can't change it yourself.</li>
-      <li><b>ATIS ID</b>: [MENU] → ATIS ID Input, 10 digits, once. The manual says this is available on the <b>HOL and FRG versions only</b>.</li>
-      <li><b>Channel group</b>: [MENU] → Settings → Radio → Channel Group (International, ATIS, … depending on version).</li>
-    </ul>
-    <p class="cx env cnote" data-c="nl"><b class="cflag">NL</b><b>Check before you buy:</b> on Dutch inland waters ATIS is mandatory and power max 1 W, and DSC is not allowed. The Dutch dealer <a href="https://www.georgekniest.nl/artikel/317713/icom-ic-m94de-handmarifoon-dsc-gps-ais-ontvanger.html" target="_blank" rel="noopener">George Kniest</a> lists the IC-M94DE with ATIS and can program your ATIS code and MMSI with the order. A UK-bought unit may be a version without ATIS input. Check that LOW is 1 W or less. Register it with RDI first and give the dealer the ATIS code and MMSI you receive.</p>
-    <p class="cx nbv cnote" lang="nl" data-c="nl"><b class="cflag">NL</b><b>Controleer vóór aankoop:</b> op de Nederlandse binnenwateren is ATIS verplicht, maximaal 1 W, en is DSC niet toegestaan. De Nederlandse dealer <a href="https://www.georgekniest.nl/artikel/317713/icom-ic-m94de-handmarifoon-dsc-gps-ais-ontvanger.html" target="_blank" rel="noopener">George Kniest</a> levert de IC-M94DE met ATIS en kan je ATIS-code en MMSI bij de bestelling programmeren. Een in de UK gekocht exemplaar kan een versie zonder ATIS-invoer zijn. Controleer dat LOW 1 W of minder is. Registreer eerst bij de RDI en geef de dealer de ATIS-code en het MMSI die je krijgt.</p>
-    <p class="cx env cnote" data-c="no"><b class="cflag">NO</b>Program the MMSI from your Norwegian VHF licence, or the DISTRESS key won't work.</p>
-    <p class="cx nbv cnote" lang="nb" data-c="no"><b class="cflag">NO</b>Programmer MMSI-nummeret fra den norske VHF-lisensen din, ellers virker ikke DISTRESS-knappen (nødknappen).</p>
-    <h4>Battery care</h4>
-    <ul><li>Switch the radio off before charging; charge at 15–40 °C; about 4 h. Don't transmit while charging; don't charge a wet pack.</li>
-      <li>Replace the pack about every 5 years or after 300–500 charges. In extreme temperatures the radio forces Low power.</li></ul>
-    <h4>Documents</h4>
-    <ul>
-      <li><a href="https://icomuk.co.uk/IC-M94DE/Handheld-VHF-Marine-Radio" target="_blank" rel="noopener">Product page (Icom UK)</a> · <a href="https://icomuk.co.uk/files/icom/PDF/productManual/IC-M94D_M94DE_ENG_IM_5.pdf" target="_blank" rel="noopener">Instruction manual (PDF)</a> · <a href="https://icomuk.co.uk/files/icom/PDF/productLeaflet/IC-M94DE.pdf" target="_blank" rel="noopener">Leaflet (PDF)</a></li>
-      <li><a href="https://icomuk.co.uk/files/icom/PDF/radioGuide/DSC_Handheld_Facts_18.pdf" target="_blank" rel="noopener">Handheld DSC VHF radios</a> · <a href="https://icomuk.co.uk/files/icom/PDF/radioGuide/GUIDE_TO_MARINE_RADIO_18.pdf" target="_blank" rel="noopener">Icom guide to marine radio</a> · <a href="https://icomuk.co.uk/files/icom/PDF/radioGuide/ATIS-UPGRADE_2018.pdf" target="_blank" rel="noopener">ATIS upgrade</a> · <a href="https://icomuk.co.uk/files/icom/PDF/radioGuide/INLAND_WATERWAYS_2018.pdf" target="_blank" rel="noopener">VHF on inland waterways</a> · <a href="https://icomuk.co.uk/files/icom/PDF/radioGuide/DAY_TO_DAY_VHF_CARE_FM37.pdf" target="_blank" rel="noopener">Day-to-day VHF care</a> · <a href="https://icomuk.co.uk/Radio-Guides" target="_blank" rel="noopener">All Icom radio guides</a></li>
-    </ul>
-    <p class="srcs">From the Icom UK product page and the IC-M94D/M94DE manual. Checked 24 Oct 2026. Some details depend on the radio's version: check your own manual.</p>
-  </div>
-
+</div>
+<div data-rsub="gen" id="general">
+  <div><div class="eyebrow">General</div><h2 class="vkh">General</h2></div>
   <div class="panel sec" id="hire"><h2>Hiring a boat <span class="lead" style="font-size:14px;font-weight:400">(boot huren)</span></h2>
     <p>Which name and identity you give depends on the boat and on which radio you use. The rule: the <b>name</b> is the boat's (so rescuers know what to look for); the <b>radio identity</b> (MMSI, call sign) belongs to the transmitter you are using.</p>
     <div class="tbl"><table><thead><tr><th>Situation</th><th>Say as name</th><th>Identity (call sign / MMSI)</th></tr></thead><tbody>
@@ -1304,269 +1683,6 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
     <p class="cx cnote" data-c="uk"><b class="cflag">UK</b>Phone <span class="phone">999</span> or <span class="phone">112</span> and ask for the Coastguard.</p>
   </div>
 
-  <div class="cx panel sec" id="country-uk" data-c="uk"><h2><span class="cflag">UK</span>Local rules</h2>
-    <p>The SRC handbook is written for UK waters. UK-only items (ch 0, 62–64, 67, M, M2, HM Coastguard practice) appear only when you choose UK coast.</p></div>
-
-  <div class="cx env panel sec" id="country-nl" data-c="nl"><h2><span class="cflag">NL</span>Netherlands: local rules</h2>
-    <h4>Licence and certificate</h4>
-    <ul>
-      <li>Register every marifoon (fixed and handheld) with <b>RDI</b>. You get a callsign, an <b>ATIS code</b> and (if needed) an <b>MMSI</b>; you must program them correctly. No registration = no maritime transmitter on board.</li>
-      <li>Exams (theory at the <b>CBR</b>, practical at CBR-recognised trainers) and certificate applications go via the CBR; radio registration via RDI.</li>
-      <li><b>Basiscertificaat Marifonie</b>: inland waters only. <b>Marcom-B</b>: inland and coastal waters; needed for sea mode with DSC. <b>Marcom-A</b>: inland, coast and sea. A foreign certificate such as an SRC can be used for registration.</li>
-      <li>Fixed marifoon compulsory on vessels of <b>20 m or more</b>. Up to 20 m a handheld is allowed on inland waters.</li>
-      <li>Dutch MMSIs start with <span class="mono">244, 245, 246</span>.</li>
-    </ul>
-    <h4 class="cx" data-c="nl" data-a="inland">Inland waters (rivers, canals, lakes; also IJsselmeer and Wadden for listening)</h4>
-    <ul class="cx" data-c="nl" data-a="inland">
-      <li><b>Listen on ch 10</b> (ship to ship, calling, safety). Fallback channel: 13.</li>
-      <li><b>Blokgebied</b>: a VHF sign with a <b>red</b> border means you must listen on that blokkanaal; a <b>blue</b> sign is an information channel (optional). Go back to ch 10 when you leave.</li>
-      <li>Bridges and locks: use the channel on the sign, then return to 10 or the blokkanaal.</li>
-      <li>Private conversations only on <b>72 and 77</b>. On-board handhelds: <b>15 and 17</b>.</li>
-      <li><b>ATIS is mandatory</b>: your code goes out automatically when you release the PTT.</li>
-      <li><b>DSC is not permitted</b> in inland navigation, except voluntarily on certain large Dutch waters. A DSC alert would hardly be received anyway (traffic posts and most inland ships have no DSC).</li>
-      <li>Max transmitter power <b>1 W</b>; the set reduces power automatically on ship-to-ship channels.</li>
-      <li><b>Dual watch is not allowed</b> on inland waters.</li>
-      <li>IJsselmeer: ch 1 is the information channel of the Centrale Meldpost (broadcasts about 15 min past the hour). Don't stay on it; go back to 10.</li>
-      <li>Distress, urgency and safety use the same prowords (MAYDAY, PAN PAN, SECURITE), on ch 10 / the blokkanaal; on IJsselmeer, Markermeer, Wadden and Zeeland waters on ch 16. Non-participating ships keep radio silence.</li>
-      <li>Small vessels with a marifoon on board must listen out (BPR art. 4.05). <b>"Klein schip: aanmelden mag, antwoorden verplicht"</b>: reporting in is optional, answering when called is compulsory.</li>
-      <li>Blue square sign = <b>informatiekanaal</b> (listening recommended; only ask for information such as berths, harbour dues, bridge times). Square sign with red border = <b>navigatiekanaal</b> (usually ch 10 or a VTS sector channel): listening compulsory.</li>
-      <li>Common channels: <b>18, 20, 22</b> bridges and locks · <b>31</b> often used by marinas · <b>77</b> social. Check blokkanalen for your route beforehand at <a href="https://www.vaarweginformatie.nl" target="_blank" rel="noopener">vaarweginformatie.nl</a> or in the Wateralmanak deel 1.</li>
-      <li>Calling: press the PTT, wait about 1 second, then speak. Use the 4 W's: who you are, what you are, where you are, where you're going / what you want.</li>
-      <li>Position words: <i>afvaart</i> (downstream, towards the sea) / <i>opvaart</i> (upstream); <i>boven</i> / <i>beneden</i> a lock or bridge (boven = higher water); <i>ter hoogte van</i> a landmark; left/right bank; kilometre post.</li>
-      <li>Rijkswaterstaat: <span class="phone">0800-8002</span>.</li>
-    </ul>
-    <h4 class="cx" data-c="nl" data-a="coast">Coast and sea</h4>
-    <ul class="cx" data-c="nl" data-a="coast">
-      <li>Listen on <b>ch 16</b>. Power up to 25 W; DSC allowed (needs Marcom-B or higher).</li>
-      <li><b>Kustwacht</b> watches ch 16, DSC ch 70 and MF DSC 2187.5 kHz. Voice name "Netherlands Coastguard", in SAR "Den Helder Rescue", MMSI <span class="mono">002442000</span>.</li>
-      <li>Gale warnings, forecasts and safety messages: announced on 16/70, broadcast on <b>ch 23 and 83</b>, and Navtex 518 kHz.</li>
-      <li>Medical advice (Radio Medische Dienst): call the Kustwacht on ch 16; you are connected to a doctor on a working channel.</li>
-      <li>Phone: <span class="phone">0900-0111</span> · <span class="phone">+31 88 958 4000</span> · <span class="phone">112</span>. Not urgent: KNRM Helpt <span class="phone">+31 88 999 61 00</span>.</li>
-    </ul>
-    <p class="srcs">Sources (Checked 24 Oct 2026): <a href="https://www.ccr-zkr.org/files/documents/reglementRP/rp41nl_pg_062017.pdf" target="_blank" rel="noopener">CCR inland radio handbook (RAINWAT)</a> · <a href="https://www.rdi.nl/onderwerpen/vergunningen-en-registraties/marifoons-en-overige-maritieme-communicatieapparatuur/marifoon-en-maritieme-zendapparatuur-instellen" target="_blank" rel="noopener">RDI</a> · <a href="https://ondernemersplein.overheid.nl/wetten-en-regels/regels-voor-marifoongebruik/" target="_blank" rel="noopener">Ondernemersplein</a> · <a href="https://www.kustwacht.nl/hulp/" target="_blank" rel="noopener">Kustwacht</a> · <a href="https://itu.int/mms/mars/coast/notes/HOL.pdf" target="_blank" rel="noopener">ITU coast station notes</a> · <a href="https://www.varendoejesamen.nl/kennis/marifoon-gebruiken-ja-natuurlijk" target="_blank" rel="noopener">Varen doe je samen</a> · <a href="https://www.vaarbewijzen.nl/dsc-gebruik-binnenwateren/" target="_blank" rel="noopener">Vaarbewijzen.nl</a> · <a href="https://cdn.prod.website-files.com/67d9891f29c33ea2bccf274a/685e5e3268dea7887bfe1cec_De%20Marifoonkaart.pdf" target="_blank" rel="noopener">VDJS Marifoonkaart (2025)</a> · <a href="https://rootsteps-s3.ams3.cdn.digitaloceanspaces.com/VarenDoeJeSamen/downloads/communicatie-op-het-water.pdf" target="_blank" rel="noopener">VDJS: Communicatie op het water</a> · <a href="https://varendoejesamen.nl/kenniscentrum/artikel/examens-marifonie-vanaf-1-juli-2023-het-cbr" target="_blank" rel="noopener">VDJS: exams via CBR</a></p>
-    <p class="note"><b>Cross-check channels:</b> <a href="https://www.frequentieland.nl/maritiem/marifoonkanalen.htm" target="_blank" rel="noopener">Frequentieland: marifoonkanalen</a>. Every channel with ship and shore frequency and its Dutch use (bridges and locks, port operations, traffic guidance, Kustwacht). Not an official source and no update date shown; blokkanalen per area are not listed.</p>
-  </div>
-  <div class="cx nbv panel sec" lang="nl" id="country-nl-nl" data-c="nl"><h2><span class="cflag">NL</span>Nederland: lokale regels</h2>
-    <h4>Registratie en certificaat</h4>
-    <ul>
-      <li>Registreer elke marifoon (vast en handheld) bij de <b>RDI</b>. Je krijgt een roepnaam, een <b>ATIS-code</b> en (indien nodig) een <b>MMSI</b>, en moet die correct programmeren. Zonder registratie geen maritieme zender aan boord.</li>
-      <li>Examens (theorie bij het <b>CBR</b>, praktijk bij door het CBR erkende opleiders) en certificaataanvragen gaan via het CBR; registratie van de marifoon via de RDI.</li>
-      <li><b>Basiscertificaat Marifonie</b>: alleen binnenwateren. <b>Marcom-B</b>: binnen- en kustwateren; nodig voor de zee-stand met DSC. <b>Marcom-A</b>: binnenwateren, kust en zee. Een buitenlands certificaat zoals SRC kan gebruikt worden voor de registratie.</li>
-      <li>Een vaste marifoon is verplicht op schepen van <b>20 m of langer</b>. Tot 20 m mag op de binnenwateren een handheld (portofoon).</li>
-      <li>Nederlandse MMSI's beginnen met <span class="mono">244, 245, 246</span>.</li>
-    </ul>
-    <h4 class="cx" data-c="nl" data-a="inland">Binnenwateren (rivieren, kanalen, meren; voor het uitluisteren ook IJsselmeer en Wadden)</h4>
-    <ul class="cx" data-c="nl" data-a="inland">
-      <li><b>Luister uit op kanaal 10</b> (schip–schip, aanroep, veiligheid). Uitwijkkanaal: 13.</li>
-      <li><b>Blokgebied</b>: een VHF-bord met <b>rode</b> rand betekent verplicht uitluisteren op dat blokkanaal; een <b>blauw</b> bord is een informatiekanaal (aanbevolen). Ga terug naar kanaal 10 als je het gebied verlaat.</li>
-      <li>Bruggen en sluizen: gebruik het kanaal op het bord en ga daarna terug naar 10 of het blokkanaal.</li>
-      <li>Privégesprekken alleen op <b>72 en 77</b>. Portofoons aan boord: <b>15 en 17</b>.</li>
-      <li><b>ATIS is verplicht</b>: je code wordt automatisch uitgezonden als je de spreekknop loslaat.</li>
-      <li><b>DSC is niet toegestaan</b> in de binnenvaart, behalve vrijwillig op bepaalde grote Nederlandse wateren. Een DSC-alarm zou ook nauwelijks ontvangen worden (verkeersposten en de meeste binnenvaartschepen hebben geen DSC).</li>
-      <li>Maximaal zendvermogen <b>1 W</b>; de marifoon schakelt op schip–schipkanalen automatisch terug.</li>
-      <li><b>Dual watch is niet toegestaan</b> op de binnenwateren.</li>
-      <li>IJsselmeer: kanaal 1 is het informatiekanaal van de Centrale Meldpost (uitzendingen rond kwart over het hele uur). Blijf er niet op staan; ga terug naar 10.</li>
-      <li>Nood, spoed en veiligheid gebruiken dezelfde procedurewoorden (MAYDAY, PAN PAN, SECURITE), op kanaal 10 / het blokkanaal; op IJsselmeer, Markermeer, Wadden en de Zeeuwse wateren op kanaal 16. Schepen die niet deelnemen bewaren radiostilte.</li>
-      <li>Heb je een marifoon aan boord, dan ben je verplicht uit te luisteren (artikel 4.05 BPR). <b>Klein schip: aanmelden mag, antwoorden verplicht.</b></li>
-      <li>Blauw vierkant bord = <b>informatiekanaal</b> (aanbeveling om uit te luisteren; vraag hier alleen informatie op, zoals ligplaats, havengeld, brugopeningstijden). Vierkant bord met rode rand = <b>navigatiekanaal</b> (meestal kanaal 10 of een sectorkanaal bij verkeersbegeleiding): verplicht uitluisteren.</li>
-      <li>Veelgebruikte kanalen: <b>18, 20, 22</b> brug- en sluisbediening · <b>31</b> vaak door havens · <b>77</b> sociaal kanaal. Check vooraf de blokkanalen op je route via <a href="https://www.vaarweginformatie.nl" target="_blank" rel="noopener">vaarweginformatie.nl</a> of in de Wateralmanak deel 1.</li>
-      <li>Oproepen: druk de spreekknop in, wacht ongeveer 1 seconde en spreek dan. Gebruik de 4 W's: wie ben je, wat ben je, waar ben je, wat wil je of waarheen ga je.</li>
-      <li>Positiewoorden: <i>afvaart</i> (stroomafwaarts, richting zee) / <i>opvaart</i> (stroomopwaarts); <i>boven</i> / <i>beneden</i> een sluis of brug (boven = hoger water); <i>ter hoogte van</i> een herkenningspunt; linker- of rechteroever; kilometerraaipaal. Zie Waters.</li>
-      <li>Rijkswaterstaat: <span class="phone">0800-8002</span>.</li>
-    </ul>
-    <h4 class="cx" data-c="nl" data-a="coast">Kust en zee</h4>
-    <ul class="cx" data-c="nl" data-a="coast">
-      <li>Luister uit op <b>kanaal 16</b>. Vermogen tot 25 W; DSC toegestaan (vanaf Marcom-B).</li>
-      <li>De <b>Kustwacht</b> luistert uit op kanaal 16, DSC kanaal 70 en MF DSC 2187,5 kHz. Roepnaam "Netherlands Coastguard", bij een redding "Den Helder Rescue", MMSI <span class="mono">002442000</span>.</li>
-      <li>Stormwaarschuwingen, weerberichten en veiligheidsberichten: aangekondigd op 16/70, uitgezonden op <b>kanaal 23 en 83</b> en via Navtex 518 kHz.</li>
-      <li>Medisch advies (Radio Medische Dienst): roep de Kustwacht op via kanaal 16; je wordt op een werkkanaal doorverbonden met een arts.</li>
-      <li>Telefoon: <span class="phone">0900-0111</span> · <span class="phone">+31 88 958 4000</span> · <span class="phone">112</span>. Geen spoed: KNRM Helpt <span class="phone">+31 88 999 61 00</span>.</li>
-    </ul>
-    <p class="note"><b>Kanalen controleren:</b> <a href="https://www.frequentieland.nl/maritiem/marifoonkanalen.htm" target="_blank" rel="noopener">Frequentieland: marifoonkanalen</a>. Geen officiële bron en zonder datum; blokkanalen per gebied staan er niet in.</p>
-    <p class="srcs">Bronnen: zie de Engelse versie (English) van dit overzicht. Gecontroleerd 24 okt 2026.</p>
-  </div>
-
-  <div class="cx env panel sec" id="country-no" data-c="no"><h2><span class="cflag">NO</span>Norway: local rules</h2>
-    <h4>Licence and certificate</h4>
-    <ul>
-      <li><b>SRC</b> required, from an approved exam with Sjøfartsdirektoratet (the Norwegian Maritime Authority).</li>
-      <li><b>VHF licence</b> from Sjøfartsdirektoratet (since 1 Jan 2026, previously Telenor): gives callsign and MMSI; renews automatically each year. Program the MMSI into the radio, or the DISTRESS button won't work. Keep the licence on board.</li>
-      <li>DSC radio strongly recommended. ATIS is not required on Norwegian coastal waters.</li>
-      <li>Norwegian MMSIs start with <span class="mono">257, 258, 259</span>.</li>
-    </ul>
-    <h4>Coast radio</h4>
-    <ul>
-      <li><b>Who covers where:</b> <b>Kystradio Sør</b> (Stavanger) from the Swedish border to Rørvik in Trøndelag, about 65° N, so including Bergen, Sognefjord, Ålesund and Trondheim. <b>Kystradio Nord</b> (Bodø) from Rørvik to the Russian border. The rescue centres split the same way at 65° N: Hovedredningssentralen Sør-Norge and Nord-Norge.</li>
-      <li><b>Kystradio Sør</b> (<span class="phone">+47 51 69 00 44</span>) and <b>Kystradio Nord</b> (<span class="phone">+47 75 52 89 25</span>); phone <span class="phone">120</span> from a Norwegian mobile. With a foreign phone use the +47 numbers (save them in your contacts); 120 may not work from a foreign SIM, 112 always does. Since 1 Jan 2026 run by Hovedredningssentralen (JRCC); Kystverket runs the technical network.</li>
-      <li>Continuous watch on <b>ch 16</b> and their working channels; they receive DSC distress alerts and link you to the rescue centre.</li>
-      <li><b>Medico</b>: direct contact with a doctor for serious acute injury or illness, via Kystradio.</li>
-      <li>Weather and navigational warnings every 3 hours; you can ask for the latest.</li>
-      <li>Keep your listening watch on ch 16. Use the radio regularly and do a radio check.</li>
-    </ul>
-    <h4>VTS (sjøtrafikksentraler)</h4>
-    <div class="tbl"><table><thead><tr><th>VTS</th><th>Ch</th><th>Phone</th></tr></thead><tbody>
-      <tr><td>Horten (Oslofjord)</td><td class="n">19 inner · 18 outer</td><td class="n">+47 33 03 49 60</td></tr>
-      <tr><td>Brevik</td><td class="n">80</td><td class="n">+47 35 57 26 20</td></tr>
-      <tr><td>Kvitsøy</td><td class="n">19 N · 18 S</td><td class="n">+47 51 73 60 33</td></tr>
-      <tr><td>Fedje</td><td class="n">80 N · 71 S</td><td class="n">+47 56 16 44 32</td></tr>
-      <tr><td>Kinn</td><td class="n">18</td><td class="n">+47 70 23 11 23</td></tr>
-      <tr><td>Melkøya ("Nor VTS")</td><td class="n">71</td><td class="n">+47 78 98 98 98</td></tr>
-      <tr><td>NOR VTS (Barents)</td><td class="n">16</td><td class="n">+47 78 98 98 98</td></tr>
-    </tbody></table></div>
-    <p class="lead" style="font-size:14px">Useful to listen to in a VTS area, especially near shipping lanes. The source does not say whether leisure craft must report.</p>
-    <h4>Phone numbers</h4>
-    <p><span class="phone">120</span> Kystradio · <span class="phone">112</span> police · <span class="phone">113</span> medical · <span class="phone">110</span> fire · <span class="phone">02016</span> Redningsselskapet assistance (or RS SafeTrx app) · <span class="phone">02800</span> police, non-urgent</p>
-    <p class="note"><b>With a Dutch / foreign SIM:</b> 112 always works. 113 and 110 usually work but aren't guaranteed. 120, 02016 and 02800 are Norwegian service numbers and probably won't work. Use the radio (ch 16), 112, or Kystradio on <span class="phone">+47 51 69 00 44</span> (Sør) / <span class="phone">+47 75 52 89 25</span> (Nord). A Norwegian prepaid SIM solves this.</p>
-    <p class="srcs">Sources (Checked 24 Oct 2026): <a href="https://kystradio.no/" target="_blank" rel="noopener">Kystradio</a> · <a href="https://www.kystverket.no/navigasjonstjenester/kystradio---infrastruktur-for-nod--og-sikkerhetskommunikasjon/" target="_blank" rel="noopener">Kystverket</a> · <a href="https://www.sdir.no/fritidsbat/maritim-radio-for-fritidsbatbrukere/hva-kan-kystradiostasjonene-gjore-for-deg/" target="_blank" rel="noopener">Sjøfartsdirektoratet</a> · <a href="https://www.sdir.no/en/Leisure-boat/maritim-radio-for-fritidsbatbrukere/dette-trenger-du-vhf-pa-1-2-3/" target="_blank" rel="noopener">SDIR: VHF 1-2-3</a> · <a href="https://kystverket.no/en/contact/vts-service" target="_blank" rel="noopener">Kystverket VTS</a> · <a href="https://batforerskolen.no/batforerproven/spesielt-viktige-emner/nodsituasjoner-vhf-mobil/" target="_blank" rel="noopener">Båtførerskolen</a></p>
-  </div>
-  <div class="cx nbv panel sec" lang="nb" id="country-no-nb" data-c="no"><h2><span class="cflag">NO</span>Norge: lokale regler</h2>
-    <h4>Lisens og sertifikat</h4>
-    <ul>
-      <li><b>SRC</b> kreves, etter godkjent eksamen hos Sjøfartsdirektoratet.</li>
-      <li><b>VHF-lisens</b> fra Sjøfartsdirektoratet (siden 1. januar 2026, tidligere Telenor): gir kallesignal og MMSI, og fornyes automatisk hvert år. MMSI-nummeret må programmeres i radioen, ellers virker ikke nødknappen (DISTRESS). Lisensen skal oppbevares om bord.</li>
-      <li>VHF med DSC anbefales sterkt. ATIS kreves ikke i norske kystfarvann.</li>
-      <li>Norske MMSI-numre begynner med <span class="mono">257, 258, 259</span>.</li>
-    </ul>
-    <h4>Kystradio</h4>
-    <ul>
-      <li><b>Hvem dekker hvor:</b> <b>Kystradio Sør</b> (Stavanger) fra svenskegrensen til Rørvik i Trøndelag, ca. 65° N, altså også Bergen, Sognefjorden, Ålesund og Trondheim. <b>Kystradio Nord</b> (Bodø) fra Rørvik til grensen mot Russland. Hovedredningssentralen er delt på samme måte ved 65° N: Sør-Norge og Nord-Norge.</li>
-      <li><b>Kystradio Sør</b> (<span class="phone">+47 51 69 00 44</span>) og <b>Kystradio Nord</b> (<span class="phone">+47 75 52 89 25</span>); telefon <span class="phone">120</span> fra norsk mobil. Med utenlandsk telefon: bruk +47-numrene (lagre dem i kontaktene); 120 virker kanskje ikke med utenlandsk SIM, 112 virker alltid. Siden 1. januar 2026 drevet av Hovedredningssentralen; Kystverket drifter det tekniske nettet.</li>
-      <li>Kontinuerlig lyttevakt på <b>kanal 16</b> og arbeidskanalene; de mottar DSC-nødalarmer og setter deg i kontakt med redningssentralen.</li>
-      <li><b>Medico</b>: direkte kontakt med lege ved alvorlig akutt skade eller sykdom, via Kystradio.</li>
-      <li>Værmeldinger og navigasjonsvarsler hver 3. time; du kan be om siste værmelding.</li>
-      <li>Hold lyttevakt på kanal 16. Bruk radioen jevnlig og ta en radiosjekk.</li>
-    </ul>
-    <h4>Sjøtrafikksentraler (VTS)</h4>
-    <div class="tbl"><table><thead><tr><th>Sentral</th><th>Kanal</th><th>Telefon</th></tr></thead><tbody>
-      <tr><td>Horten (Oslofjorden)</td><td class="n">19 indre · 18 ytre</td><td class="n">+47 33 03 49 60</td></tr>
-      <tr><td>Brevik</td><td class="n">80</td><td class="n">+47 35 57 26 20</td></tr>
-      <tr><td>Kvitsøy</td><td class="n">19 N · 18 S</td><td class="n">+47 51 73 60 33</td></tr>
-      <tr><td>Fedje</td><td class="n">80 N · 71 S</td><td class="n">+47 56 16 44 32</td></tr>
-      <tr><td>Kinn</td><td class="n">18</td><td class="n">+47 70 23 11 23</td></tr>
-      <tr><td>Melkøya («Nor VTS»)</td><td class="n">71</td><td class="n">+47 78 98 98 98</td></tr>
-      <tr><td>NOR VTS (Barentshavet)</td><td class="n">16</td><td class="n">+47 78 98 98 98</td></tr>
-    </tbody></table></div>
-    <p class="lead" style="font-size:14px">Nyttig å lytte på i et VTS-område, særlig nær skipsleder. Kilden sier ikke om fritidsbåter må melde seg.</p>
-    <h4>Telefonnumre</h4>
-    <p><span class="phone">120</span> Kystradio · <span class="phone">112</span> politi · <span class="phone">113</span> medisinsk nødhjelp · <span class="phone">110</span> brann · <span class="phone">02016</span> Redningsselskapets assistanse (eller appen RS SafeTrx) · <span class="phone">02800</span> politi, ikke akutt</p>
-    <p class="note"><b>Med nederlandsk / utenlandsk SIM:</b> 112 virker alltid. 113 og 110 virker som regel, men ikke garantert. 120, 02016 og 02800 er norske tjenestenumre og virker trolig ikke. Bruk radioen (kanal 16), 112 eller Kystradio på <span class="phone">+47 51 69 00 44</span> (Sør) / <span class="phone">+47 75 52 89 25</span> (Nord). Et norsk kontantkort løser dette.</p>
-    <h4>Nødprosedyren på norsk</h4>
-    <p class="lead" style="font-size:14px">Rekkefølgen slik den står på nødprosedyrekortet fra Telenor Maritim Radio. Selve sambandet gjøres på engelsk (MAYDAY, «this is»), men slik heter delene på norsk:</p>
-    <div class="tbl"><table><thead><tr><th>Norsk</th><th>English</th></tr></thead><tbody>
-      <tr><td><b>Nødalarmering</b>: trykk inn den røde DSC-knappen (nødknappen)</td><td>DSC distress alert</td></tr>
-      <tr><td><b>Nødkalling</b>: MAYDAY ×3, «Dette er», fartøyets navn ×3, kallesignal, MMSI</td><td>Distress call</td></tr>
-      <tr><td><b>Nødmelding</b>: MAYDAY, navn, kallesignal, MMSI</td><td>Distress message</td></tr>
-      <tr><td>fartøyets posisjon</td><td>position</td></tr>
-      <tr><td>type nød (hvilken nød det er)</td><td>nature of distress</td></tr>
-      <tr><td>hvilken hjelp som trengs</td><td>assistance required</td></tr>
-      <tr><td>antall personer om bord</td><td>number of persons on board</td></tr>
-      <tr><td>andre viktige opplysninger</td><td>other information</td></tr>
-    </tbody></table></div>
-    <h4>Nyttige ord i en nødsituasjon</h4>
-    <div class="tbl"><table><thead><tr><th>Norsk</th><th>English</th><th>Kilde</th></tr></thead><tbody>
-      <tr><td>nødanrop · nødmelding</td><td>distress call · distress message</td><td>B, T</td></tr>
-      <tr><td>hastemelding (Pan-Pan)</td><td>urgency message</td><td>K</td></tr>
-      <tr><td>sikkerhetsmelding (Sécurité)</td><td>safety message</td><td>B</td></tr>
-      <tr><td>lyttevakt</td><td>listening watch</td><td>B</td></tr>
-      <tr><td>kallekanal · arbeidskanal</td><td>calling channel · working channel</td><td>B</td></tr>
-      <tr><td>kallesignal</td><td>call sign</td><td>B</td></tr>
-      <tr><td>nødknapp</td><td>distress button</td><td>B</td></tr>
-      <tr><td>radiosjekk</td><td>radio check</td><td>B</td></tr>
-      <tr><td>brann</td><td>fire</td><td>T</td></tr>
-      <tr><td>grunnstøting · grunnstøtt</td><td>grounding · aground</td><td>T, B, O</td></tr>
-      <tr><td>kantring · kantret</td><td>capsizing · capsized</td><td>T, O</td></tr>
-      <tr><td>synker</td><td>sinking</td><td>T</td></tr>
-      <tr><td>mann over bord</td><td>man overboard</td><td>T</td></tr>
-      <tr><td>lekkasje · tar inn vann</td><td>leak · taking on water</td><td>O</td></tr>
-      <tr><td>motorstopp · i drift</td><td>engine failure · adrift</td><td>O</td></tr>
-      <tr><td>slep</td><td>tow</td><td>O</td></tr>
-      <tr><td>skadet · syk · lege</td><td>injured · ill · doctor</td><td>O</td></tr>
-      <tr><td>redningsskøyte</td><td>rescue boat</td><td>O</td></tr>
-      <tr><td>nødbluss</td><td>distress flare</td><td>O</td></tr>
-      <tr><td>redningsvest · redningsflåte</td><td>life jacket · liferaft</td><td>O</td></tr>
-      <tr><td>kuling · storm · værmelding</td><td>gale · storm · weather forecast</td><td>O</td></tr>
-      <tr><td>mottatt · vent</td><td>received · wait</td><td>–</td></tr>
-    </tbody></table></div>
-    <p class="srcs">Kilder for ordene: <b>T</b> = <a href="https://favnforsikring.no/wp-content/uploads/2016/03/nodprosedyre_vhf.pdf" target="_blank" rel="noopener">Telenor Maritim Radio, Nødprosedyre for maritim VHF</a> · <b>B</b> = <a href="https://eteo.no/teori/batforerproven/kommunikasjon-og-nodssignaler/vhf-radio-prosedyrer/" target="_blank" rel="noopener">Båtførerprøven: VHF-prosedyrer (eteo.no)</a> · <b>K</b> = <a href="https://bukt.no/articles/kommunikasjon" target="_blank" rel="noopener">bukt.no: Kommunikasjon på sjøen</a> · <b>O</b> = <a href="https://ordbokene.no" target="_blank" rel="noopener">Bokmålsordboka (Språkrådet / UiB)</a>. «Mottatt» og «vent» fant jeg ikke i en offisiell norsk prosedyrekilde; prosedyreordene sies uansett på engelsk (RECEIVED, WAIT).</p>
-    <p class="srcs">Norsk tekst er oversatt av Claude fra kildene nedenfor, ikke en offisiell oversettelse. Ved tvil gjelder de offisielle kildene.</p>
-  </div>
-
-
-  <div class="panel sec" id="phonetic"><h2>Phonetic alphabet</h2>
-    <div class="phon" id="phon"><div><b>A</b><span>Alpha</span></div><div><b>B</b><span>Bravo</span></div><div><b>C</b><span>Charlie</span></div><div><b>D</b><span>Delta</span></div><div><b>E</b><span>Echo</span></div><div><b>F</b><span>Foxtrot</span></div><div><b>G</b><span>Golf</span></div><div><b>H</b><span>Hotel</span></div><div><b>I</b><span>India</span></div><div><b>J</b><span>Juliet</span></div><div><b>K</b><span>Kilo</span></div><div><b>L</b><span>Lima</span></div><div><b>M</b><span>Mike</span></div><div><b>N</b><span>November</span></div><div><b>O</b><span>Oscar</span></div><div><b>P</b><span>Papa</span></div><div><b>Q</b><span>Quebec</span></div><div><b>R</b><span>Romeo</span></div><div><b>S</b><span>Sierra</span></div><div><b>T</b><span>Tango</span></div><div><b>U</b><span>Uniform</span></div><div><b>V</b><span>Victor</span></div><div><b>W</b><span>Whiskey</span></div><div><b>X</b><span>X-Ray</span></div><div><b>Y</b><span>Yankee</span></div><div><b>Z</b><span>Zulu</span></div><div><b>1</b><span>One</span></div><div><b>2</b><span>Two</span></div><div><b>3</b><span>Three</span></div><div><b>4</b><span>Four</span></div><div><b>5</b><span>Five</span></div><div><b>6</b><span>Six</span></div><div><b>7</b><span>Seven</span></div><div><b>8</b><span>Eight</span></div><div><b>9</b><span>Niner</span></div><div><b>0</b><span>Zero</span></div></div>
-    <p class="lead js-only" style="font-size:14px;margin-top:10px">Spell your callsign: </p>
-    <div class="quick js-only"><input id="speller" placeholder="Type anything, e.g. MVYQ7" aria-label="Text to spell phonetically"><div id="spelled" class="script" style="font-size:18px;--k:var(--accent)"><span class="empty">The phonetic spelling appears here.</span></div></div>
-  </div>
-
-  <div class="panel sec" id="prowords"><h2>Prowords</h2>
-    <dl class="dl" id="pw"><dt>All after / All before</dt><dd>Asking for part of a message to be repeated: "say again all after a pound of sausages"</dd><dt>Correct / Wrong</dt><dd>"Correct" confirms a read-back. "Wrong" (not "incorrect") sounds completely different</dd><dt>Correction</dt><dd>Putting a mistake right: "a hundred and sixteen carrots, correction, one pound of carrots"</dd><dt>In figures / In letters</dt><dd>Distinguishing numbers and words: "Five Ashes Lane" vs "5, Ashes Lane"</dd><dt>I say again</dt><dd>I am going to repeat what I just said</dd><dt>I spell</dt><dd>I am going to spell the last word, using the phonetic alphabet</dd><dt>Out</dt><dd>End of transmission, no reply expected</dd><dt>Over</dt><dd>End of transmission, reply expected</dd><dt>Radio check</dt><dd>Please comment on the strength and quality of my transmission</dd><dt>Read back</dt><dd>Please read back the message I just passed</dd><dt>Received</dt><dd>I have received your message (not "roger")</dd><dt>Say again</dt><dd>Please repeat what you just said</dd><dt>Station calling</dt><dd>Instead of a name when you didn't hear who called you</dd><dt>Text</dt><dd>Start of a message to be written down and relayed verbatim</dd><dt>Traffic</dt><dd>General term for radio communications</dd><dt>This is</dt><dd>Identifying yourself at the start of a call</dd><dt>Wait</dt><dd>Wait, ideally with a time: "Wait five minutes"</dd><dt>Word after / Word before</dt><dd>Asking for a single word to be repeated or spelt</dd></dl>
-    <h4 style="margin-top:14px">Distress, urgency and safety prowords</h4>
-    <dl class="dl">
-      <dt>Mayday</dt><dd>Distress (from French <i>m'aidez</i>). Grave and imminent danger.</dd>
-      <dt>Mayday Relay</dt><dd>Passing on a distress message for another vessel.</dd>
-      <dt>Received Mayday</dt><dd>Acknowledging a distress message.</dd>
-      <dt>Seelonce Mayday</dt><dd>Radio silence: distress traffic in progress. Used by the casualty or the station controlling distress traffic.</dd>
-      <dt>Seelonce Feenee</dt><dd>Radio silence lifted; normal working may resume.</dd>
-      <dt>Pan-pan</dt><dd>Urgency (from French <i>panne</i>, breakdown). Very urgent message about the safety of a vessel or person.</dd>
-      <dt>Sécurité</dt><dd>Safety (pronounced "Securitay"). Navigational or meteorological warning.</dd>
-    </dl>
-    <p class="lead" style="font-size:14px">"Panpan Medico" is no longer used. "Medevac" only refers to medical transports in war.</p>
-  </div>
-
-  <div class="panel sec" id="special-ch"><h2>Channels worth memorising</h2>
-    <div class="tbl"><table><thead><tr><th>Ch</th><th>Use</th></tr></thead><tbody>
-      <tr class="cx" data-c="uk" data-a="coast"><td class="n">0</td><td>Private channel, UK Search and Rescue organisations (Coastguard, RNLI) <span class="tag">UK</span></td></tr>
-      <tr><td class="n">6, 8</td><td>Inter-ship</td></tr>
-      <tr><td class="n">11, 12, 14</td><td>Port operations</td></tr>
-      <tr><td class="n">13</td><td>Bridge-to-bridge, navigational safety</td></tr>
-      <tr class="hot"><td class="n">16</td><td><b>Distress, Safety and Calling</b></td></tr>
-      <tr class="cx" data-c="uk" data-a="coast"><td class="n">62, 63, 64</td><td>Maritime Safety Information broadcasts <span class="tag">UK</span></td></tr>
-      <tr class="cx" data-c="uk" data-a="coast"><td class="n">67</td><td>Small craft safety channel <span class="tag">UK</span></td></tr>
-      <tr class="hot"><td class="n">70</td><td><b>DSC only, no voice</b></td></tr>
-      <tr><td class="n">72, 77</td><td>Inter-ship</td></tr>
-      <tr><td class="n">75, 76</td><td>Guard band either side of 16: port ops/on-board only, max 1 W</td></tr>
-      <tr class="cx" data-c="uk" data-a="coast"><td class="n">80</td><td>Marinas (duplex) <span class="tag">UK</span></td></tr>
-      <tr class="cx" data-c="uk" data-a="coast"><td class="n">M, M2</td><td>UK private channels for marinas, yacht clubs, recreational craft; M may show as 37 or P1 <span class="tag">UK</span></td></tr>
-    </tbody></table></div>
-  </div>
-
-  <div class="panel sec" id="channels"><h2>Channel selection chart</h2>
-    <p class="note warn"><b>Changed since the handbook:</b> from 1 Jan 2023 (fully in use across Europe from 2024) channels <b>24, 25, 26, 84, 85, 86</b> are used for VDES data and can no longer be used for analogue voice duplex. Channels <b>27 and 28</b> are split into <b>1027/1028</b> (analogue simplex voice) and 2027/2028 (data). Locks and bridges that used these channels moved to others; follow the signs. Source: <a href="https://www.varendoejesamen.nl/nieuws/agentschap-telecom-wijziging-marifoonkanalen-1-januari-2023" target="_blank" rel="noopener">RDI via Varen doe je samen</a>.</p>
-    <p class="lead" style="font-size:15px">Frequencies in MHz. Duplex channels: ship transmits on the lower frequency. With semi-duplex equipment, two vessels cannot talk on a duplex channel.</p>
-    <div class="filter js-only" id="chfilter">
-      <button data-f="all" aria-pressed="true">All</button>
-      <button data-f="ship">Inter-ship</button>
-      <button data-f="port">Port ops</button>
-      <button data-f="pc">Public corr.</button>
-      <button data-f="simplex">Simplex</button>
-    </div>
-    <p class="cx env cnote" data-c="nl" data-a="inland"><b class="cflag">NL</b>Inland the uses differ from this international table: <b>10</b> = ship to ship and calling, <b>13</b> = fallback for 10, blokkanalen and lock/bridge channels vary by area (see the signs; often <b>18, 20, 22</b>), <b>31</b> often marinas, <b>72/77</b> private, <b>15/17</b> on board. DSC (70) not permitted. Cross-check: <a href="https://www.frequentieland.nl/maritiem/marifoonkanalen.htm" target="_blank" rel="noopener">Frequentieland</a>.</p>
-    <p class="cx nbv cnote" lang="nl" data-c="nl" data-a="inland"><b class="cflag">NL</b>Op het binnenwater wijkt het gebruik af van deze internationale tabel: <b>10</b> = schip–schip en aanroep, <b>13</b> = uitwijkkanaal voor 10, blokkanalen en brug- en sluiskanalen verschillen per gebied (zie de borden; vaak <b>18, 20, 22</b>), <b>31</b> vaak havens, <b>72/77</b> privé, <b>15/17</b> aan boord. DSC (70) niet toegestaan. Controle: <a href="https://www.frequentieland.nl/maritiem/marifoonkanalen.htm" target="_blank" rel="noopener">Frequentieland</a>.</p>
-    <p class="cx env cnote" data-c="nl" data-a="coast"><b class="cflag">NL</b>Kustwacht safety broadcasts on <b>23</b> and <b>83</b>. Cross-check: <a href="https://www.frequentieland.nl/maritiem/marifoonkanalen.htm" target="_blank" rel="noopener">Frequentieland</a>.</p>
-    <p class="cx nbv cnote" lang="nl" data-c="nl" data-a="coast"><b class="cflag">NL</b>Veiligheidsberichten van de Kustwacht op <b>23</b> en <b>83</b>. Controle: <a href="https://www.frequentieland.nl/maritiem/marifoonkanalen.htm" target="_blank" rel="noopener">Frequentieland</a>.</p>
-    <p class="cx env cnote" data-c="no"><b class="cflag">NO</b>VTS: <b>18, 19, 71, 80</b> (by area). Kystradio working channels vary by location; Kystradio tells you which.</p>
-    <p class="cx nbv cnote" lang="nb" data-c="no"><b class="cflag">NO</b>Sjøtrafikksentraler (VTS): <b>18, 19, 71, 80</b> (etter område). Kystradios arbeidskanaler varierer etter sted; Kystradio sier hvilken du skal bruke.</p>
-    <div class="tbl" style="max-height:70vh"><table><thead><tr><th>Ch</th><th>Ship TX</th><th>Coast TX</th><th>Use</th><th>Notes</th></tr></thead><tbody id="chbody"><tr class=""><td class="n"><b>01</b></td><td class="n">156.050</td><td class="n">160.650</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>02</b></td><td class="n">156.100</td><td class="n">160.700</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>03</b></td><td class="n">156.150</td><td class="n">160.750</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>04</b></td><td class="n">156.200</td><td class="n">160.800</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>05</b></td><td class="n">156.250</td><td class="n">160.850</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>06</b></td><td class="n">156.300</td><td class="n">–</td><td>Inter-ship</td><td>Ship to ship</td></tr><tr class=""><td class="n"><b>07</b></td><td class="n">156.350</td><td class="n">160.950</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>08</b></td><td class="n">156.400</td><td class="n">–</td><td>Inter-ship</td><td>Ship to ship</td></tr><tr class=""><td class="n"><b>09</b></td><td class="n">156.450</td><td class="n">156.450</td><td>Inter-ship · Port ops</td><td>Used by pilots</td></tr><tr class=""><td class="n"><b>10</b></td><td class="n">156.500</td><td class="n">156.500</td><td>Inter-ship · Port ops</td><td>Used by HM Coastguard</td></tr><tr class=""><td class="n"><b>11</b></td><td class="n">156.550</td><td class="n">156.550</td><td>Port ops</td><td>Port operations</td></tr><tr class=""><td class="n"><b>12</b></td><td class="n">156.600</td><td class="n">156.600</td><td>Port ops</td><td>Port operations</td></tr><tr class=""><td class="n"><b>13</b></td><td class="n">156.650</td><td class="n">156.650</td><td>Inter-ship · Port ops</td><td>Bridge-to-bridge working</td></tr><tr class=""><td class="n"><b>14</b></td><td class="n">156.700</td><td class="n">156.700</td><td>Port ops</td><td>Port operations</td></tr><tr class=""><td class="n"><b>15</b></td><td class="n">156.750</td><td class="n">156.750</td><td>Inter-ship · Port ops</td><td>On-board working</td></tr><tr class="hot"><td class="n"><b>16</b></td><td class="n">156.800</td><td class="n">156.800</td><td>–</td><td><b>DISTRESS, SAFETY AND CALLING</b></td></tr><tr class=""><td class="n"><b>17</b></td><td class="n">156.850</td><td class="n">156.850</td><td>Inter-ship · Port ops</td><td>On-board working</td></tr><tr class=""><td class="n"><b>18</b></td><td class="n">156.900</td><td class="n">161.500</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>19</b></td><td class="n">156.950</td><td class="n">161.550</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>20</b></td><td class="n">157.000</td><td class="n">161.600</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>21</b></td><td class="n">157.050</td><td class="n">161.650</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>22</b></td><td class="n">157.100</td><td class="n">161.700</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>23</b></td><td class="n">157.150</td><td class="n">161.750</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>24</b></td><td class="n">157.200</td><td class="n">161.800</td><td>Port ops · Public corr.</td><td>VDES: digital data since 2023, no analogue voice</td></tr><tr class=""><td class="n"><b>25</b></td><td class="n">157.250</td><td class="n">161.850</td><td>Port ops · Public corr.</td><td>VDES: digital data since 2023, no analogue voice</td></tr><tr class=""><td class="n"><b>26</b></td><td class="n">157.300</td><td class="n">161.900</td><td>Port ops · Public corr.</td><td>VDES satellite since 2023, no analogue voice</td></tr><tr class=""><td class="n"><b>27</b></td><td class="n">157.350</td><td class="n">161.950</td><td>Port ops (two freq.) · Public corr.</td><td>Split: 1027 = analogue simplex voice, 2027 = data</td></tr><tr class=""><td class="n"><b>28</b></td><td class="n">157.400</td><td class="n">162.000</td><td>Port ops (two freq.) · Public corr.</td><td>Split: 1028 = analogue simplex voice, 2028 = data</td></tr><tr class=""><td class="n"><b>60</b></td><td class="n">156.025</td><td class="n">160.625</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>61</b></td><td class="n">156.075</td><td class="n">160.675</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>62</b></td><td class="n">156.125</td><td class="n">160.725</td><td>Port ops · Public corr.</td><td>HMCG MSI broadcasts (UK)</td></tr><tr class=""><td class="n"><b>63</b></td><td class="n">156.175</td><td class="n">160.775</td><td>Port ops · Public corr.</td><td>HMCG MSI broadcasts (UK)</td></tr><tr class=""><td class="n"><b>64</b></td><td class="n">156.225</td><td class="n">160.825</td><td>Port ops · Public corr.</td><td>HMCG MSI broadcasts (UK)</td></tr><tr class=""><td class="n"><b>65</b></td><td class="n">156.275</td><td class="n">160.875</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>66</b></td><td class="n">156.325</td><td class="n">160.925</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>67</b></td><td class="n">156.375</td><td class="n">156.375</td><td>Inter-ship · Port ops</td><td>UK small ship safety</td></tr><tr class=""><td class="n"><b>68</b></td><td class="n">156.425</td><td class="n">156.425</td><td>Port ops</td><td></td></tr><tr class=""><td class="n"><b>69</b></td><td class="n">156.475</td><td class="n">156.475</td><td>Inter-ship · Port ops</td><td>Port operations</td></tr><tr class="hot"><td class="n"><b>70</b></td><td class="n">156.525</td><td class="n">156.525</td><td>–</td><td><b>DSC ONLY. NOT FOR VOICE</b></td></tr><tr class=""><td class="n"><b>71</b></td><td class="n">156.575</td><td class="n">156.575</td><td>Port ops</td><td></td></tr><tr class=""><td class="n"><b>72</b></td><td class="n">156.625</td><td class="n">–</td><td>Inter-ship</td><td>Ship to ship</td></tr><tr class=""><td class="n"><b>73</b></td><td class="n">156.675</td><td class="n">156.675</td><td>Inter-ship · Port ops</td><td>Used by HM Coastguard</td></tr><tr class=""><td class="n"><b>74</b></td><td class="n">156.725</td><td class="n">156.725</td><td>Port ops</td><td></td></tr><tr class=""><td class="n"><b>75</b></td><td class="n">156.775</td><td class="n">156.775</td><td>Port ops</td><td>Guard band: navigation comms, 1 W</td></tr><tr class=""><td class="n"><b>76</b></td><td class="n">156.825</td><td class="n">156.825</td><td>Port ops</td><td>Guard band: navigation comms, 1 W</td></tr><tr class=""><td class="n"><b>77</b></td><td class="n">156.875</td><td class="n">–</td><td>Inter-ship</td><td>Ship to ship</td></tr><tr class=""><td class="n"><b>78</b></td><td class="n">156.925</td><td class="n">161.525</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>79</b></td><td class="n">156.975</td><td class="n">161.575</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>80</b></td><td class="n">157.025</td><td class="n">161.625</td><td>Port ops · Public corr.</td><td>Marinas (UK only)</td></tr><tr class=""><td class="n"><b>81</b></td><td class="n">157.075</td><td class="n">161.675</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>82</b></td><td class="n">157.125</td><td class="n">161.725</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>83</b></td><td class="n">157.175</td><td class="n">161.775</td><td>Port ops · Public corr.</td><td></td></tr><tr class=""><td class="n"><b>84</b></td><td class="n">157.225</td><td class="n">161.825</td><td>Port ops · Public corr.</td><td>VDES: digital data since 2023, no analogue voice</td></tr><tr class=""><td class="n"><b>85</b></td><td class="n">157.275</td><td class="n">161.875</td><td>Port ops · Public corr.</td><td>VDES: digital data since 2023, no analogue voice</td></tr><tr class=""><td class="n"><b>86</b></td><td class="n">157.325</td><td class="n">161.925</td><td>Port ops · Public corr.</td><td>VDES satellite since 2023, no analogue voice</td></tr><tr class=""><td class="n"><b>87</b></td><td class="n">157.375</td><td class="n">157.375</td><td>Port ops</td><td></td></tr><tr class=""><td class="n"><b>88</b></td><td class="n">157.425</td><td class="n">157.425</td><td>Port ops</td><td></td></tr><tr class=""><td class="n"><b>AIS 1</b></td><td class="n">161.975</td><td class="n">161.975</td><td>–</td><td>AIS</td></tr><tr class=""><td class="n"><b>AIS 2</b></td><td class="n">162.025</td><td class="n">162.025</td><td>–</td><td>AIS</td></tr><tr class=""><td class="n"><b>M (37)</b></td><td class="n">157.850</td><td class="n">157.850</td><td>Port ops</td><td>UK private: marinas, clubs, recreational craft</td></tr><tr class=""><td class="n"><b>M2</b></td><td class="n">161.425</td><td class="n">161.425</td><td>Port ops</td><td>UK private: marinas, clubs, recreational craft</td></tr></tbody></table></div>
-  </div>
-
-  <div class="panel sec" id="posconv"><h2>Position converter</h2>
-    <p>Google Maps and phones show <b>decimal degrees</b> (50.9174962, -4.7981849). At sea you give <b>degrees and decimal minutes</b>: multiply the decimals by 60. Plus = N / E, minus = S / W. Longitude has three digits for the degrees.</p>
-    <div class="quick js-only"><input id="rc-in" placeholder="paste e.g. 50.9174962, -4.7981849" aria-label="Decimal coordinates"><div id="rc-out" class="conv-out"><p class="lead" style="font-size:14px;margin:.4em 0">Paste latitude, longitude as decimals, e.g. 50.9174962, -4.7981849</p></div></div>
-    <p class="note">Example: 50.9174962, -4.7981849 → <b class="mono">50° 55.05' N, 004° 47.89' W</b>. On the radio, read the figures out digit by digit.</p>
-  </div>
-
-  <div class="panel sec" id="range"><h2>VHF range</h2>
-    <p>Radio horizon (nautical miles) ≈ <b>3 × √(antenna height in metres)</b>. Two stations can talk when their horizons overlap: add them up.</p>
-    <div class="tbl"><table><thead><tr><th></th><th>Dinghy 1 m</th><th>Motor 4 m</th><th>Yacht 16 m</th><th>Ship 36 m</th><th>Coast 100 m</th></tr></thead><tbody>
-      <tr><td><b>Own horizon</b></td><td class="n">3</td><td class="n">6</td><td class="n">12</td><td class="n">18</td><td class="n">30</td></tr>
-      <tr><td>Dinghy</td><td class="n">6</td><td class="n">9</td><td class="n">15</td><td class="n">21</td><td class="n">33</td></tr>
-      <tr><td>Motor boat</td><td class="n">9</td><td class="n">12</td><td class="n">18</td><td class="n">24</td><td class="n">36</td></tr>
-      <tr><td>Sailing yacht</td><td class="n">15</td><td class="n">18</td><td class="n">24</td><td class="n">30</td><td class="n">42</td></tr>
-      <tr><td>Ship</td><td class="n">21</td><td class="n">24</td><td class="n">30</td><td class="n">36</td><td class="n">48</td></tr>
-      <tr><td>Coast station</td><td class="n">33</td><td class="n">36</td><td class="n">42</td><td class="n">48</td><td class="n">–</td></tr>
-    </tbody></table></div>
-  </div>
-
   <div class="panel sec" id="beaufort"><h2>Beaufort scale: wind speed <span class="cx nbv nlt" lang="nl" data-c="nl">(windkracht)</span><span class="cx nbv nlt" lang="nb" data-c="no">(vindstyrke)</span></h2>
     <div class="tbl"><table><thead><tr><th>Bft</th><th>Name</th><th>knots</th><th>m/s</th><th>km/h</th></tr></thead><tbody>
       <tr><td class="n"><b>0</b></td><td>Calm <span class="cx nbv nlt" lang="nl" data-c="nl">(stil)</span><span class="cx nbv nlt" lang="nb" data-c="no">(stille)</span></td><td class="n">&lt; 1</td><td class="n">0–0.2</td><td class="n">&lt; 1</td></tr>
@@ -1590,66 +1706,7 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
     <p class="cx nbv cnote" lang="nb" data-c="no"><b class="cflag">NO</b>Norske varsler (Yr, Met.no) oppgir vind i <b>m/s</b>, ikke Beaufort. Bruk m/s-kolonnen.</p>
     <p class="srcs">WMO Beaufort scale (mean wind at 10 m). Wave descriptions: see the KVB weather section and Day Skipper 7.3.</p>
   </div>
-
-  <div class="panel sec" id="mmsi"><h2>MMSI formats</h2>
-    <dl class="dl">
-      <dt>Ship</dt><dd><span class="mono">MID + 6 digits</span>. 9 digits; first three = Maritime Identification Digits (country). UK: 232, 233, 234, 235. e.g. <span class="mono">232089001</span></dd>
-      <dt>Coast station</dt><dd><span class="mono">00 + MID + 4 digits</span>. e.g. Milford Haven Coastguard <span class="mono">002320017</span></dd>
-      <dt>Group</dt><dd><span class="mono">0 + MID + 5 digits</span>. e.g. <span class="mono">023208591</span>. Can be stored and deleted freely.</dd>
-      <dt>AIS EPIRB</dt><dd>Manufacturer's 9-digit code beginning <span class="mono">974</span></dd>
-      <dt>EPIRB / PLB</dt><dd>15-character <b>Hex ID</b></dd>
-    </dl>
-    <p class="note"><b>Look up a ship or station:</b> <a href="https://mmsapp.itu.int/mmsapp/shipstation/list" target="_blank" rel="noopener">ITU MARS Ship Station List</a>. Search by ship name, MMSI, call sign, EPIRB Hex ID or vessel ID number, and filter by country. Needs internet.</p>
-    <p class="note">Your own MMSI can usually be entered into a Class D controller only <b>once</b>. A mistake means returning it to the supplier.</p>
-  </div>
-
-  <div class="panel sec" id="smcp"><h2>Standard Marine Communication Phrases</h2>
-    <p class="lead" style="font-size:15px">IMO's "standard English" for the sea. Not compulsory.</p>
-    <h4>Message markers</h4>
-    <dl class="dl">
-      <dt>QUESTION</dt><dd>The following message is a question</dd>
-      <dt>ANSWER</dt><dd>Reply to a previous question</dd>
-      <dt>REQUEST</dt><dd>Asking for action from others</dd>
-      <dt>INFORMATION</dt><dd>Observed facts only</dd>
-      <dt>INTENTION</dt><dd>Immediate navigational actions you intend to take</dd>
-      <dt>WARNING</dt><dd>Dangers to other traffic</dd>
-      <dt>ADVICE</dt><dd>A recommendation to influence the recipient</dd>
-      <dt>INSTRUCTION</dt><dd>A regulation-based instruction</dd>
-    </dl>
-    <h4>Standard responses</h4>
-    <ul>
-      <li>Affirmative: "Yes, …" + the phrase in full. Negative: "No, …" + the phrase in full.</li>
-      <li>Information coming soon: "Stand by". Can't be obtained: "No information".</li>
-      <li>Not properly heard: "Say again". Not understood: "Message not understood".</li>
-    </ul>
-    <h4>Readability and signal strength</h4>
-    <div class="tbl"><table><thead><tr><th>#</th><th>"I read you…"</th><th>Signal strength</th></tr></thead><tbody>
-      <tr><td class="n">1</td><td>bad</td><td>barely perceptible</td></tr>
-      <tr><td class="n">2</td><td>poor</td><td>weak</td></tr>
-      <tr><td class="n">3</td><td>fair</td><td>fairly good</td></tr>
-      <tr><td class="n">4</td><td>good</td><td>good</td></tr>
-      <tr><td class="n">5</td><td>excellent</td><td>very good</td></tr>
-    </tbody></table></div>
-    <h4>Useful phrases</h4>
-    <ul>
-      <li>What is your name (and call sign)? · How do you read me?</li>
-      <li>Stand by on channel … · Change to channel …</li>
-      <li>I cannot read you. · I cannot understand you.</li>
-      <li>I am passing a message for vessel … · Correction …</li>
-      <li>I am (not) ready to receive your message.</li>
-      <li>I do not have channel … Please use channel …</li>
-    </ul>
-    <h4>Conventions</h4>
-    <ul>
-      <li><b>Repetition:</b> "repeat" for vital parts: "You will load 163 repeat 163 tons bunkers", "Do not repeat not overtake".</li>
-      <li><b>Position:</b> degrees and minutes (decimals if needed) N/S, E/W; or bearing <b>FROM</b> a well-defined charted mark, 360° true, plus distance.</li>
-      <li><b>Courses and bearings:</b> 360° notation from true north unless stated. Relative bearings from the bow, e.g. "030° on your port bow".</li>
-      <li><b>Speed:</b> through the water unless "ground speed" is said.</li>
-      <li><b>Numbers:</b> digit by digit: "one-five-zero" for 150; "two point five" for 2.5.</li>
-      <li><b>Names:</b> as on the chart or Sailing Directions; else give lat/long.</li>
-      <li><b>Time:</b> 24-hour notation, stating UTC, zone time or local time.</li>
-    </ul>
-  </div>
+</div>
 </section>
 
 <!-- ============ STUDY ============ -->
@@ -3515,7 +3572,6 @@ Droogvalling <u>0</u><sub>5</sub> (bodem 0,5 m boven LAT), HW 2,1 m: werkelijke 
 <nav class="tabs" aria-label="Sections"><div class="row">
   <a class="t-em" href="#v-emergency" data-tab="emergency" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/></svg>Emergency</a>
   <a href="#v-routine" data-tab="routine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15a8 8 0 0 1 8-8M4 15h4l2 4h4l2-4h4a8 8 0 0 0-8-8"/></svg>Routine</a>
-  <a href="#v-waters" data-tab="waters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 13c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 18c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/></svg>Waters</a>
   <a href="#v-reference" data-tab="reference"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Reference</a>
   <a href="#v-study" data-tab="study"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l9-3 9 3-9 3-9-3zM6 8v6c0 2 3 4 6 4s6-2 6-4V8"/></svg>Study</a>
   <a href="#v-exam" data-tab="exam"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Exam</a>
@@ -3864,10 +3920,15 @@ $("#sh-body").addEventListener("click",e=>{if(e.target.closest(".conv-use")){con
 $("#rc-in").addEventListener("input",e=>{$("#rc-out").innerHTML=convHTML(e.target.value.trim()?convertDec(e.target.value):null,false)});
 document.addEventListener("click",e=>{const o=e.target.closest("[data-open]");if(o){e.preventDefault();openSheet(o.dataset.open)}});
 
+/* ---------- reference sub-sections ---------- */
+(function(){const R=["nav","vhf","waters","gen"];let cur=store.get("sm-rsub");if(!R.includes(cur))cur="nav";
+function apply(){$$("[data-rsub]").forEach(el=>el.hidden=el.dataset.rsub!==cur);$$("[data-r-pick]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.rPick===cur));store.set("sm-rsub",cur);window.dispatchEvent(new Event("resize"))}
+$$(".rsub").forEach(seg=>seg.addEventListener("click",e=>{const b=e.target.closest("[data-r-pick]");if(!b)return;cur=b.dataset.rPick;apply();const v=document.getElementById("v-reference");if(v&&v.getBoundingClientRect().top<0)window.scrollTo(0,0)}));
+window.smSetRef=r=>{if(R.includes(r)){cur=r;apply()}};apply()})();
 /* ---------- tabs ---------- */
 function showTab(t){$$(".view").forEach(v=>v.hidden=v.dataset.tab!==t);$$("nav.tabs a").forEach(b=>b.dataset.tab===t?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));store.set("vhf-tab",t)}
 $$("nav.tabs a").forEach(b=>b.addEventListener("click",e=>{e.preventDefault();showTab(b.dataset.tab);window.scrollTo(0,0)}));
-function goTo(id){const el=document.getElementById(id);if(!el)return;const dc=el.closest("[data-course]");if(dc&&window.smSetCourse)window.smSetCourse(dc.dataset.course);const v=el.closest(".view");if(v)showTab(v.dataset.tab);if(el.tagName==="DETAILS")el.open=true;
+function goTo(id){const el=document.getElementById(id);if(!el)return;const dc=el.closest("[data-course]");if(dc&&window.smSetCourse)window.smSetCourse(dc.dataset.course);const dr=el.closest("[data-rsub]");if(dr&&window.smSetRef)window.smSetRef(dr.dataset.rsub);const v=el.closest(".view");if(v)showTab(v.dataset.tab);if(el.tagName==="DETAILS")el.open=true;
   requestAnimationFrame(()=>{el.scrollIntoView({block:"start"});window.scrollBy(0,-70);el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")})}
 const h0=location.hash.slice(1);const h=h0.startsWith("v-")?h0.slice(2):h0.startsWith("s-")?"emergency":h0;
 if(h&&document.getElementById(h)){goTo(h)}else{showTab(["emergency","routine","waters","reference","study","exam"].includes(h)?h:"emergency")}

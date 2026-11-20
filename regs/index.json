@@ -4,18 +4,10 @@
   "title": "BPR — Binnenvaartpolitiereglement",
   "regs": "bpr",
   "src": "https://wetten.overheid.nl/ (zoek: Binnenvaartpolitiereglement)",
-  "file": null,
-  "bytes": 0,
-  "date": null
- },
- {
-  "id": "bpr-bijlagen",
-  "title": "BPR — bijlagen (tekens, lichten, borden)",
-  "regs": "bpr",
-  "src": "https://wetten.overheid.nl/ (bijlagen bij het Binnenvaartpolitiereglement)",
-  "file": null,
-  "bytes": 0,
-  "date": null
+  "file": "regs/bpr.pdf",
+  "bytes": 9091003,
+  "date": "geldend vanaf 1-7-2025",
+  "note": "Incl. all bijlagen (signs, lights, sound signals). Copy from wetten.overheid.nl via Varen doe je Samen!"
  },
  {
   "id": "srw",
@@ -31,18 +23,20 @@
   "title": "BVA — Bepalingen ter voorkoming van aanvaringen op zee (COLREG)",
   "regs": "colreg srt sre",
   "src": "https://wetten.overheid.nl/ (zoek: Bepalingen ter voorkoming van aanvaringen op zee)",
-  "file": null,
-  "bytes": 0,
-  "date": null
+  "file": "regs/bva.pdf",
+  "bytes": 251680,
+  "date": "text 1972 as amended, coordination 1996",
+  "note": "Belgian unofficial coordination (mobilit.fgov.be). Older than the current COLREG amendments: check the Dutch text on wetten.overheid.nl."
  },
  {
   "id": "rpr",
   "title": "RPR — Rijnvaartpolitiereglement",
   "regs": "rpr",
   "src": "https://www.ccr-zkr.org/ (Rijnvaartpolitiereglement, Nederlandse versie)",
-  "file": null,
-  "bytes": 0,
-  "date": null
+  "file": "regs/rpr.pdf",
+  "bytes": 1925614,
+  "date": "stand 1-6-2026",
+  "note": "Official CCR edition (Dutch)."
  },
  {
   "id": "marifoon-algemeen",

@@ -62,12 +62,13 @@
  },
  {
   "id": "marifoon-regionaal",
-  "title": "Handboek radiocommunicatie binnenvaart — regionaal deel (CCR)",
-  "regs": "bpr rpr",
+  "title": "Handboek radiocommunicatie binnenvaart — regionaal deel Rijn en Moezel (CCR)",
+  "regs": "rpr",
   "src": "https://www.ccr-zkr.org/files/documents/reglementRP/rp41nl_pr_032026.pdf",
-  "file": null,
-  "bytes": 0,
-  "date": null
+  "file": "regs/marifoon-regionaal.pdf",
+  "bytes": 1106696,
+  "date": "editie 2026",
+  "note": "Rhine (Basel – open sea) and Moselle: VHF equipment duty, channels, traffic posts per stretch, incl. a section on the Netherlands."
  },
  {
   "id": "sre",

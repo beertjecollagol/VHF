@@ -14,19 +14,20 @@
   "title": "SRW — Scheepvaartreglement Westerschelde",
   "regs": "srw",
   "src": "https://wetten.overheid.nl/ (zoek: Scheepvaartreglement Westerschelde)",
-  "file": null,
-  "bytes": 0,
-  "date": null
+  "file": "regs/srw.pdf",
+  "bytes": 203162,
+  "date": "geldend vanaf 1-1-2017 (wetten.nl, opgehaald 20-11-2026)",
+  "note": "The charts of bijlagen 2–5 are not in this print."
  },
  {
   "id": "bva",
-  "title": "BVA — Bepalingen ter voorkoming van aanvaringen op zee (COLREG)",
+  "title": "BVA / COLREG — Verdrag ter voorkoming van aanvaringen op zee 1972 (EN + NL)",
   "regs": "colreg srt sre",
   "src": "https://wetten.overheid.nl/ (zoek: Bepalingen ter voorkoming van aanvaringen op zee)",
   "file": "regs/bva.pdf",
-  "bytes": 251680,
-  "date": "text 1972 as amended, coordination 1996",
-  "note": "Belgian unofficial coordination (mobilit.fgov.be). Older than the current COLREG amendments: check the Dutch text on wetten.overheid.nl."
+  "bytes": 380102,
+  "date": "geldend vanaf 1-1-2016 (wetten.nl, opgehaald 20-11-2026)",
+  "note": "Authentic English text followed by the official Dutch translation (Voorschrift 1 = Rule 1)."
  },
  {
   "id": "rpr",
@@ -39,8 +40,19 @@
   "note": "Official CCR edition (Dutch)."
  },
  {
+  "id": "marifoon-zee",
+  "title": "Handboek Algemene Maritieme Radiocommunicatie — voorschriften (Agentschap Telecom)",
+  "regs": "colreg srt srw sre sjo",
+  "src": "Agentschap Telecom / RDI",
+  "optional": false,
+  "file": "regs/marifoon-zee.pdf",
+  "date": "uitgave 2020",
+  "note": "Maritime (sea) radio rules: SRC/VHF at sea, DSC, distress, urgency, safety.",
+  "bytes": 286170
+ },
+ {
   "id": "marifoon-algemeen",
-  "title": "Handboek radiocommunicatie binnenvaart — algemeen deel",
+  "title": "Handboek radiocommunicatie binnenvaart — algemeen deel (CCR)",
   "regs": "bpr rpr",
   "src": "https://www.ccr-zkr.org/files/documents/reglementRP/rp41nl_pg_062017.pdf",
   "file": null,
@@ -49,7 +61,7 @@
  },
  {
   "id": "marifoon-regionaal",
-  "title": "Handboek radiocommunicatie binnenvaart — regionaal deel",
+  "title": "Handboek radiocommunicatie binnenvaart — regionaal deel (CCR)",
   "regs": "bpr rpr",
   "src": "https://www.ccr-zkr.org/files/documents/reglementRP/rp41nl_pr_032026.pdf",
   "file": null,

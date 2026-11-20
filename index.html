@@ -5204,18 +5204,19 @@ async function render(){
  try{items=await (await fetch("regs/index.json",{cache:"no-store"})).json()}catch(e){try{const c=await caches.open(RC);const r=await c.match(new URL("regs/index.json",base).href);if(r)items=await r.json()}catch(x){}}
  let h="";for(const it of items){
   if(it.file){const off=await cached(it.file);
-   h+=`<div class="rg"><div><a href="${it.file}" data-pdf="${it.file}" data-t="${it.title}">${it.title}</a><small>Text: ${it.date||"?"} · ${fmt(it.bytes)} · ${off?"✓ saved offline":"online only"}${it.note?"<br>"+it.note:""}</small></div>${off?"":`<button class="btn" data-save="${it.file}" type="button">Save offline</button>`}</div>`}
+   h+=`<div class="rg"><div><a href="${it.file}" data-pdf="${it.file}" data-t="${it.title}">${it.title}</a><small>Text: ${it.date||"?"} · ${fmt(it.bytes)} · ${off?"✓ saved offline":"online only"}${it.note?"<br>"+it.note:""}</small></div><span style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">${off?"":`<button class="btn" data-save="${it.file}" type="button">Save offline</button>`}<a href="${it.file}" target="_blank" rel="noopener" style="font-size:13px">open as PDF ↗</a></span></div>`}
   else h+=`<div class="rg"><div>${it.title}<small>Not yet in the app${it.optional?" (optional)":""} — official source: ${it.src.startsWith("http")&&!it.src.includes(" ")?`<a href="${it.src}" target="_blank" rel="noopener">link</a>`:it.src}</small></div></div>`}
  list.innerHTML=h||"<p>No texts yet.</p>"}
 async function save(u){const c=await caches.open(RC);const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw new Error(r.status);await c.put(new URL(u,base).href,r);try{await c.put(new URL("regs/index.json",base).href,await fetch("regs/index.json",{cache:"no-store"}))}catch(e){}}
 list.addEventListener("click",async e=>{const b=e.target.closest("[data-save]");if(b){b.disabled=true;b.textContent="Saving…";try{await save(b.dataset.save)}catch(x){b.textContent="Failed"}render();return}
- const a=e.target.closest("[data-pdf]");if(a){e.preventDefault();openPdf(a.dataset.pdf,a.dataset.t)}});
+ const a=e.target.closest("a[data-pdf]");if(a){e.preventDefault();openPdf(a.dataset.pdf,a.dataset.t)}});
 document.getElementById("regs-all").addEventListener("click",async()=>{const m=document.getElementById("regs-msg");let n=0;for(const it of items)if(it.file&&!(await cached(it.file))){m.textContent="Saving "+it.title+"…";try{await save(it.file);n++}catch(x){}}m.textContent=n?"Saved "+n+".":"All saved.";render()});
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
 render();
 /* ---- viewer ---- */
 const V=document.getElementById("pdfv"),PG=document.getElementById("pdfv-pages");let lib=null,doc=null,io=null,texts=[],zoom=1,baseW=360;
-async function openPdf(u,t){V.hidden=false;document.body.style.overflow="hidden";document.getElementById("pdfv-t").textContent=t;PG.innerHTML='<p style="color:#fff;padding:16px">Loading…</p>';texts=[];
+async function openPdf(u,t){try{await openPdf0(u,t)}catch(err){PG.innerHTML=`<div style="color:#fff;padding:16px;line-height:1.5"><p>This viewer could not open the file (${String(err&&err.message||err).slice(0,120)}).</p><p><a href="${u}" target="_blank" rel="noopener" style="color:#fff;font-weight:700;text-decoration:underline">Open the PDF in the phone's own viewer</a></p></div>`}}
+async function openPdf0(u,t){V.hidden=false;document.body.style.overflow="hidden";document.getElementById("pdfv-t").textContent=t;PG.innerHTML='<p style="color:#fff;padding:16px">Loading…</p>';texts=[];
  history.pushState({pdfv:1},"");
  if(!lib){lib=await import("./lib/pdfjs/pdf.min.mjs");lib.GlobalWorkerOptions.workerSrc=new URL("lib/pdfjs/pdf.worker.min.mjs",base).href}
  let buf;const c=await caches.open(RC);let r=await c.match(new URL(u,base).href);

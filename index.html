@@ -1128,6 +1128,12 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
     .pc-tzlbl{background:rgba(250,238,218,.92);color:#633806;border-radius:6px;padding:1px 6px;font-size:12px;white-space:nowrap;font-family:var(--f-mono);border:1px solid rgba(186,117,23,.5)}
     .pc-nm{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 6px;font-family:var(--f-mono);font-size:12px}
     .pc-scale{background:rgba(255,255,255,.85);border:2px solid #0e2233;border-top:0;font:600 12px var(--f-mono);color:#0e2233;padding:0 4px;text-align:center}
+    #pc-globe{background:#0b1a2a}
+    .pc-gl{font:600 11px var(--f-mono);color:#0e3c6e;background:rgba(255,255,255,.85);border-radius:4px;padding:0 4px;white-space:nowrap;pointer-events:none}
+    .pc-pl{font:12px var(--f-body);color:#26215C;background:rgba(255,255,255,.88);border-radius:4px;padding:0 5px;white-space:nowrap;pointer-events:none;transform:translate(52%,0)}
+    .pc-pl::before{content:'';position:absolute;left:-9px;top:50%;width:8px;height:8px;margin-top:-4px;border-radius:50%;background:#7F77DD;border:1.5px solid #fff}
+    .pc-gscale{position:absolute;left:8px;bottom:22px;z-index:2}
+    :root.night #pc-globe canvas{filter:grayscale(1) brightness(.55) sepia(1) hue-rotate(-50deg) saturate(6)}
     :root.night .pc-map .leaflet-tile-pane{filter:grayscale(1) brightness(.55) sepia(1) hue-rotate(-50deg) saturate(6)}
   </style>
   <div class="panel sec js-only" id="poschart"><h2>Position and chart <span class="cx nbv nlt" lang="nl" data-c="nl">(Positie en kaart)</span><span class="cx nbv nlt" lang="nb" data-c="no">(Posisjon og kart)</span></h2>
@@ -1151,6 +1157,9 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
     </div>
     <p class="pc-read" id="pc-msg" style="font-family:var(--f-body);color:var(--muted);font-size:13px"></p>
 
+    <div class="pc-ctl"><span class="lbl">View</span><span class="chips" id="pc-view">
+      <button data-v="flat" aria-pressed="true">Flat</button>
+      <button data-v="globe" aria-pressed="false">Globe</button></span></div>
     <div class="pc-ctl"><span class="lbl">Chart</span><span class="chips" id="pc-base">
       <button data-b="osm" aria-pressed="true">OpenStreetMap</button>
       <button data-b="sjo" aria-pressed="false">Sea chart Norway</button>
@@ -1162,6 +1171,7 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
       <button data-o="places" aria-pressed="false">Places on meridians</button>
       <button data-o="measure" aria-pressed="false">Measure (nm)</button></span></div>
     <div class="pc-map" id="pc-map" role="application" aria-label="Chart"></div>
+    <div class="pc-map" id="pc-globe" role="application" aria-label="Globe chart" hidden></div>
     <div class="pc-read" id="pc-read">Tap the chart for a position.</div>
     <div class="pc-btns" style="margin-top:0">
       <button class="ghost" id="pc-clr" hidden>Clear measurement</button>
@@ -4530,6 +4540,7 @@ const st={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k
 const pad=(n,l)=>String(n).padStart(l,'0');
 function ddm(v,isLat,dec){dec=dec==null?3:dec;const a=Math.abs(v);let d=Math.floor(a),m=+((a-d)*60).toFixed(dec);if(m>=60){d++;m=0}const ms=m.toFixed(dec).padStart(dec?dec+3:2,'0');return pad(d,isLat?2:3)+'°'+ms+'′'+(isLat?(v>=0?'N':'S'):(v>=0?'E':'W'))}
 const R_NM=3440.065;
+window.pcUtil={ddm,pad,rhumb:(a,b)=>rhumb(a,b),dest:(p,b,n)=>dest(p,b,n)};
 function rhumb(a,b){const r=Math.PI/180,f1=a[0]*r,f2=b[0]*r,df=f2-f1;let dl=(b[1]-a[1])*r;if(Math.abs(dl)>Math.PI)dl=dl>0?-(2*Math.PI-dl):2*Math.PI+dl;const dp=Math.log(Math.tan(Math.PI/4+f2/2)/Math.tan(Math.PI/4+f1/2));const q=Math.abs(dp)>1e-12?df/dp:Math.cos(f1);return{nm:Math.sqrt(df*df+q*q*dl*dl)*R_NM,brg:(Math.atan2(dl,dp)/r+360)%360}}
 function dest(p,brgDeg,nm){const r=Math.PI/180,d=nm/R_NM,b=brgDeg*r,f1=p[0]*r,l1=p[1]*r;const f2=Math.asin(Math.sin(f1)*Math.cos(d)+Math.cos(f1)*Math.sin(d)*Math.cos(b));const l2=l1+Math.atan2(Math.sin(b)*Math.sin(d)*Math.cos(f1),Math.cos(d)-Math.sin(f1)*Math.sin(f2));return[f2/r,l2/r]}
 
@@ -4547,6 +4558,7 @@ function showFix(p){
   $('pc-cog').textContent=last.cog==null?'–°T':pad(Math.round(last.cog)%360,3)+'°T';
   $('pc-acc').textContent=Math.round(c.accuracy)+' m';
   if(window.pcMap)pcMap.ownFix(last,follow);
+  if(window.pcGlobe)pcGlobe.ownFix(last,follow);
 }
 function tick(){const n=new Date();$('pc-utc').textContent=pad(n.getUTCHours(),2)+':'+pad(n.getUTCMinutes(),2)+':'+pad(n.getUTCSeconds(),2);if(last){const s=Math.round((Date.now()-last.t)/1000);$('pc-age').textContent=s<60?s+' s ago':Math.round(s/60)+' min ago'}}
 setInterval(tick,1000);tick();
@@ -4559,7 +4571,8 @@ $('pc-gps').onclick=()=>{
 };
 $('pc-copy').onclick=()=>{if(!last){msg('No position yet. Start GPS first.');return}const t=ddm(last.lat,true)+' '+ddm(last.lon,false);(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg('Copied: '+t),()=>msg(t))};
 function setFollow(v){follow=v;st.set('pc-follow',v?'1':'0');const b=$('pc-follow');b.setAttribute('aria-pressed',v);b.textContent='Follow: '+(v?'on':'off')}
-setFollow(follow);$('pc-follow').onclick=()=>{setFollow(!follow);if(follow&&last&&window.pcMap)pcMap.ownFix(last,true)};
+setFollow(follow);$('pc-follow').onclick=()=>{setFollow(!follow);if(follow&&last&&window.pcMap)pcMap.ownFix(last,true);if(follow&&last&&window.pcGlobe)pcGlobe.ownFix(last,true)};
+window.pcLast=()=>last;window.pcFollow=()=>follow;
 async function setWake(on){const b=$('pc-wake');if(on){try{wake=await navigator.wakeLock.request('screen');wake.addEventListener('release',()=>{if(b.getAttribute('aria-pressed')==='true'&&document.visibilityState!=='visible')return});b.setAttribute('aria-pressed','true');b.textContent='Keep screen on: on'}catch(e){msg('This browser cannot keep the screen on.')}}else{try{wake&&wake.release()}catch(e){}wake=null;b.setAttribute('aria-pressed','false');b.textContent='Keep screen on: off'}}
 $('pc-wake').onclick=()=>setWake($('pc-wake').getAttribute('aria-pressed')!=='true');
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&$('pc-wake').getAttribute('aria-pressed')==='true')setWake(true)});
@@ -4572,7 +4585,8 @@ const SRC={
   topo:{url:KV.replace('{L}','topo'),o:{maxZoom:18,maxNativeZoom:17,bounds:[[57,2],[72,33]],attribution:'© Kartverket'}},
   seamark:{url:'https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png',o:{maxZoom:18,attribution:'OpenSeaMap'}}
 };
-const MER=[['Greenwich',51.48,0.0],['Görlitz',51.15,14.99],['St Petersburg',59.94,30.31],['Kyiv',50.45,30.52],['Tbilisi',41.72,44.79],['Yekaterinburg',56.84,60.61],['Amritsar',31.63,74.87],['Dhaka',23.81,90.41],['Hanoi',21.03,105.85],['Hangzhou',30.27,120.16],['Akashi',34.65,134.99],['Sydney',-33.87,151.21],['Nome',64.50,-165.41],['Anchorage',61.22,-149.90],['Juneau',58.30,-134.42],['Lake Tahoe',39.10,-120.03],['Denver',39.74,-104.99],['Memphis',35.15,-90.05],['Philadelphia',39.95,-75.17],['Sydney NS',46.14,-60.19],['Accra',5.60,-0.19]];
+window.pcSRC=SRC;
+const MER=window.pcMER=[['Greenwich',51.48,0.0],['Görlitz',51.15,14.99],['St Petersburg',59.94,30.31],['Kyiv',50.45,30.52],['Tbilisi',41.72,44.79],['Yekaterinburg',56.84,60.61],['Amritsar',31.63,74.87],['Dhaka',23.81,90.41],['Hanoi',21.03,105.85],['Hangzhou',30.27,120.16],['Akashi',34.65,134.99],['Sydney',-33.87,151.21],['Nome',64.50,-165.41],['Anchorage',61.22,-149.90],['Juneau',58.30,-134.42],['Lake Tahoe',39.10,-120.03],['Denver',39.74,-104.99],['Memphis',35.15,-90.05],['Philadelphia',39.95,-75.17],['Sydney NS',46.14,-60.19],['Accra',5.60,-0.19]];
 
 /* ---------- Map (Leaflet loaded lazily) ---------- */
 function loadLeaflet(){return new Promise((ok,bad)=>{if(window.L)return ok();const l=document.createElement('link');l.rel='stylesheet';l.href='lib/leaflet.css';document.head.appendChild(l);const s=document.createElement('script');s.src='lib/leaflet.js';s.onload=ok;s.onerror=bad;document.head.appendChild(s)})}
@@ -4582,7 +4596,7 @@ const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){startMap
 
 function initMap(){
   const map=L.map('pc-map',{zoomControl:true,worldCopyJump:true,attributionControl:true}).setView(JSON.parse(st.get('pc-view')||'null')||[59.6,6.3],(+st.get('pc-zoom'))||7);
-  map.attributionControl.setPrefix(false);
+  map.attributionControl.setPrefix(false);window.pcLeaf=map;
   const mk=k=>L.tileLayer(SRC[k].url,Object.assign({crossOrigin:'anonymous'},SRC[k].o));
   const base={osm:mk('osm'),sjo:mk('sjo'),topo:mk('topo')};
   let curBase=st.get('pc-base')||'osm';if(!base[curBase])curBase='osm';
@@ -4688,6 +4702,106 @@ function initMap(){
   document.addEventListener('visibilitychange',drawGrid);
   new MutationObserver(drawGrid).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
 }
+})();
+</script>
+<script>
+(function(){
+const $=id=>document.getElementById(id),$$=q=>Array.from(document.querySelectorAll(q));
+if(!$('pc-globe'))return;
+const st={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const U=window.pcUtil,pad=U.pad,ddm=U.ddm;
+let gm=null,loading=null,mode=st.get('pc-mode')==='globe'?'globe':'flat';
+function loadML(){if(window.maplibregl)return Promise.resolve();if(loading)return loading;loading=new Promise((ok,bad)=>{const l=document.createElement('link');l.rel='stylesheet';l.href='lib/maplibre-gl.css';document.head.appendChild(l);const s=document.createElement('script');s.src='lib/maplibre-gl.js';s.onload=ok;s.onerror=()=>{loading=null;bad()};document.head.appendChild(s)});return loading}
+const ovl=()=>JSON.parse(st.get('pc-ovl')||'{"seamark":true,"grid":true}');
+const baseKey=()=>{const b=st.get('pc-base');return ['osm','sjo','topo'].includes(b)?b:'osm'};
+function setMode(m){
+  mode=m;st.set('pc-mode',m);$$('#pc-view button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===m));
+  $('pc-map').hidden=m!=='flat';$('pc-globe').hidden=m!=='globe';
+  if(m==='globe'){
+    let c=JSON.parse(st.get('pc-view')||'null')||[59.6,6.3],z=(+st.get('pc-zoom'))||7;
+    if(window.pcLeaf){const lc=pcLeaf.getCenter();c=[lc.lat,lc.lng];z=pcLeaf.getZoom()}
+    loadML().then(()=>{if(!gm)init(c,z-1);else{gm.resize();gm.jumpTo({center:[c[1],c[0]],zoom:z-1})}}).catch(()=>{$('pc-read').textContent='Globe library could not be loaded. Open the app once with internet.'});
+  }else if(gm&&window.pcLeaf){const c=gm.getCenter();pcLeaf.invalidateSize();pcLeaf.setView([c.lat,c.lng],Math.max(1,Math.round(gm.getZoom()+1)))}
+}
+$$('#pc-view button').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.v)));
+
+function init(c,z){
+  if(!maplibregl.supported||(maplibregl.supported&&maplibregl.supported()===false)){}
+  const S=window.pcSRC,src=k=>({type:'raster',tiles:[S[k].url],tileSize:256,maxzoom:S[k].o.maxNativeZoom||S[k].o.maxZoom,attribution:S[k].o.attribution,...(S[k].o.bounds?{bounds:[S[k].o.bounds[0][1],S[k].o.bounds[0][0],S[k].o.bounds[1][1],S[k].o.bounds[1][0]]}:{})});
+  const empty={type:'FeatureCollection',features:[]};
+  gm=new maplibregl.Map({container:'pc-globe',center:[c[1],c[0]],zoom:Math.max(0,z),maxZoom:18,attributionControl:{compact:true},
+    style:{version:8,projection:{type:'globe'},sources:{osm:src('osm'),sjo:src('sjo'),topo:src('topo'),seamark:src('seamark'),grid:{type:'geojson',data:empty},tz:{type:'geojson',data:empty},meas:{type:'geojson',data:empty},me:{type:'geojson',data:empty}},
+      layers:[{id:'bg',type:'background',paint:{'background-color':'#aac8dc'}},
+        {id:'osm',type:'raster',source:'osm'},{id:'sjo',type:'raster',source:'sjo',layout:{visibility:'none'}},{id:'topo',type:'raster',source:'topo',layout:{visibility:'none'}},
+        {id:'tz-fill',type:'fill',source:'tz',layout:{visibility:'none'},paint:{'fill-color':['match',['get','map_color8'],1,'#7F77DD',2,'#1D9E75',3,'#D85A30',4,'#D4537E',5,'#EF9F27',6,'#378ADD',7,'#639922','#888780'],'fill-opacity':0.18}},
+        {id:'tz-line',type:'line',source:'tz',layout:{visibility:'none'},paint:{'line-color':'#BA7517','line-width':1}},
+        {id:'seamark',type:'raster',source:'seamark'},
+        {id:'grid-minor',type:'line',source:'grid',filter:['!',['get','major']],paint:{'line-color':'#0e3c6e','line-opacity':0.4,'line-width':0.8}},
+        {id:'grid-major',type:'line',source:'grid',filter:['get','major'],paint:{'line-color':'#0e3c6e','line-opacity':0.8,'line-width':1.4}},
+        {id:'meas',type:'line',source:'meas',paint:{'line-color':'#D4537E','line-width':3}},
+        {id:'me-acc',type:'fill',source:'me',filter:['==',['get','k'],'acc'],paint:{'fill-color':'#378ADD','fill-opacity':0.15}},
+        {id:'me-vec',type:'line',source:'me',filter:['==',['get','k'],'vec'],paint:{'line-color':'#185FA5','line-width':3,'line-dasharray':[2,1.5]}},
+        {id:'me-dot',type:'circle',source:'me',filter:['==',['get','k'],'pos'],paint:{'circle-radius':7,'circle-color':'#185FA5','circle-stroke-color':'#fff','circle-stroke-width':2}}]}});
+  gm.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'top-left');
+  const scale=document.createElement('div');scale.className='pc-scale pc-gscale';$('pc-globe').appendChild(scale);
+  /* grid */
+  const STEPS=[10,5,2,1,30/60,20/60,10/60,5/60,2/60,1/60,0.5/60],BIG=[30,10,10,5,1,1,1,0.5,1/6,1/12,1/60];
+  let labels=[];
+  function lab(v,step,isLat){const a=Math.abs(v),h=isLat?(v>0?'N':v<0?'S':''):(v>0?'E':v<0?'W':'');if(step>=1)return Math.round(a)+'°'+h;let d=Math.floor(a+1e-9),m=Math.round((a-d)*600)/10;if(m>=60){d++;m=0}return d+'°'+(step*60<1?m.toFixed(1):Math.round(m))+'′'+h}
+  const isMul=(v,m)=>Math.abs(v/m-Math.round(v/m))<1e-6;
+  function grid(){
+    labels.forEach(m=>m.remove());labels=[];
+    if(!ovl().grid){gm.getSource('grid').setData(empty);return}
+    const z=gm.getZoom(),cc=gm.getCenter(),pxDeg=512*Math.pow(2,z)/360;
+    let si=0;STEPS.forEach((s,i)=>{if(s*pxDeg>=80)si=i});const step=STEPS[si],big=BIG[si];
+    let W=-180,E=180,S=-90,N=90;
+    if(step<1){const b=gm.getBounds();const span=Math.max(2,Math.min(60,(b.getNorth()-b.getSouth())*1.2));S=Math.max(-90,cc.lat-span);N=Math.min(90,cc.lat+span);const hw=Math.min(180,span/Math.max(0.05,Math.cos(Math.min(85,Math.abs(cc.lat)+span)*Math.PI/180)));W=cc.lng-hw;E=cc.lng+hw}
+    const f=[],dens=Math.max(step,(N-S)/90);
+    for(let lo=Math.ceil(W/step)*step;lo<=E+1e-9;lo+=step){const co=[];for(let la=S;la<=N+1e-9;la+=Math.max(dens,(N-S)/60))co.push([lo,la]);co.push([lo,N]);f.push({type:'Feature',properties:{major:isMul(lo,big)},geometry:{type:'LineString',coordinates:co}})}
+    for(let la=Math.ceil(S/step)*step;la<=N+1e-9;la+=step){if(Math.abs(la)>=90)continue;const co=[];const dl=Math.max(step,(E-W)/180);for(let lo=W;lo<=E+1e-9;lo+=dl)co.push([lo,la]);co.push([E,la]);f.push({type:'Feature',properties:{major:isMul(la,big)},geometry:{type:'LineString',coordinates:co}})}
+    gm.getSource('grid').setData({type:'FeatureCollection',features:f});
+    const latAt=Math.round(cc.lng/step)*step,lonAt=Math.max(-80,Math.min(80,Math.round(cc.lat/step)*step));
+    const span=step<1?(N-S):90,n=Math.min(40,Math.round(span/step));
+    for(let i=-n;i<=n;i++){const la=Math.round(cc.lat/step)*step+i*step;if(Math.abs(la)>85)continue;labels.push(mkLabel([latAt,la],lab(la,step,true),[22,-8]))}
+    for(let i=-n;i<=n;i++){const lo=Math.round(cc.lng/step)*step+i*step;const L=((lo+540)%360)-180;labels.push(mkLabel([lo,lonAt],lab(L,step,false),[0,10]))}
+  }
+  function mkLabel(lnglat,txt,off){const el=document.createElement('span');el.className='pc-gl';el.textContent=txt;return new maplibregl.Marker({element:el,offset:off,opacityWhenCovered:'0'}).setLngLat(lnglat).addTo(gm)}
+  function upScale(){const r=$('pc-globe').getBoundingClientRect(),y=r.height/2,a=gm.unproject([r.width/2-50,y]),b=gm.unproject([r.width/2+50,y]);const nm=U.rhumb([a.lat,a.lng],[b.lat,b.lng]).nm/100;if(!nm){scale.style.display='none';return}scale.style.display='';const ppn=1/nm;const o=[0.05,0.1,0.2,0.25,0.5,1,2,5,10,20,50,100,200,500,1000,2000];const v=o.find(x=>x*ppn>=60)||2000;scale.style.width=Math.round(v*ppn)+'px';scale.textContent=v+' nm'}
+  /* time zones */
+  let tzData=null,tzMk=[];
+  function tzName(p){const z=+p.zone;if(isNaN(z))return p.time_zone||'';const s=z<0?'−':'+',a=Math.abs(z),h=Math.floor(a),m=Math.round((a-h)*60);return 'UTC'+(z===0?'':s+h+(m?':'+pad(m,2):''))}
+  function tzTime(p){const now=new Date();if(p.tz_name1st&&!/\/$/.test(p.tz_name1st)){try{return new Intl.DateTimeFormat('en-GB',{timeZone:p.tz_name1st,hour:'2-digit',minute:'2-digit',hour12:false}).format(now)}catch(e){}}const t=new Date(now.getTime()+(+p.zone||0)*3600000);return pad(t.getUTCHours(),2)+':'+pad(t.getUTCMinutes(),2)}
+  function inRing(pt,r){let c=false;for(let i=0,j=r.length-1;i<r.length;j=i++){const xi=r[i][0],yi=r[i][1],xj=r[j][0],yj=r[j][1];if(((yi>pt[1])!==(yj>pt[1]))&&(pt[0]<(xj-xi)*(pt[1]-yi)/(yj-yi)+xi))c=!c}return c}
+  function tz(on){
+    ['tz-fill','tz-line'].forEach(id=>gm.setLayoutProperty(id,'visibility',on?'visible':'none'));
+    tzMk.forEach(m=>on?m.addTo(gm):m.remove());
+    if(on&&!tzData)fetch('data/timezones.json').then(r=>r.json()).then(j=>{tzData=j;gm.getSource('tz').setData(j);
+      j.features.forEach(f=>{const g=f.geometry;if(!g)return;const ps=g.type==='Polygon'?[g.coordinates]:g.coordinates;let best=null,ba=0;ps.forEach(p=>{let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;p[0].forEach(q=>{x0=Math.min(x0,q[0]);x1=Math.max(x1,q[0]);y0=Math.min(y0,q[1]);y1=Math.max(y1,q[1])});const a=(x1-x0)*(y1-y0);if(a>ba){ba=a;best={p,c:[(x0+x1)/2,(y0+y1)/2]}}});if(!best||ba<40||!inRing(best.c,best.p[0]))return;const el=document.createElement('span');el.className='pc-tzlbl';el._p=f.properties;tzMk.push(new maplibregl.Marker({element:el,opacityWhenCovered:'0'}).setLngLat(best.c))});
+      updTZ();if(ovl().tz)tzMk.forEach(m=>m.addTo(gm));occl()});
+  }
+  function updTZ(){tzMk.forEach(m=>{const el=m.getElement();el.textContent=tzName(el._p)+' '+tzTime(el._p)})}
+  setInterval(()=>{if(gm&&ovl().tz)updTZ()},20000);
+  /* places */
+  const plMk=window.pcMER.map(([n,la,lo])=>{const el=document.createElement('span');el.className='pc-pl';el.textContent=n+' '+ddm(la,true,1)+' '+ddm(lo,false,1);return new maplibregl.Marker({element:el,opacityWhenCovered:'0'}).setLngLat([lo,la])});
+  /* measure */
+  let meas=[],measMk=[];
+  function drawMeas(){measMk.forEach(m=>m.remove());measMk=[];gm.getSource('meas').setData(meas.length>1?{type:'Feature',properties:{},geometry:{type:'LineString',coordinates:meas.map(p=>[p[1],p[0]])}}:empty);if(!meas.length)return;let tot=0;meas.forEach((p,i)=>{const d=document.createElement('span');d.style.cssText='width:9px;height:9px;border-radius:50%;background:#D4537E;display:block';measMk.push(new maplibregl.Marker({element:d}).setLngLat([p[1],p[0]]).addTo(gm));if(i){const r=U.rhumb(meas[i-1],p);tot+=r.nm;const el=document.createElement('span');el.className='pc-nm';el.textContent=r.nm.toFixed(r.nm<10?2:1)+' nm · '+pad(Math.round(r.brg)%360,3)+'°T';measMk.push(new maplibregl.Marker({element:el}).setLngLat([(meas[i-1][1]+p[1])/2,(meas[i-1][0]+p[0])/2]).addTo(gm))}});$('pc-read').textContent=meas.length<2?'Start '+ddm(meas[0][0],true)+' '+ddm(meas[0][1],false)+' — tap the next point.':'Total '+tot.toFixed(tot<10?2:1)+' nm over '+(meas.length-1)+' leg(s).'}
+  $('pc-clr').addEventListener('click',()=>{meas=[];if(gm)drawMeas()});
+  /* own position */
+  function circle(ll,m){const c=[];for(let i=0;i<=48;i++){const d=U.dest(ll,i*7.5,m/1852);c.push([d[1],d[0]])}return c}
+  window.pcGlobe={ownFix(f,fol){if(!gm||!gm.getSource('me'))return;const ll=[f.lat,f.lon],fs=[{type:'Feature',properties:{k:'acc'},geometry:{type:'Polygon',coordinates:[circle(ll,Math.max(5,f.acc))]}},{type:'Feature',properties:{k:'pos'},geometry:{type:'Point',coordinates:[f.lon,f.lat]}}];if(f.cog!=null&&f.sogKn){const d=U.dest(ll,f.cog,f.sogKn*0.1);fs.push({type:'Feature',properties:{k:'vec'},geometry:{type:'LineString',coordinates:[[f.lon,f.lat],[d[1],d[0]]]}})}gm.getSource('me').setData({type:'FeatureCollection',features:fs});if(fol&&mode==='globe')gm.easeTo({center:[f.lon,f.lat],duration:600})}};
+  $('pc-me').addEventListener('click',()=>{const l=window.pcLast&&pcLast();if(l&&gm&&mode==='globe')gm.easeTo({center:[l.lon,l.lat],zoom:Math.max(gm.getZoom(),12)})});
+  /* sync with chips */
+  function sync(){if(!gm||!gm.isStyleLoaded())return;const b=baseKey(),o=ovl();['osm','sjo','topo'].forEach(k=>gm.setLayoutProperty(k,'visibility',k===b?'visible':'none'));gm.setLayoutProperty('seamark','visibility',o.seamark?'visible':'none');tz(!!o.tz);plMk.forEach(m=>o.places?m.addTo(gm):m.remove());if(!o.measure&&meas.length){meas=[];drawMeas()}gm.getCanvas().style.cursor=o.measure?'crosshair':'';grid()}
+  $$('#pc-base button,#pc-ovl button').forEach(b=>b.addEventListener('click',()=>setTimeout(()=>{if(!window.pcLeaf){if(b.dataset.b)st.set('pc-base',b.dataset.b);if(b.dataset.o){const o=ovl();o[b.dataset.o]=!o[b.dataset.o];st.set('pc-ovl',JSON.stringify(o));$$('#pc-ovl button').forEach(x=>x.setAttribute('aria-pressed',!!o[x.dataset.o]));$('pc-clr').hidden=!o.measure}$$('#pc-base button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.b===baseKey()))}sync()},0)));
+  gm.on('load',()=>{sync();upScale();const l=window.pcLast&&pcLast();if(l)pcGlobe.ownFix(l,false)});
+  gm.on('moveend',()=>{grid();upScale();const c=gm.getCenter();st.set('pc-view',JSON.stringify([c.lat,c.lng]));st.set('pc-zoom',Math.round(gm.getZoom()+1))});
+  let vq=0;function occl(){vq=0;const c=gm.getCenter(),r=Math.PI/180,z=gm.getZoom();const f1=c.lat*r;const lim=Math.max(20,Math.min(80,80-(z<3?0:z*4)));const chk=(m,hideLow)=>{const p=m.getLngLat(),f2=p.lat*r,dl=(p.lng-c.lng)*r;const d=Math.acos(Math.max(-1,Math.min(1,Math.sin(f1)*Math.sin(f2)+Math.cos(f1)*Math.cos(f2)*Math.cos(dl))))/r;m.getElement().style.visibility=(d>lim||(hideLow&&z<1.6))?'hidden':'visible'};labels.forEach(m=>chk(m,false));tzMk.forEach(m=>chk(m,true));plMk.forEach(m=>chk(m,false))}
+  gm.on('move',()=>{upScale();if(!vq)vq=requestAnimationFrame(occl)});gm.on('moveend',()=>setTimeout(occl,0));
+  gm.on('click',e=>{const ll=[e.lngLat.lat,((e.lngLat.lng+540)%360)-180];if(ovl().measure){meas.push(ll);drawMeas();return}let t=ddm(ll[0],true)+'  '+ddm(ll[1],false);const l=window.pcLast&&pcLast();if(l){const r=U.rhumb([l.lat,l.lon],ll);t+='  ·  from you '+r.nm.toFixed(r.nm<10?2:1)+' nm / '+pad(Math.round(r.brg)%360,3)+'°T'}if(ovl().tz&&tzData){const pt=[ll[1],ll[0]];const f=tzData.features.find(f=>{const g=f.geometry;if(!g)return false;const ps=g.type==='Polygon'?[g.coordinates]:g.coordinates;return ps.some(p=>inRing(pt,p[0])&&!p.slice(1).some(h=>inRing(pt,h)))});if(f)t+='  ·  '+tzName(f.properties)+' '+tzTime(f.properties)}$('pc-read').textContent=t;new maplibregl.Popup({closeButton:false}).setLngLat(e.lngLat).setHTML('<span style="font-family:var(--f-mono)">'+ddm(ll[0],true)+'<br>'+ddm(ll[1],false)+'</span>').addTo(gm)});
+  new ResizeObserver(()=>{if(!$('pc-globe').hidden)gm.resize()}).observe($('pc-globe'));
+}
+if(mode==='globe'){const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){setMode('globe');io.disconnect()}});$('pc-map').hidden=true;$('pc-globe').hidden=false;$$('#pc-view button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v==='globe'));io.observe($('pc-globe'))}
 })();
 </script>
 <script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}</script></body></html>

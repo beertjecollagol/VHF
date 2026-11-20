@@ -1,8 +1,8 @@
 // Network-first for pages (so updates arrive when online), cache fallback when offline.
 // Chart tiles live in their own cache (sm-tiles) that survives app updates.
-const CACHE='vhf-v20';
+const CACHE='vhf-v21';
 const TILES='sm-tiles';
-const FILES=['./','./index.html','./sim.html','./manifest.webmanifest','./icon-180.png','./icon-192.png','./icon-512.png','./robots.txt','./lib/leaflet.js','./lib/leaflet.css','./data/timezones.json'];
+const FILES=['./','./index.html','./sim.html','./manifest.webmanifest','./icon-180.png','./icon-192.png','./icon-512.png','./robots.txt','./lib/leaflet.js','./lib/leaflet.css','./lib/maplibre-gl.js','./lib/maplibre-gl.css','./data/timezones.json'];
 const KV='cache.kartverket.no', NET_FIRST=['tile.openstreetmap.org','tiles.openseamap.org'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE&&k!==TILES).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

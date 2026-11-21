@@ -5214,7 +5214,7 @@ document.getElementById("regs-all").addEventListener("click",async()=>{const m=d
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
 render();
 /* ---- viewer ---- */
-const V=document.getElementById("pdfv"),PG=document.getElementById("pdfv-pages");let lib=null,doc=null,io=null,texts=[],zoom=1,baseW=360;
+const V=document.getElementById("pdfv"),PG=document.getElementById("pdfv-pages");document.body.appendChild(V);let lib=null,doc=null,io=null,texts=[],zoom=1,baseW=360;
 async function openPdf(u,t){try{await openPdf0(u,t)}catch(err){PG.innerHTML=`<div style="color:#fff;padding:16px;line-height:1.5"><p>This viewer could not open the file (${String(err&&err.message||err).slice(0,120)}).</p><p><a href="${u}" target="_blank" rel="noopener" style="color:#fff;font-weight:700;text-decoration:underline">Open the PDF in the phone's own viewer</a></p></div>`}}
 async function openPdf0(u,t){V.hidden=false;document.body.style.overflow="hidden";document.getElementById("pdfv-t").textContent=t;PG.innerHTML='<p style="color:#fff;padding:16px">Loading…</p>';texts=[];
  history.pushState({pdfv:1},"");

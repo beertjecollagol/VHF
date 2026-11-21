@@ -1261,7 +1261,7 @@ ol.kl{columns:2;column-gap:28px;font-size:14px;padding-left:22px}
 <div data-rsub="waters" id="waters">
 <div><div class="eyebrow">On the water</div><h2 class="vkh">Waters: <span id="reg-title">rules</span></h2></div>
 <div class="pc-ctl" style="margin:6px 0 4px"><span class="lbl">Rules</span><span class="chips" id="reg-pick">
-  <button data-reg-pick="colreg">BVA/COLREG</button><button data-reg-pick="bpr">BPR</button><button data-reg-pick="rpr">RPR</button><button data-reg-pick="srt">SRT</button><button data-reg-pick="srw">SRW</button><button data-reg-pick="sre">SRE</button><button data-reg-pick="srkgt">SRKGT</button><button data-reg-pick="srgm">SRGM</button><button data-reg-pick="sjo">Sjøveisreglene</button></span></div><p style="margin:4px 0 8px"><a href="#regs-lib" id="reg-doc" data-go="regs-lib">📄 Official text of this regulation</a></p>
+  <button data-reg-pick="colreg">BVA/COLREG</button><button data-reg-pick="bpr">BPR</button><button data-reg-pick="rpr">RPR</button><button data-reg-pick="srt">SRT</button><button data-reg-pick="srw">SRW</button><button data-reg-pick="sre">SRE</button><button data-reg-pick="srkgt">SRKGT</button><button data-reg-pick="srgm">SRGM</button><button data-reg-pick="sjo">Sjøveisreglene</button></span></div><p style="margin:4px 0 8px"><a href="#regs-lib" id="reg-doc">📄 Official text of this regulation</a></p>
 <p id="reg-auto" class="srcs" style="margin:2px 0 8px">Tap a regulation, or pick it on the map further down (“Where am I?”). With GPS on it is chosen from your position.</p>
 
 
@@ -5206,7 +5206,7 @@ async function render(){
   if(it.file){const off=await cached(it.file);
    h+=`<div class="rg"><div><a href="${it.file}" data-pdf="${it.file}" data-t="${it.title}">${it.title}</a><small>Text: ${it.date||"?"} · ${fmt(it.bytes)} · ${off?"✓ saved offline":"online only"}${it.note?"<br>"+it.note:""}</small></div><span style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">${off?"":`<button class="btn" data-save="${it.file}" type="button">Save offline</button>`}<a href="${it.file}" target="_blank" rel="noopener" style="font-size:13px">open as PDF ↗</a></span></div>`}
   else h+=`<div class="rg"><div>${it.title}<small>Not yet in the app${it.optional?" (optional)":""} — official source: ${it.src.startsWith("http")&&!it.src.includes(" ")?`<a href="${it.src}" target="_blank" rel="noopener">link</a>`:it.src}</small></div></div>`}
- list.innerHTML=h||"<p>No texts yet.</p>"}
+ list.innerHTML=h||"<p>No texts yet.</p>";updDoc()}
 async function save(u){const c=await caches.open(RC);const r=await fetch(u,{cache:"no-store"});if(!r.ok)throw new Error(r.status);await c.put(new URL(u,base).href,r);try{await c.put(new URL("regs/index.json",base).href,await fetch("regs/index.json",{cache:"no-store"}))}catch(e){}}
 list.addEventListener("click",async e=>{const b=e.target.closest("[data-save]");if(b){b.disabled=true;b.textContent="Saving…";try{await save(b.dataset.save)}catch(x){b.textContent="Failed"}render();return}
  const a=e.target.closest("a[data-pdf]");if(a){e.preventDefault();openPdf(a.dataset.pdf,a.dataset.t)}});
@@ -5243,7 +5243,13 @@ async function find(){const q=document.getElementById("pdfv-q").value.trim().toL
  PG.querySelectorAll(".pp.hit").forEach(x=>x.classList.remove("hit"));
  if(!hits.length){out.textContent="0";return}hits.forEach(n=>{const d=PG.querySelector(`.pp[data-n="${n}"]`);if(d)d.classList.add("hit")});out.textContent=`p.${hits[hi]} (${hi+1}/${hits.length})`;goPage(hits[hi])}
 document.getElementById("pdfv-go").addEventListener("click",find);document.getElementById("pdfv-q").addEventListener("keydown",e=>{if(e.key==="Enter")find()});
-document.getElementById("reg-doc")?.addEventListener("click",e=>{const cur=document.querySelector("[data-reg-pick][aria-pressed=true]")?.dataset.regPick;const id=({colreg:"bva",srt:"bva",bpr:"bpr",rpr:"rpr",srw:"srw",sre:"sre",srkgt:"srkgt",sjo:"sjo"})[cur];const it=items.find(x=>x.id===id);if(it&&it.file){e.preventDefault();e.stopImmediatePropagation();openPdf(it.file,it.title)}},true);
+const DOCMAP={colreg:"bva",srt:"bva",bpr:"bpr",rpr:"rpr",srw:"srw",sre:"sre",srkgt:"srkgt",sjo:"sjo",srgm:null};
+const curReg=()=>document.querySelector('[data-reg-pick][aria-pressed="true"]')?.dataset.regPick;
+function updDoc(){const el=document.getElementById("reg-doc");if(!el)return;const it=items.find(x=>x.id===DOCMAP[curReg()]);
+ el.textContent=it&&it.file?"📄 Official text: "+it.title.split(" — ")[0]+" (PDF)":"📄 Official texts on board (this one is not in the app yet)"}
+document.getElementById("reg-doc")?.addEventListener("click",e=>{e.preventDefault();const it=items.find(x=>x.id===DOCMAP[curReg()]);if(it&&it.file)openPdf(it.file,it.title);else if(window.smGoTo)smGoTo("regs-lib")});
+document.getElementById("reg-pick")?.addEventListener("click",()=>setTimeout(updDoc,0));
+{const h=window.smRegMapHl;window.smRegMapHl=r=>{if(h)h(r);setTimeout(updDoc,0)}}
 window.smOpenReg=id=>{const it=items.find(x=>x.id===id);if(it&&it.file)openPdf(it.file,it.title);else if(window.smGoTo)smGoTo("regs-lib")};
 }
 </script>

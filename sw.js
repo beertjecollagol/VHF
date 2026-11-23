@@ -1,6 +1,6 @@
 // Network-first for pages (so updates arrive when online), cache fallback when offline.
 // Chart tiles live in their own cache (sm-tiles) that survives app updates.
-const CACHE='vhf-v45';
+const CACHE='vhf-v46';
 const TILES='sm-tiles';
 const REGS='sm-regs';
 const FILES=['./','./index.html','./sim.html','./manifest.webmanifest','./icon-180.png','./icon-192.png','./icon-512.png','./robots.txt','./lib/leaflet.js','./lib/leaflet.css','./lib/maplibre-gl.js','./lib/maplibre-gl.css','./data/timezones.json','./lib/pdfjs/pdf.min.mjs','./lib/pdfjs/pdf.worker.min.mjs'];
